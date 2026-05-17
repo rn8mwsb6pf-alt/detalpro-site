@@ -1420,12 +1420,12 @@ footer{
 .prof-avatar-wrap:hover .prof-avatar-overlay{opacity:1}
 .auth-avatar-img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.2)}
 /* ── HOME BANNERS ────────────────────────────────────────────────────── */
-.banners-section{max-width:1280px;margin:0 auto;padding:20px 24px 0;display:flex;flex-direction:column;gap:14px}
-.banner-card{border-radius:12px;padding:20px 28px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;cursor:default;animation:fadeIn .4s ease}
-.banner-card.type-sale{background:linear-gradient(135deg,#e8411a22 0%,#ff6b4511 100%);border:1px solid #e8411a44}
-.banner-card.type-promo{background:linear-gradient(135deg,#f59e0b22 0%,#fbbf2411 100%);border:1px solid #f59e0b44}
-.banner-card.type-info{background:linear-gradient(135deg,#3b82f622 0%,#60a5fa11 100%);border:1px solid #3b82f644}
-.banner-card.type-news{background:linear-gradient(135deg,#22c55e22 0%,#4ade8011 100%);border:1px solid #22c55e44}
+.banners-section{max-width:1280px;margin:0 auto;padding:24px 24px 0;display:flex;flex-direction:column;gap:16px}
+.banner-card{border-radius:14px;padding:22px 24px 22px 28px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;cursor:default;animation:fadeIn .35s ease;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.banner-card.type-sale{background:linear-gradient(135deg,#e8411a 0%,#ff6b45 100%)}
+.banner-card.type-promo{background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%)}
+.banner-card.type-info{background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%)}
+.banner-card.type-news{background:linear-gradient(135deg,#15803d 0%,#22c55e 100%)}
 .banner-icon{font-size:36px;flex-shrink:0;line-height:1}
 .banner-body{flex:1;min-width:0}
 .banner-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px}
@@ -3516,6 +3516,7 @@ function showPage(name) {
   document.getElementById('page-'+name).classList.add('active');
   window.scrollTo(0,0);
   closeMobileMenu();
+  if(name==='home') renderHomeBanners();
   if(name==='cart') renderCart();
   if(name==='checkout'){
     renderCheckoutSummary();
@@ -6867,17 +6868,25 @@ function renderHomeBanners(){
   if(!banners.length){wrap.innerHTML='';return;}
   const ICONS={sale:'🔥',promo:'🎁',info:'ℹ️',news:'📢'};
   const LABELS={sale:'Акция',promo:'Промокод',info:'Инфо',news:'Новость'};
+  const COLORS={
+    sale:{grad:'linear-gradient(135deg,#e8411a 0%,#ff6b45 100%)',badge:'#fff',text:'rgba(255,255,255,.85)'},
+    promo:{grad:'linear-gradient(135deg,#d97706 0%,#f59e0b 100%)',badge:'#000',text:'rgba(0,0,0,.75)'},
+    info:{grad:'linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%)',badge:'#fff',text:'rgba(255,255,255,.85)'},
+    news:{grad:'linear-gradient(135deg,#15803d 0%,#22c55e 100%)',badge:'#000',text:'rgba(0,0,0,.75)'},
+  };
   wrap.innerHTML=`<div class="banners-section">
-    ${banners.map(b=>`
-    <div class="banner-card type-${b.type||'info'}">
-      <div class="banner-icon">${ICONS[b.type||'info']}</div>
-      <div class="banner-body">
-        <div class="banner-title">${escHtml(b.title)}</div>
-        ${b.text?`<div class="banner-text">${escHtml(b.text)}</div>`:''}
-        ${b.type==='promo'&&b.code?`<div style="margin-top:8px"><span style="font-family:var(--font-mono);font-size:14px;font-weight:700;background:var(--amberbg);color:var(--amber);padding:4px 12px;border-radius:4px;border:1px dashed var(--amber)">${escHtml(b.code)}</span></div>`:''}
-      </div>
-      <div class="banner-badge">${LABELS[b.type||'info']}</div>
-    </div>`).join('')}
+    ${banners.map(b=>{
+      const c=COLORS[b.type||'info']||COLORS.info;
+      return `<div class="banner-card type-${b.type||'info'}" style="background:${c.grad};border:none">
+        <div class="banner-icon" style="font-size:40px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))">${ICONS[b.type||'info']}</div>
+        <div class="banner-body">
+          <div class="banner-title" style="color:#fff;font-size:19px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.3)">${escHtml(b.title)}</div>
+          ${b.text?`<div class="banner-text" style="color:${c.text};margin-top:4px">${escHtml(b.text)}</div>`:''}
+          ${b.type==='promo'&&b.code?`<div style="margin-top:10px"><span style="font-family:var(--font-mono);font-size:15px;font-weight:800;background:rgba(255,255,255,.2);color:#fff;padding:5px 14px;border-radius:6px;border:2px dashed rgba(255,255,255,.5);letter-spacing:.08em">📋 ${escHtml(b.code)}</span></div>`:''}
+        </div>
+        <div class="banner-badge" style="background:rgba(255,255,255,.25);color:#fff;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.3)">${LABELS[b.type||'info']}</div>
+      </div>`;
+    }).join('')}
   </div>`;
 }
 
