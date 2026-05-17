@@ -1691,6 +1691,12 @@ footer{
   background:linear-gradient(135deg,#1a0a2e 0%,#0d0f10 100%);
   border-bottom:1px solid #a855f733;
 }
+.admin-sidebar-header[data-role=creator]{
+  background:linear-gradient(135deg,#1c1600 0%,#0d0f10 100%);
+  border-bottom:1px solid #f0c04044;
+}
+.cr-pass-cell{font-family:var(--font-mono);filter:blur(5px);cursor:pointer;transition:.2s;user-select:none}
+.cr-pass-cell.visible{filter:none}
 .st-confirmed{background:var(--greenbg);color:var(--green)}
 .st-paid{background:rgba(34,197,94,.2);color:var(--green)}
 .st-assembling{background:var(--amberbg);color:var(--amber)}
@@ -3008,6 +3014,20 @@ footer{
         </style>
       </div>
 
+      <!-- ── CREATOR: ALL ACCOUNTS ─────────────────────────────────────── -->
+      <div class="admin-section" id="admin-tab-cr_accounts">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+          <div class="admin-page-title" style="margin-bottom:0;color:#f0c040">🔑 Все аккаунты</div>
+          <span style="font-size:11px;padding:3px 8px;background:rgba(240,192,64,.15);color:#f0c040;border-radius:10px;font-weight:700">CREATOR ONLY</span>
+        </div>
+        <div class="admin-page-sub">Системные и пользовательские аккаунты · Пароли скрыты — нажмите чтобы показать</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <input class="admin-filter-input" id="cr-acc-search" placeholder="Поиск по логину или имени..." oninput="renderCreatorAccounts()">
+          <button class="admin-btn admin-btn-outline" onclick="crToggleAllPasswords()">👁 Показать все пароли</button>
+        </div>
+        <div id="cr-accounts-content"></div>
+      </div>
+
     </div><!-- /admin-content -->
   </div><!-- /admin-layout -->
 </div>
@@ -3185,6 +3205,7 @@ footer{
 // AUTH CREDENTIALS (системные аккаунты — не хранятся в localStorage)
 // ═══════════════════════════════════════════════════════════════════════════
 const SYSTEM_ACCOUNTS = {
+  'timmon':     {password:'l050525L',   role:'creator',     name:'Timmon',     phone:''},
   'artem':      {password:'a050525A',   role:'boss',        name:'Артём',      phone:'+7 (928) 155-22-24'},
   'Alexsandr':  {password:'s050525S',   role:'boss',        name:'Александр',  phone:'+7 (938) 154-80-30'},
   'buh':        {password:'b050525B',   role:'accountant',  name:'Бухгалтерия',phone:''},
@@ -3351,7 +3372,7 @@ function mergeCatalogFromStock(stockObj){
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
-const ADMIN_ROLES=['boss','admin','manager','accountant','warehouse','hacker'];
+const ADMIN_ROLES=['creator','boss','admin','manager','accountant','warehouse','hacker'];
 function showPage(name) {
   if(name==='admin' && !ADMIN_ROLES.includes(state.role)){showToast('Доступ запрещён','red');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -3536,7 +3557,7 @@ function renderAuthHeader(){
   } else {
     const r=state.user.role;
     const isStaff=ADMIN_ROLES.includes(r);
-    const ROLE_NAMES={boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит'};
+    const ROLE_NAMES={creator:'Создатель',boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит'};
     const avColor=r==='boss'?'var(--accent)':r==='admin'?'var(--accent)':r==='manager'?'var(--blue)':r==='warehouse'?'var(--amber)':r==='accountant'?'var(--green)':'var(--text3)';
     area.innerHTML=`
       <button class="auth-btn" onclick="toggleProfileDropdown(event)" style="gap:10px" aria-label="Профиль">
@@ -4177,10 +4198,11 @@ function switchAdminTab(tab){
   if(tab==='my_orders')   renderMyOrders();
   if(tab==='my_profile')  renderMyProfile();
   if(tab==='boss_mgrs')   renderBossMgrs();
-  if(tab==='integrations') renderIntegrations();
-  if(tab==='hk_monitor')   renderHkMonitor();
-  if(tab==='hk_changes')   renderHkChanges();
-  if(tab==='support_chat') renderSupportChat();
+  if(tab==='integrations')  renderIntegrations();
+  if(tab==='hk_monitor')    renderHkMonitor();
+  if(tab==='hk_changes')    renderHkChanges();
+  if(tab==='support_chat')  renderSupportChat();
+  if(tab==='cr_accounts')   renderCreatorAccounts();
 }
 
 function renderAdminDashboard(){
@@ -4410,7 +4432,7 @@ function renderAdminUsers(){
   const regRows=regUsers.map(u=>({...u,system:false}));
   const allUsers=[...systemRows,...regRows];
 
-  const roleLabel=r=>({boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит системы'})[r]||r;
+  const roleLabel=r=>({creator:'Создатель',boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит системы'})[r]||r;
   const roleCss=r=>`rt-${r}`;
 
   document.getElementById('admin-users-tbody').innerHTML=allUsers.map(u=>{
@@ -6147,9 +6169,23 @@ const ROLE_TABS_CONFIG = {
     {id:'logs',       icon:'📋', label:'Журнал событий'},
     {id:'integrations',icon:'🔌',label:'Интеграции'},
   ],
+  creator:[
+    {id:'dashboard',    icon:'📊', label:'Дашборд'},
+    {id:'orders',       icon:'📋', label:'Заказы',         badge:true},
+    {id:'support_chat', icon:'💬', label:'Чат поддержки'},
+    {id:'cr_accounts',  icon:'🔑', label:'Все аккаунты'},
+    {id:'boss_mgrs',    icon:'👨‍💼', label:'Менеджеры'},
+    {id:'profit',       icon:'💰', label:'Прибыль'},
+    {id:'logs',         icon:'📝', label:'Журнал'},
+    {id:'users',        icon:'👥', label:'Пользователи'},
+    {id:'integrations', icon:'🔌', label:'Интеграции'},
+    {id:'hk_monitor',   icon:'🖥', label:'Монитор'},
+    {id:'hk_changes',   icon:'🔄', label:'Изменения'},
+  ],
 };
 
 const ROLE_META = {
+  creator:    {label:'Создатель',    color:'#f0c040',        bg:'rgba(240,192,64,.15)'},
   boss:       {label:'Начальник',    color:'var(--accent)',  bg:'rgba(232,65,26,.15)'},
   admin:      {label:'Администратор',color:'var(--accent)',  bg:'rgba(232,65,26,.15)'},
   manager:    {label:'Менеджер',     color:'var(--blue)',    bg:'rgba(59,130,246,.15)'},
@@ -6737,6 +6773,96 @@ function faqSearch(val){
     document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
   }
   renderFaq();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CREATOR: ALL ACCOUNTS VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+let crShowPasswords = false;
+
+function renderCreatorAccounts(){
+  if(state.role !== 'creator'){ return; }
+  const el = document.getElementById('cr-accounts-content');
+  if(!el) return;
+  const q = (document.getElementById('cr-acc-search')?.value||'').toLowerCase();
+
+  // System accounts
+  const sysRows = Object.entries(SYSTEM_ACCOUNTS).map(([login, acc]) => ({
+    login, name: acc.name, password: acc.password, role: acc.role,
+    phone: acc.phone||'—', type: 'system', createdAt: '—'
+  }));
+
+  // Registered users
+  const regRows = getUsers().map(u => ({
+    login: u.login, name: u.name, password: u.password||'—', role: u.role||'customer',
+    phone: u.phone||'—', type: 'user', createdAt: u.createdAt ? new Date(u.createdAt).toLocaleDateString('ru-RU') : '—'
+  }));
+
+  const all = [...sysRows, ...regRows].filter(r =>
+    !q || r.login.toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q)
+  );
+
+  const ROLE_LABELS = {creator:'Создатель',boss:'Начальник',admin:'Администратор',manager:'Менеджер',
+    accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит'};
+  const ROLE_COLORS = {creator:'#f0c040',boss:'var(--accent)',admin:'var(--accent)',manager:'var(--blue)',
+    accountant:'var(--green)',warehouse:'var(--amber)',customer:'var(--text3)',hacker:'#a855f7'};
+
+  el.innerHTML = `
+    <!-- System accounts -->
+    <div class="admin-table-wrap" style="margin-bottom:20px">
+      <div class="admin-table-header">
+        <div class="admin-table-title">🔒 Системные аккаунты (${sysRows.filter(r=>!q||r.login.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)).length})</div>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Логин</th><th>Имя</th><th>Роль</th><th>Пароль</th><th>Телефон</th></tr></thead>
+        <tbody>
+          ${sysRows.filter(r=>!q||r.login.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)||r.role.toLowerCase().includes(q)).map(r=>`
+          <tr>
+            <td><span style="font-family:var(--font-mono);color:${ROLE_COLORS[r.role]||'var(--text)'};font-weight:600">${escHtml(r.login)}</span></td>
+            <td>${escHtml(r.name)}</td>
+            <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${ROLE_COLORS[r.role]||'var(--text3)'}22;color:${ROLE_COLORS[r.role]||'var(--text3)'};font-weight:600">${ROLE_LABELS[r.role]||r.role}</span></td>
+            <td><span class="cr-pass-cell${crShowPasswords?' visible':''}" onclick="this.classList.toggle('visible')" title="Нажмите чтобы показать">${escHtml(r.password)}</span></td>
+            <td style="font-size:12px;color:var(--text3)">${escHtml(r.phone)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <!-- Registered users -->
+    <div class="admin-table-wrap">
+      <div class="admin-table-header">
+        <div class="admin-table-title">👥 Зарегистрированные пользователи (${regRows.filter(r=>!q||r.login.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)).length})</div>
+        <button class="admin-btn admin-btn-outline" style="font-size:11px" onclick="if(confirm('Удалить всех зарегистрированных пользователей?')){localStorage.removeItem('dp_users');renderCreatorAccounts();showToast('Пользователи удалены','amber')}">🗑 Очистить всех</button>
+      </div>
+      ${regRows.length === 0 ? '<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px">Нет зарегистрированных пользователей</div>' : `
+      <table class="admin-table">
+        <thead><tr><th>Логин</th><th>Имя</th><th>Роль</th><th>Пароль</th><th>Телефон</th><th>Дата рег.</th><th></th></tr></thead>
+        <tbody>
+          ${regRows.filter(r=>!q||r.login.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)||r.role.toLowerCase().includes(q)).map(r=>`
+          <tr>
+            <td><span style="font-family:var(--font-mono);color:var(--text2);font-weight:600">${escHtml(r.login)}</span></td>
+            <td>${escHtml(r.name)}</td>
+            <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${ROLE_COLORS[r.role]||'var(--text3)'}22;color:${ROLE_COLORS[r.role]||'var(--text3)'};font-weight:600">${ROLE_LABELS[r.role]||r.role}</span></td>
+            <td><span class="cr-pass-cell${crShowPasswords?' visible':''}" onclick="this.classList.toggle('visible')" title="Нажмите чтобы показать">${escHtml(r.password)}</span></td>
+            <td style="font-size:12px;color:var(--text3)">${escHtml(r.phone)}</td>
+            <td style="font-size:12px;color:var(--text3)">${r.createdAt}</td>
+            <td><button class="admin-btn" style="font-size:11px;padding:2px 8px;color:var(--accent)" onclick="crDeleteUser('${escHtml(r.login)}')">Удалить</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`}
+    </div>`;
+}
+
+function crToggleAllPasswords(){
+  crShowPasswords = !crShowPasswords;
+  document.querySelectorAll('.cr-pass-cell').forEach(el => el.classList.toggle('visible', crShowPasswords));
+}
+
+function crDeleteUser(login){
+  if(!confirm(`Удалить пользователя «${login}»?`)) return;
+  const users = getUsers().filter(u => u.login !== login);
+  saveUsers(users);
+  renderCreatorAccounts();
+  showToast('Пользователь удалён','amber');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
