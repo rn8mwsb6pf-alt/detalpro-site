@@ -3242,24 +3242,53 @@ const PVZ_LIST = [
 ];
 
 // Мок-результаты поиска по разным артикулам
-const MOCK_RESULTS = {
-  default: [
-    {id:1,article:'04465-12080',brand:'TOYOTA',name:'Фильтр масляный Toyota 04465-12080',source:'1c',price_retail:890,price_wholesale:620,stock:8,delivery_days:0,supplier_internal:null},
-    {id:2,article:'04465-12080',brand:'CHAMPION',name:'Масляный фильтр Champion',source:'1c',price_retail:650,price_wholesale:430,stock:14,delivery_days:0,supplier_internal:null},
-    {id:3,article:'04465-12080',brand:'FILTRON',name:'Filtron OP 526',source:'qwep',price_retail:720,price_wholesale:490,price_input:490,stock:22,delivery_days:2,supplier_internal:'АвтоСклад-МСК'},
-    {id:4,article:'04465-12080',brand:'MANN',name:'Mann-Filter HU 714/4 x',source:'qwep',price_retail:980,price_wholesale:710,price_input:710,stock:5,delivery_days:3,supplier_internal:'Партнёр-Авто'},
-    {id:5,article:'04465-12080',brand:'BOSCH',name:'Bosch F 026 407 078',source:'qwep',price_retail:1150,price_wholesale:820,price_input:820,stock:3,delivery_days:1,supplier_internal:'БошДистрибутор'},
-  ],
-  'HH050-16840': [
-    {id:10,article:'HH050-16840',brand:'NISSAN',name:'Прокладка клапанной крышки Nissan',source:'1c',price_retail:1250,price_wholesale:890,stock:3,delivery_days:0,supplier_internal:null},
-    {id:11,article:'HH050-16840',brand:'ELRING',name:'Elring 194.541 Прокладка',source:'qwep',price_retail:1480,price_wholesale:1050,price_input:1050,stock:6,delivery_days:2,supplier_internal:'ЕлрингПлюс'},
-  ],
-  '96535081': [
-    {id:20,article:'96535081',brand:'GM',name:'Катушка зажигания Chevrolet/Daewoo',source:'1c',price_retail:2100,price_wholesale:1450,stock:0,delivery_days:0,supplier_internal:null},
-    {id:21,article:'96535081',brand:'BERU',name:'BERU ZSE029 Катушка зажигания',source:'qwep',price_retail:2450,price_wholesale:1720,price_input:1720,stock:4,delivery_days:3,supplier_internal:'БеруРоссия'},
-    {id:22,article:'96535081',brand:'BOSCH',name:'Bosch 0 221 604 100',source:'qwep',price_retail:2890,price_wholesale:2100,price_input:2100,stock:2,delivery_days:2,supplier_internal:'БошДистрибутор'},
-  ],
-};
+// ── Каталог товаров (1С / QWEP — только реальные данные) ──────────────────
+// dp_catalog: [{id,article,brand,name,price_retail,price_wholesale,stock,source,delivery_days,...}]
+function getCatalog(){ try{return JSON.parse(localStorage.getItem('dp_catalog')||'[]');}catch{return[];} }
+function saveCatalog(arr){ localStorage.setItem('dp_catalog',JSON.stringify(arr)); }
+function getCatalogCount(){ return getCatalog().length; }
+
+function searchCatalog(query){
+  const q=query.trim().toUpperCase();
+  if(!q) return [];
+  return getCatalog().filter(item=>{
+    const art=(item.article||'').toUpperCase().replace(/[-\s]/g,'');
+    const name=(item.name||'').toUpperCase();
+    const brand=(item.brand||'').toUpperCase();
+    const qClean=q.replace(/[-\s]/g,'');
+    return art.includes(qClean)||name.includes(q)||brand.includes(q)||art===qClean;
+  }).map((item,i)=>({...item, id: item.id||(i+1)}));
+}
+
+// Merge/upsert items into catalog (by article+brand key)
+function mergeCatalog(newItems, source){
+  const existing = getCatalog();
+  const map = {};
+  existing.forEach(it => { map[(it.article+'|'+it.brand).toUpperCase()] = it; });
+  let added=0, updated=0;
+  newItems.forEach(it => {
+    const key = ((it.article||'')+'|'+(it.brand||'')).toUpperCase();
+    if(map[key]){ Object.assign(map[key], it, {source, updatedAt: new Date().toISOString()}); updated++; }
+    else{ map[key] = {...it, source, id: Date.now()+Math.random(), importedAt: new Date().toISOString()}; added++; }
+  });
+  saveCatalog(Object.values(map));
+  return {added, updated};
+}
+
+// Also update catalog when 1C server stock is imported
+function mergeCatalogFromStock(stockObj){
+  const items = Object.values(stockObj).map(it=>({
+    article: it.article||it.Артикул||'',
+    brand:   it.brand||it.Производитель||'',
+    name:    it.name||it.Наименование||it.article||'',
+    price_retail:    parseFloat(it.price_retail||it.Цена||0),
+    price_wholesale: parseFloat(it.price_wholesale||it.ЦенаОпт||0),
+    stock:           parseInt(it.quantity||it.Количество||0),
+    delivery_days:   0,
+    source: '1c',
+  })).filter(it=>it.article);
+  return mergeCatalog(items,'1c');
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -3469,32 +3498,116 @@ function renderAuthHeader(){
 // ═══════════════════════════════════════════════════════════════════════════
 // SEARCH
 // ═══════════════════════════════════════════════════════════════════════════
-function triggerSearch(q){
+async function triggerSearch(q){
   if(!q.trim()) return;
   state.currentQuery=q.trim().toUpperCase();
   showPage('search');
   document.getElementById('header-search-input').value=q;
   document.getElementById('search-article-display').textContent=state.currentQuery;
-  document.getElementById('search-results-area').innerHTML=`
+
+  const area=document.getElementById('search-results-area');
+  const qwepCfg=getQwepConfig();
+  const hasQwep=qwepCfg.enabled&&(qwepCfg.apiKey||qwepCfg.login);
+  const hasCatalog=getCatalogCount()>0;
+
+  // Show "not configured" immediately if nothing is set up
+  if(!hasCatalog && !hasQwep){
+    area.innerHTML=`
+      <div style="text-align:center;padding:60px 24px">
+        <div style="font-size:48px;margin-bottom:16px">📦</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Каталог пуст</div>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7;max-width:480px;margin:0 auto 24px">
+          Данные о наличии товаров загружаются только из <strong>1С</strong> или <strong>QWEP</strong>.<br>
+          Загрузите файл из 1С или настройте QWEP API в панели управления.
+        </p>
+        ${state.role&&['boss','admin','manager'].includes(state.role)?`
+          <button class="admin-btn admin-btn-primary" onclick="showPage('admin');switchAdminTab('integrations')">⚙️ Открыть Интеграции</button>
+        `:'<p style="font-size:13px;color:var(--text3)">Обратитесь к менеджеру.</p>'}
+      </div>`;
+    document.getElementById('search-results-count').textContent='Нет данных';
+    return;
+  }
+
+  area.innerHTML=`
     <div style="text-align:center;padding:60px 0">
       <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
-      <div style="font-size:13px;color:var(--text3);margin-top:12px">Поиск в базе данных и у поставщиков QWEP...</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:12px">
+        ${hasCatalog?'Поиск в базе 1С...':''}${hasCatalog&&hasQwep?' · ':''}${hasQwep?'Запрос к QWEP...':''}
+      </div>
     </div>`;
 
-  // Симулируем задержку API
-  setTimeout(()=>{
-    const key = Object.keys(MOCK_RESULTS).find(k=>state.currentQuery.includes(k.replace('-','')))
-              || (MOCK_RESULTS[state.currentQuery]?state.currentQuery:'default');
-    state.currentResults = (MOCK_RESULTS[key]||MOCK_RESULTS.default).map(r=>({...r}));
-    document.getElementById('search-results-count').textContent=
-      `Найдено ${state.currentResults.length} предложений`;
-    renderResults();
-    renderBrandFilters();
-    if(state.user && (state.role==='manager'||state.role==='admin')){
-      logActivity({user:state.user.login,role:state.role,action:'search',
-        details:`«${state.currentQuery}» — ${state.currentResults.length} результатов`});
-    }
-  },900);
+  // 1. Local catalog (1C)
+  const localResults = searchCatalog(state.currentQuery);
+
+  // 2. QWEP API
+  let qwepResults = [];
+  if(hasQwep){
+    try{ qwepResults = await fetchQwepSearch(state.currentQuery, qwepCfg); }catch(e){}
+  }
+
+  // 3. Merge (local first, QWEP appended)
+  state.currentResults = [...localResults, ...qwepResults];
+
+  document.getElementById('search-results-count').textContent=
+    state.currentResults.length
+      ? `Найдено ${state.currentResults.length} предложений`
+      : 'Ничего не найдено';
+
+  if(!state.currentResults.length){
+    area.innerHTML=`
+      <div style="text-align:center;padding:60px 24px">
+        <div style="font-size:40px;margin-bottom:12px">🔍</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px">«${escHtml(state.currentQuery)}» не найдено</div>
+        <p style="font-size:13px;color:var(--text2)">Товар отсутствует в базе 1С${hasQwep?' и в QWEP':''}.<br>Проверьте артикул или обновите каталог.</p>
+      </div>`;
+    return;
+  }
+
+  renderResults();
+  renderBrandFilters();
+  if(state.user && ['manager','admin','boss'].includes(state.role)){
+    logActivity({user:state.user.login,role:state.role,action:'search',
+      details:`«${state.currentQuery}» — ${state.currentResults.length} рез. (1С:${localResults.length} QWEP:${qwepResults.length})`});
+  }
+}
+
+// QWEP API search (browser direct call — работает если QWEP CORS разрешён)
+async function fetchQwepSearch(query, cfg){
+  const markup = (parseFloat(cfg.markup)||25)/100;
+  // QWEP REST API: POST /api/v2/search с Bearer токеном
+  const apiUrl = (cfg.serverUrl||'https://api.qwep.ru').replace(/\/+$/,'');
+  const resp = await fetch(`${apiUrl}/api/v2/search`, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+(cfg.apiKey||''),
+      'X-Login': cfg.login||'',
+      'X-Password': cfg.password||'',
+    },
+    body: JSON.stringify({query, limit:50}),
+    signal: AbortSignal.timeout(8000),
+  });
+  if(!resp.ok) throw new Error('QWEP HTTP '+resp.status);
+  const data = await resp.json();
+  // QWEP returns array of offers
+  const offers = data.offers||data.results||data.data||data||[];
+  return offers.map((o,i)=>{
+    const input = parseFloat(o.price||o.cost||0);
+    const retail = Math.round(input*(1+markup));
+    return {
+      id: 'q_'+Date.now()+'_'+i,
+      article:  o.article||o.partNumber||o.vendorCode||query,
+      brand:    o.brand||o.manufacturer||o.brandName||'—',
+      name:     o.name||o.description||o.article||query,
+      source:   'qwep',
+      price_retail:    retail||0,
+      price_wholesale: input||0,
+      price_input:     input||0,
+      stock:           parseInt(o.quantity||o.stock||o.qty||0),
+      delivery_days:   parseInt(o.deliveryDays||o.delivery||o.days||3),
+      supplier_internal: o.warehouse||o.supplier||o.warehouseName||'QWEP',
+    };
+  });
 }
 
 function renderResults(){
@@ -5171,13 +5284,197 @@ function clearSyncLog(){
 }
 
 // ── Render integrations page ──────────────────────────────────────────────
+// ── 1C File import ────────────────────────────────────────────────────────
+function handle1cFileDrop(event){
+  const file = event.dataTransfer?.files?.[0];
+  if(file) processOnecFile(file);
+}
+function handle1cFile(input){
+  const file = input?.files?.[0];
+  if(file) processOnecFile(file);
+  input.value='';
+}
+
+function processOnecFile(file){
+  if(file.size > 52_428_800){ showToast('Файл слишком большой (макс. 50 МБ)','red'); return; }
+  showToast('Читаем файл...','amber');
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const text = e.target.result;
+      const ext  = file.name.split('.').pop().toLowerCase();
+      let items  = [];
+      if(ext==='json'||text.trimStart().startsWith('[')||text.trimStart().startsWith('{')){
+        items = parseOnecJson(text);
+      } else if(ext==='xml'||text.trimStart().startsWith('<')){
+        items = parseOnecXml(text);
+      } else {
+        items = parseOnecCsv(text);
+      }
+      if(!items.length){ showToast('Не удалось распознать данные — проверьте формат','red'); return; }
+      const {added,updated} = mergeCatalog(items,'1c');
+      localStorage.setItem('dp_catalog_meta', JSON.stringify({updatedAt:new Date().toISOString(),file:file.name}));
+      showToast(`Импортировано: ${added} новых · ${updated} обновлено`,'green');
+      renderIntegrations();
+    }catch(err){
+      showToast('Ошибка разбора файла: '+err.message,'red');
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+function parseOnecCsv(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2) return [];
+  // Auto-detect separator
+  const sep = (lines[0].match(/;/g)||[]).length > (lines[0].match(/,/g)||[]).length ? ';' : ',';
+  // Header row — try to map columns
+  const headers = lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+
+  const colMap = {
+    article:   headers.findIndex(h=>/артикул|article|art|partno|partnumber|vendorcode/i.test(h)),
+    brand:     headers.findIndex(h=>/производитель|бренд|brand|manufacturer|maker/i.test(h)),
+    name:      headers.findIndex(h=>/наименование|название|name|description|товар/i.test(h)),
+    price_retail: headers.findIndex(h=>/цена.*розн|розничн|price.*retail|retail/i.test(h)||/^цена$/i.test(h)),
+    price_wholesale: headers.findIndex(h=>/цена.*опт|оптов|price.*whole|wholesale/i.test(h)),
+    stock:     headers.findIndex(h=>/количество|кол|остат|stock|qty|quantity/i.test(h)),
+    delivery:  headers.findIndex(h=>/срок|delivery|дней/i.test(h)),
+  };
+  // Fallback: positional
+  if(colMap.article<0) colMap.article=0;
+  if(colMap.brand<0)   colMap.brand=1;
+  if(colMap.name<0)    colMap.name=2;
+  if(colMap.price_retail<0) colMap.price_retail=3;
+  if(colMap.price_wholesale<0) colMap.price_wholesale=4;
+  if(colMap.stock<0)   colMap.stock=5;
+
+  const items=[];
+  for(let i=1;i<lines.length;i++){
+    const cols = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    const article = cols[colMap.article]||'';
+    if(!article) continue;
+    items.push({
+      article,
+      brand:           cols[colMap.brand]||'',
+      name:            cols[colMap.name]||article,
+      price_retail:    parseFloat((cols[colMap.price_retail]||'0').replace(/[^\d.]/g,''))||0,
+      price_wholesale: parseFloat((cols[colMap.price_wholesale]||'0').replace(/[^\d.]/g,''))||0,
+      stock:           parseInt((cols[colMap.stock]||'0').replace(/[^\d]/g,''))||0,
+      delivery_days:   parseInt((cols[colMap.delivery>=0?colMap.delivery:99]||'0'))||0,
+      source:          '1c',
+    });
+  }
+  return items;
+}
+
+function parseOnecJson(text){
+  const data = JSON.parse(text);
+  const arr  = Array.isArray(data) ? data : (data.items||data.products||data.catalog||data.Товары||[data]);
+  return arr.map(o=>({
+    article:         o.article||o.Артикул||o.partNumber||o.VendorCode||'',
+    brand:           o.brand||o.Производитель||o.Brand||o.manufacturer||'',
+    name:            o.name||o.Наименование||o.Name||o.description||o.article||'',
+    price_retail:    parseFloat(o.price_retail||o.ЦенаРозн||o.price||o.Цена||0),
+    price_wholesale: parseFloat(o.price_wholesale||o.ЦенаОпт||o.wholesale||0),
+    stock:           parseInt(o.stock||o.Количество||o.quantity||o.qty||0),
+    delivery_days:   parseInt(o.delivery_days||o.Срок||0),
+    source:          '1c',
+  })).filter(o=>o.article);
+}
+
+function parseOnecXml(text){
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(text,'text/xml');
+  const items  = [];
+
+  // CommerceML 2.x: //Товар
+  doc.querySelectorAll('Товар').forEach(t=>{
+    const article = t.querySelector('Артикул')?.textContent||
+                    t.querySelector('ВендорКод')?.textContent||'';
+    if(!article) return;
+    items.push({
+      article,
+      brand:           t.querySelector('Производитель')?.textContent||'',
+      name:            t.querySelector('Наименование')?.textContent||article,
+      price_retail:    0, price_wholesale:0, stock:0, delivery_days:0, source:'1c'
+    });
+  });
+
+  // CommerceML prices: //Предложение
+  doc.querySelectorAll('Предложение').forEach(p=>{
+    const article = p.querySelector('Артикул')?.textContent||'';
+    const qty     = parseInt(p.querySelector('Количество')?.textContent||0);
+    const price   = parseFloat(p.querySelector('Цена Представление')?.textContent||
+                               p.querySelector('ЦенаЗаЕдиницу')?.textContent||0);
+    const it = items.find(i=>i.article===article);
+    if(it){ it.stock=qty; if(price) it.price_retail=price; }
+    else items.push({article, brand:'', name:article, price_retail:price, price_wholesale:0, stock:qty, delivery_days:0, source:'1c'});
+  });
+
+  // Generic: any element with article/price/quantity attributes
+  if(!items.length){
+    doc.querySelectorAll('[article],[Артикул],[partNumber]').forEach(el=>{
+      const article = el.getAttribute('article')||el.getAttribute('Артикул')||el.getAttribute('partNumber')||'';
+      if(!article) return;
+      items.push({
+        article,
+        brand:        el.getAttribute('brand')||el.getAttribute('Производитель')||'',
+        name:         el.getAttribute('name')||el.getAttribute('Наименование')||article,
+        price_retail: parseFloat(el.getAttribute('price')||0),
+        price_wholesale:0, stock:parseInt(el.getAttribute('stock')||0), delivery_days:0, source:'1c',
+      });
+    });
+  }
+  return items.filter(i=>i.article);
+}
+
 function renderIntegrations(){
   const q=getQwepConfig();
   const cfgs=get1cConfigs();
   const el=document.getElementById('integrations-content');
   if(!el) return;
 
+  const catCount = getCatalogCount();
   el.innerHTML=`
+    <!-- ══ 1С FILE IMPORT ══════════════════════════════════════════════════ -->
+    <div class="integ-card" style="border-left:4px solid var(--green)">
+      <div class="integ-card-header">
+        <div class="integ-logo" style="background:rgba(34,197,94,.15);color:var(--green);font-family:var(--font-head);font-weight:900;font-size:14px">1С</div>
+        <div>
+          <div class="integ-title">Импорт каталога из файла (1С)</div>
+          <div class="integ-status ${catCount>0?'sync-log-ok':''}">${catCount>0?`● Загружено позиций: ${catCount.toLocaleString('ru-RU')}`:'○ Каталог пуст — загрузите файл'}</div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0 0 16px">
+        Выгрузите из 1С файл остатков в формате <strong>CSV</strong>, <strong>JSON</strong> или <strong>XML</strong>
+        и загрузите его сюда. Данные мгновенно появятся в каталоге. Повторный импорт обновляет существующие позиции.
+      </p>
+      <div style="background:var(--bg3);border:2px dashed var(--line2);border-radius:var(--r2);padding:28px;text-align:center;margin-bottom:16px;cursor:pointer;transition:.15s"
+        onclick="document.getElementById('onec-file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--green)'"
+        ondragleave="this.style.borderColor='var(--line2)'"
+        ondrop="event.preventDefault();this.style.borderColor='var(--line2)';handle1cFileDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">Перетащите файл или нажмите для выбора</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">CSV · JSON · XML · до 50 МБ</div>
+        <input type="file" id="onec-file-input" accept=".csv,.json,.xml,.txt" style="display:none" onchange="handle1cFile(this)">
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="admin-btn admin-btn-green" onclick="document.getElementById('onec-file-input').click()">📂 Выбрать файл</button>
+        ${catCount>0?`<button class="admin-btn admin-btn-outline" style="color:var(--accent);border-color:var(--accent)" onclick="if(confirm('Очистить весь каталог? Данные удалятся из поиска.')){saveCatalog([]);showToast('Каталог очищен','amber');renderIntegrations()}">🗑 Очистить каталог</button>`:''}
+        <span style="font-size:12px;color:var(--text3)">${catCount>0?`Последнее обновление: ${fmtDate(JSON.parse(localStorage.getItem('dp_catalog_meta')||'{}').updatedAt,true)||'—'}`:'Данных нет'}</span>
+      </div>
+
+      <!-- CSV column mapping hint -->
+      <div style="margin-top:16px;background:var(--bg3);border-radius:var(--r);padding:14px;font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">Формат CSV (разделитель ; или ,):</strong><br>
+        <code style="color:var(--green)">Артикул;Производитель;Наименование;ЦенаРозн;ЦенаОпт;Количество</code><br>
+        <strong style="color:var(--text)">Формат JSON:</strong>
+        <code style="color:var(--green)">[{"article":"...", "brand":"...", "name":"...", "price_retail":..., "stock":...}]</code><br>
+        <strong style="color:var(--text)">Формат XML (1С CommerceML):</strong> автоматически распознаётся.
+      </div>
+    </div>
+
     <!-- QWEP block -->
     <div class="integ-card">
       <div class="integ-card-header">
@@ -5502,7 +5799,10 @@ async function import1cStock(id){
         stock[key]={...item,receivedAt:new Date().toISOString(),source:'1c:'+c.name};
       });
       localStorage.setItem('dp_stock',JSON.stringify(stock));
-      addSyncLog(c.name,'ok',`Загружено ${data.length} позиций`);
+      // Также обновляем каталог товаров
+      const {added,updated}=mergeCatalogFromStock(stock);
+      localStorage.setItem('dp_catalog_meta',JSON.stringify({updatedAt:new Date().toISOString(),file:'1C: '+c.name}));
+      addSyncLog(c.name,'ok',`Загружено ${data.length} позиций · каталог +${added} новых, обновл. ${updated}`);
       showToast(`«${c.name}»: загружено ${data.length} позиций`,'green');
     }else{
       addSyncLog(c.name,'err',`HTTP ${resp.status} при загрузке остатков`);
