@@ -36,118 +36,201 @@
 }
 /* ── LIGHT THEME ──────────────────────────────────────────────────────── */
 :root.light{
-  --bg:#f5f6f7;
+  --bg:#f2f4f6;
   --bg2:#ffffff;
-  --bg3:#eef0f2;
-  --bg4:#e4e7ea;
-  --line:#d4d8dc;
-  --line2:#c0c6cc;
-  --text:#1a1d20;
-  --text2:#4a5560;
-  --text3:#8a9299;
+  --bg3:#e8ecef;
+  --bg4:#dde1e6;
+  --line:#ccd0d5;
+  --line2:#b8bec6;
+  --text:#111417;
+  --text2:#3d4852;
+  --text3:#7a8590;
   --accentbg:rgba(232,65,26,.08);
   --greenbg:rgba(34,197,94,.08);
   --amberbg:rgba(245,158,11,.08);
   --bluebg:rgba(59,130,246,.08);
 }
-:root.light header{background:rgba(245,246,247,.95)}
-:root.light .admin-sidebar{background:#fff;border-right:1px solid var(--line)}
-:root.light .modal-box{background:#fff}
-:root.light .profile-dropdown{background:#fff}
-:root.light .profile-dd-head{background:var(--bg3)}
-:root.light .chat-window{background:#fff}
-:root.light input,:root.light select,:root.light textarea{background:var(--bg3);color:var(--text)}
 
-/* ── LIGHT THEME: fix hardcoded white text in UI components ─────────── */
-:root.light .auth-name,
-:root.light .summary-val,
-:root.light .order-card-total,
-:root.light .order-card-id,
-:root.light .admin-page-title,
-:root.light .admin-table-title,
-:root.light .admin-section,
-:root.light .admin-card,
-:root.light .admin-stat-val,
-:root.light .asc-title,
-:root.light .asc-value,
-:root.light .kpi-val,
-:root.light .role-panel-title,
-:root.light .role-panel-sub,
-:root.light .integ-title,
-:root.light .mgr-card-name,
-:root.light .mgr-stat-val,
-:root.light .hk-user,
-:root.light .ptc-value,
-:root.light .pvz-name,
-:root.light .store-name,
-:root.light .cart-item-name,
-:root.light .vin-cat-label,
-:root.light .vin-part-name,
-:root.light .vin-products-title,
-:root.light .vin-info-title,
-:root.light .admin-table td,
-:root.light .admin-table th,
-:root.light .faq-q,
-:root.light .section-title,
-:root.light .filter-title,
-:root.light .form-section-title,
-:root.light .delivery-tab-name,
-:root.light .order-card-item span,
-:root.light .profile-form .profile-label,
-:root.light .checkout-steps .step span,
-:root.light .admin-nav-item,
-:root.light .admin-sidebar-role,
-:root.light .be-item-body
-{ color:var(--text) }
+/* ── Structural elements ── */
+:root.light header{ background:rgba(242,244,246,.97);border-bottom:1px solid var(--line) }
+:root.light body{ color:var(--text) }
 
-/* Success page */
-:root.light .success-title{ color:var(--text) }
-
-/* Cart */
-:root.light .cart-empty-title{ color:var(--text) }
-
-/* Result cards */
-:root.light .result-name,
-:root.light .result-article,
-:root.light .search-title
-{ color:var(--text) }
-
-/* Modal */
-:root.light .modal-title{ color:var(--text) }
-:root.light .modal-box strong{ color:var(--text) }
-
-/* Admin sidebar active item */
+/* ── Admin panel ── */
+:root.light .admin-layout{ background:var(--bg) }
+:root.light .admin-sidebar{ background:var(--bg2);border-right:1px solid var(--line) }
+:root.light .admin-sidebar-header{ background:var(--bg3) }
+:root.light .admin-content{ background:var(--bg) }
+:root.light .admin-section{ background:var(--bg) }
+:root.light .admin-nav-item{ color:var(--text2) }
 :root.light .admin-nav-item.active{ background:var(--accentbg);color:var(--accent) }
 :root.light .admin-nav-item:hover{ background:var(--bg3);color:var(--text) }
 
-/* Tables */
+/* ── Tables ── */
 :root.light .admin-table{ color:var(--text) }
 :root.light .admin-table-wrap{ background:var(--bg2);border:1px solid var(--line) }
-:root.light .admin-table thead th{ background:var(--bg3);color:var(--text2) }
+:root.light .admin-table thead th{ background:var(--bg3);color:var(--text2);border-bottom:1px solid var(--line) }
+:root.light .admin-table tbody tr{ border-bottom:1px solid var(--line) }
 :root.light .admin-table tbody tr:hover{ background:var(--bg3) }
+:root.light .result-table{ background:var(--bg2);color:var(--text) }
+:root.light .result-table th{ background:var(--bg3);color:var(--text2) }
+:root.light .result-table tr:hover{ background:var(--bg3) }
+:root.light .result-table td{ border-color:var(--line) }
 
-/* Cards */
+/* ── Cards & containers ── */
 :root.light .order-card{ background:var(--bg2);border:1px solid var(--line) }
 :root.light .admin-card{ background:var(--bg2);border:1px solid var(--line) }
-:root.light .delivery-tab{ background:var(--bg3) }
-:root.light .delivery-tab.active{ background:var(--accentbg) }
+:root.light .admin-stats-row .asc-card{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .kpi-card{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .mgr-card{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .integ-card{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .form-section{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .cart-summary{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .be-item{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .be-form{ background:var(--bg2);border:1px solid var(--line) }
+
+/* ── Delivery tabs ── */
+:root.light .delivery-tab{ background:var(--bg3);border-color:var(--line) }
+:root.light .delivery-tab.active{ background:var(--accentbg);border-color:var(--accent) }
+:root.light .delivery-tab-name{ color:var(--text) }
+:root.light .delivery-tab-hint{ color:var(--text3) }
 :root.light .pvz-item{ background:var(--bg3) }
 :root.light .store-item{ background:var(--bg3) }
 
-/* Inline white text in JS-rendered content: override via parent */
-:root.light .admin-content *[style*="color:#fff"],
-:root.light .admin-content *[style*="color: #fff"],
-:root.light .admin-content *[style*="color:white"]
+/* ── Cart ── */
+:root.light .cart-item{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .qty-btn{ background:var(--bg3);color:var(--text2) }
+:root.light .qty-btn:hover{ background:var(--bg4);color:var(--text) }
+
+/* ── Modals ── */
+:root.light .modal-box{ background:var(--bg2) }
+:root.light .modal-title{ color:var(--text) }
+:root.light .modal-box strong{ color:var(--text) }
+:root.light .modal-label{ color:var(--text2) }
+:root.light .modal-input{ background:var(--bg3);color:var(--text);border-color:var(--line2) }
+
+/* ── Profile dropdown ── */
+:root.light .profile-dropdown{ background:var(--bg2);border:1px solid var(--line);box-shadow:0 8px 32px rgba(0,0,0,.12) }
+:root.light .profile-dd-head{ background:var(--bg3) }
+:root.light .profile-dd-item{ color:var(--text2) }
+:root.light .profile-dd-item:hover{ background:var(--bg3);color:var(--text) }
+:root.light .profile-dd-sep{ background:var(--line) }
+
+/* ── Inputs & forms ── */
+:root.light input,:root.light select,:root.light textarea{
+  background:var(--bg3);color:var(--text);border-color:var(--line2);
+}
+:root.light input::placeholder,:root.light textarea::placeholder{ color:var(--text3) }
+:root.light .form-input{ background:var(--bg3);color:var(--text);border-color:var(--line2) }
+:root.light .profile-input{ background:var(--bg3);color:var(--text);border-color:var(--line2) }
+:root.light .admin-filter-input{ background:var(--bg3);color:var(--text);border-color:var(--line2) }
+:root.light .admin-filter-select{ background:var(--bg3);color:var(--text);border-color:var(--line2) }
+
+/* ── Chat ── */
+:root.light .chat-window{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .chat-input-wrap{ background:var(--bg3);border-top:1px solid var(--line) }
+:root.light .chat-msg-bot{ background:var(--bg3) }
+:root.light .chat-msg-user{ background:var(--accent) }
+
+/* ── Search/result page ── */
+:root.light .search-panel{ background:var(--bg2);border-right:1px solid var(--line) }
+:root.light .group-label .group-badge{ /* keep own bg */ }
+:root.light .td-article{ color:var(--accent) }
+:root.light .td-name{ color:var(--text) }
+:root.light .td-brand{ color:var(--text2) }
+:root.light .td-price{ color:var(--text) }
+
+/* ── FAQ ── */
+:root.light .faq-item{ background:var(--bg2);border-color:var(--line) }
+:root.light .faq-q-text{ color:var(--text) }
+
+/* ── Checkout ── */
+:root.light .checkout-layout{ background:var(--bg) }
+
+/* ── Welcome overlay ── */
+:root.light #welcome-overlay{ background:var(--bg2) }
+
+/* ────────────────────────────────────────────────────────────────────── */
+/* GLOBAL: all inline color:#fff inside non-hero content becomes text    */
+/* ────────────────────────────────────────────────────────────────────── */
+:root.light .page:not(#page-home) strong[style*="color:#fff"],
+:root.light .page:not(#page-home) div[style*="color:#fff"],
+:root.light .page:not(#page-home) span[style*="color:#fff"]
 { color:var(--text) !important }
-:root.light .checkout-form-col *[style*="color:#fff"],
-:root.light .checkout-form-col *[style*="color: #fff"]
+
+:root.light .admin-content strong[style*="color:#fff"],
+:root.light .admin-content div[style*="color:#fff"],
+:root.light .admin-content span[style*="color:#fff"],
+:root.light .admin-content td[style*="color:#fff"]
 { color:var(--text) !important }
-:root.light #my-orders-list *[style*="color:#fff"],
-:root.light #my-orders-list *[style*="color: #fff"]
+
+:root.light #page-checkout strong[style*="color:#fff"],
+:root.light #page-checkout div[style*="color:#fff"],
+:root.light #page-checkout span[style*="color:#fff"]
 { color:var(--text) !important }
-:root.light #my-profile-content *[style*="color:#fff"],
-:root.light #my-profile-content *[style*="color: #fff"]
+
+:root.light #page-success strong[style*="color:#fff"],
+:root.light #page-success div[style*="color:#fff"],
+:root.light #page-success span[style*="color:#fff"]
 { color:var(--text) !important }
+
+:root.light #page-search strong[style*="color:#fff"],
+:root.light #page-search div[style*="color:#fff"],
+:root.light #page-search span[style*="color:#fff"]
+{ color:var(--text) !important }
+
+:root.light #page-cart strong[style*="color:#fff"],
+:root.light #page-cart div[style*="color:#fff"],
+:root.light #page-cart span[style*="color:#fff"]
+{ color:var(--text) !important }
+
+/* Hero section stays dark regardless of theme */
+:root.light .hero{ background:var(--bg);color:var(--text) }
+:root.light .hero h1{ color:var(--text) }
+:root.light .hero-bg{ opacity:.04 }
+:root.light .hero-search-box{ background:var(--bg2);border-color:var(--line2) }
+
+/* Footer in light mode */
+:root.light footer{ background:var(--bg2);border-top:1px solid var(--line);color:var(--text2) }
+:root.light .footer-desc{ color:var(--text3) }
+:root.light .footer-col-title{ color:var(--text) }
+:root.light .footer-links a{ color:var(--text3) }
+
+/* Brands bar */
+:root.light .brands-bar{ background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line) }
+:root.light .brand-item{ color:var(--text3) }
+
+/* Logo in light theme */
+:root.light .logo-text{ color:var(--text) }
+:root.light .logo-text .logo-main{ color:var(--text) }
+
+/* Category cards in light theme */
+:root.light .cat-card{ background:var(--bg2);border:1px solid var(--line) }
+:root.light .cat-card:hover{ border-color:var(--accent) }
+:root.light .cat-count{ color:var(--text3) }
+
+/* Search page */
+:root.light .search-panel{ background:var(--bg2);border-right:1px solid var(--line) }
+:root.light .search-layout{ background:var(--bg) }
+:root.light .group-badge{ /* keep existing background */ }
+
+/* VIN page */
+:root.light #page-vin{ background:var(--bg) }
+:root.light .vin-hero{ background:var(--bg2) }
+
+/* Help/FAQ page */
+:root.light #page-help{ background:var(--bg) }
+
+/* Section backgrounds in О нас / О доставке */
+:root.light .section{ background:var(--bg) }
+:root.light .section-header .section-link{ color:var(--accent) }
+
+/* "О нас" section — headings */
+:root.light #page-home h2[style*="color:#fff"]{ color:var(--text) !important }
+:root.light #page-home [style*="color:#fff"]{ color:var(--text) !important }
+
+/* But keep banners white text */
+:root.light .banner-card *{ color:#fff !important }
+:root.light .banner-badge{ color:#fff !important }
 
 html{font-size:16px;scroll-behavior:smooth}
 body{
@@ -192,7 +275,7 @@ header{
   font-family:var(--font-head);
   font-weight:900;
   letter-spacing:.04em;
-  color:#fff;
+  color:var(--text);
   line-height:1.05;
 }
 .logo-text .logo-sub{
@@ -461,7 +544,7 @@ nav a:hover,nav a.active{color:var(--text)}
 .cat-name{
   font-family:var(--font-head);
   font-weight:700;font-size:18px;
-  color:#fff;letter-spacing:.01em;
+  color:var(--text);letter-spacing:.01em;
   margin-bottom:4px;
 }
 .cat-count{font-size:12px;color:var(--text3)}
@@ -521,7 +604,7 @@ nav a:hover,nav a.active{color:var(--text)}
 .search-query-article{
   font-family:var(--font-mono);
   font-size:20px;font-weight:500;
-  color:#fff;letter-spacing:.03em;
+  color:var(--text);letter-spacing:.03em;
 }
 .search-count{font-size:13px;color:var(--text3)}
 .search-sort{
@@ -586,7 +669,7 @@ nav a:hover,nav a.active{color:var(--text)}
 .td-name{color:var(--text);font-size:13px;max-width:240px}
 .td-price{
   font-family:var(--font-mono);
-  font-size:15px;font-weight:500;color:#fff;
+  font-size:15px;font-weight:500;color:var(--text);
   white-space:nowrap;
 }
 .td-price-input{
@@ -642,7 +725,7 @@ nav a:hover,nav a.active{color:var(--text)}
 }
 .page-title{
   font-family:var(--font-head);
-  font-size:36px;font-weight:700;color:#fff;
+  font-size:36px;font-weight:700;color:var(--text);
   letter-spacing:-.01em;
   margin-bottom:28px;
 }
@@ -683,13 +766,13 @@ nav a:hover,nav a.active{color:var(--text)}
   width:36px;height:30px;
   background:var(--bg2);
   font-family:var(--font-mono);font-size:13px;font-weight:500;
-  color:#fff;text-align:center;
+  color:var(--text);text-align:center;
   display:flex;align-items:center;justify-content:center;
   border-left:1px solid var(--line2);border-right:1px solid var(--line2);
 }
 .cart-item-price{
   font-family:var(--font-mono);
-  font-size:16px;font-weight:500;color:#fff;
+  font-size:16px;font-weight:500;color:var(--text);
   min-width:90px;text-align:right;
 }
 .cart-item-del{
@@ -709,7 +792,7 @@ nav a:hover,nav a.active{color:var(--text)}
 }
 .summary-title{
   font-family:var(--font-head);
-  font-size:20px;font-weight:700;color:#fff;
+  font-size:20px;font-weight:700;color:var(--text);
   margin-bottom:20px;
 }
 .summary-row{
@@ -723,7 +806,7 @@ nav a:hover,nav a.active{color:var(--text)}
 .summary-row.total{
   padding-top:14px;
   font-weight:600;font-size:16px;
-  color:#fff;
+  color:var(--text);
 }
 .summary-label{color:var(--text2)}
 .summary-val{font-family:var(--font-mono);color:var(--text)}
@@ -2568,24 +2651,24 @@ footer{
       <!-- Left: description -->
       <div>
         <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
-          <strong style="color:#fff">Дорожный комплекс «ГАРАЖ»</strong> — профессиональный магазин автозапчастей
+          <strong style="color:var(--text)">Дорожный комплекс «ГАРАЖ»</strong> — профессиональный магазин автозапчастей
           и комплектующих, расположенный в Каменск-Шахтинском на 932 км трассы М4 «Дон».
-          Мы работаем с <strong style="color:#fff">2007 года</strong> и за это время стали надёжным
+          Мы работаем с <strong style="color:var(--text)">2007 года</strong> и за это время стали надёжным
           партнёром тысяч автовладельцев, дальнобойщиков и автосервисов Ростовской области и всего юга России.
         </p>
         <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
           Наше расположение прямо на федеральной трассе М4 — огромное преимущество: мы доступны
           круглосуточно для водителей в дороге. В наличии — широкий ассортимент
-          <strong style="color:#fff">расходников, фильтров, тормозных систем, масел и аккумуляторов</strong>
+          <strong style="color:var(--text)">расходников, фильтров, тормозных систем, масел и аккумуляторов</strong>
           для всех категорий транспорта: легковые, грузовые, спецтехника.
         </p>
         <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
-          В нашем каталоге — более <strong style="color:#fff">2 000 000 артикулов</strong> в наличии
+          В нашем каталоге — более <strong style="color:var(--text)">2 000 000 артикулов</strong> в наличии
           и под заказ от ведущих мировых производителей: Bosch, SKF, Gates, TRW, NGK, MANN и других.
           Работаем напрямую с поставщиками — без посредников и лишних наценок.
         </p>
         <p style="font-size:16px;color:var(--text2);line-height:1.8">
-          Для автосервисов и корпоративных клиентов — <strong style="color:#fff">особые условия</strong>:
+          Для автосервисов и корпоративных клиентов — <strong style="color:var(--text)">особые условия</strong>:
           индивидуальные цены, отсрочка платежа, персональный менеджер и приоритетная обработка заказов.
           Доставляем по всей России через СДЭК и Почту России.
         </p>
@@ -2697,7 +2780,7 @@ footer{
     <div class="hero-eyebrow" style="margin-bottom:12px">Доставка по России</div>
     <h2 style="font-family:var(--font-head);font-size:clamp(36px,5vw,64px);font-weight:900;color:#fff;line-height:.95;margin-bottom:8px">Доставка<br><em style="font-style:italic;color:var(--accent)">и оплата</em></h2>
     <p style="font-size:16px;color:var(--text2);max-width:560px;line-height:1.7;margin-bottom:48px">
-      Отправляем заказы из <strong style="color:#fff">Каменск-Шахтинского</strong> через службу доставки СДЭК
+      Отправляем заказы из <strong style="color:var(--text)">Каменск-Шахтинского</strong> через службу доставки СДЭК
       по всей России. Срок доставки — от 1 до 7 рабочих дней в зависимости от вашего города.
     </p>
 
@@ -7643,11 +7726,83 @@ function showPdPolicy(e){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// DEMO CATALOG — грузовые запчасти (загружается если каталог пуст)
+// ═══════════════════════════════════════════════════════════════════════════
+const DEMO_PARTS = [
+  // КАМАЗ — в наличии
+  {article:'740.1000128-10', brand:'КАМАЗ', name:'Комплект прокладок двигателя 740.31', price_retail:4850, price_wholesale:3880, price_input:2900, stock:3, delivery_days:0, vehicle:'КАМАЗ 65115/5490'},
+  {article:'5320-3501136',   brand:'КАМАЗ', name:'Тормозной цилиндр задний правый',     price_retail:2200, price_wholesale:1760, price_input:1320, stock:5, delivery_days:0, vehicle:'КАМАЗ 5320/5410'},
+  {article:'740.11-1012038', brand:'КАМАЗ', name:'Масляный насос двигателя 740',         price_retail:6900, price_wholesale:5520, price_input:4100, stock:2, delivery_days:0, vehicle:'КАМАЗ 740'},
+  {article:'740.1117010',    brand:'КАМАЗ', name:'Топливный насос высокого давления ТНВД',price_retail:18500,price_wholesale:14800,price_input:11000,stock:1, delivery_days:0, vehicle:'КАМАЗ 740.31'},
+  {article:'5320-1703010',   brand:'КАМАЗ', name:'Сцепление в сборе 14" 330мм',          price_retail:12400,price_wholesale:9920, price_input:7400, stock:2, delivery_days:0, vehicle:'КАМАЗ 5320/65115'},
+  // Фильтры — в наличии
+  {article:'W11102/80',      brand:'Mann-Filter', name:'Масляный фильтр двигателя 740 КАМАЗ', price_retail:890,  price_wholesale:712, price_input:534, stock:12, delivery_days:0, vehicle:'КАМАЗ'},
+  {article:'WK9503X',        brand:'Mann-Filter', name:'Топливный фильтр тонкой очистки',      price_retail:1150, price_wholesale:920, price_input:690, stock:8,  delivery_days:0, vehicle:'DAF XF/CF'},
+  {article:'WD95028',        brand:'Mann-Filter', name:'Масляный фильтр гидравлики КПП',        price_retail:760,  price_wholesale:608, price_input:456, stock:15, delivery_days:0, vehicle:'КАМАЗ/МАЗ'},
+  {article:'P550778',        brand:'Donaldson',   name:'Воздушный фильтр первичный',            price_retail:2340, price_wholesale:1872,price_input:1400,stock:4,  delivery_days:0, vehicle:'КАМАЗ 65115'},
+  {article:'C311300',        brand:'Mann-Filter', name:'Воздушный фильтр вторичный',            price_retail:980,  price_wholesale:784, price_input:588, stock:6,  delivery_days:0, vehicle:'MAN TGA/TGX'},
+  // Тормозные — в наличии
+  {article:'29087',          brand:'Knorr-Bremse',name:'Тормозные колодки задний мост',         price_retail:5600, price_wholesale:4480,price_input:3360,stock:4,  delivery_days:0, vehicle:'DAF XF105/95'},
+  {article:'WVA29087',       brand:'Textar',      name:'Тормозные колодки барабанные 420×180',  price_retail:4200, price_wholesale:3360,price_input:2520,stock:6,  delivery_days:0, vehicle:'MAN TGX/TGA'},
+  {article:'1906350',        brand:'SAF Holland', name:'Тормозной барабан задний ось SAF',       price_retail:8900, price_wholesale:7120,price_input:5340,stock:2,  delivery_days:0, vehicle:'полуприцеп SAF'},
+  // DAF — под заказ
+  {article:'1669768',        brand:'DAF Original',name:'Генератор 28V 100A Bosch',               price_retail:32000,price_wholesale:25600,price_input:19200,stock:0,delivery_days:4, vehicle:'DAF XF105'},
+  {article:'1788521',        brand:'DAF Original',name:'Стартер 24V 7.5кВт',                     price_retail:18700,price_wholesale:14960,price_input:11220,stock:0,delivery_days:5, vehicle:'DAF XF/CF'},
+  {article:'0535376',        brand:'ZF',          name:'Ремонтный комплект КПП ZF16S151',         price_retail:24500,price_wholesale:19600,price_input:14700,stock:0,delivery_days:7, vehicle:'DAF/MAN/Volvo ZF'},
+  // MAN — под заказ
+  {article:'51.25415.6024',  brand:'MAN Original',name:'Термостат охлаждающей жидкости',         price_retail:3800, price_wholesale:3040,price_input:2280,stock:0, delivery_days:3, vehicle:'MAN TGX/TGA D2066'},
+  {article:'81.96201.0499',  brand:'MAN Original',name:'Компрессор пневмосистемы',                price_retail:42000,price_wholesale:33600,price_input:25200,stock:0,delivery_days:10,vehicle:'MAN TGX 18.440'},
+  {article:'81.50804.6012',  brand:'Wabco',       name:'Клапан ABS/EBS пневматический',          price_retail:6700, price_wholesale:5360,price_input:4020,stock:0, delivery_days:4, vehicle:'MAN/DAF/Volvo'},
+  // Volvo — под заказ
+  {article:'21340612',       brand:'Volvo Original',name:'Диск сцепления 430мм Ø50 шлиц',        price_retail:15600,price_wholesale:12480,price_input:9360,stock:0, delivery_days:6, vehicle:'Volvo FH/FM D13'},
+  {article:'20545770',       brand:'Volvo Original',name:'Форсунка ТНВД unit injector',           price_retail:28000,price_wholesale:22400,price_input:16800,stock:0,delivery_days:8, vehicle:'Volvo FH12/FH16'},
+  {article:'21277100',       brand:'Volvo Original',name:'Кронштейн двигателя правый',            price_retail:9200, price_wholesale:7360,price_input:5520,stock:0, delivery_days:5, vehicle:'Volvo FM/FMX'},
+  // Mercedes Actros — под заказ
+  {article:'A0001400285',    brand:'Mercedes',    name:'Турбокомпрессор OM471 euro6',             price_retail:95000,price_wholesale:76000,price_input:57000,stock:0,delivery_days:14,vehicle:'Mercedes Actros MP4'},
+  {article:'A9700900952',    brand:'Mercedes',    name:'EGR клапан рециркуляции OM471',           price_retail:38000,price_wholesale:30400,price_input:22800,stock:0,delivery_days:10,vehicle:'Mercedes Actros'},
+  // Scania — под заказ
+  {article:'1377192',        brand:'Scania',      name:'Водяной насос охлаждения DC12',           price_retail:14500,price_wholesale:11600,price_input:8700,stock:0, delivery_days:7, vehicle:'Scania R/P series DC12'},
+  {article:'1419009',        brand:'Scania',      name:'Муфта вентилятора с крыльчаткой',        price_retail:22000,price_wholesale:17600,price_input:13200,stock:0,delivery_days:9, vehicle:'Scania R420/440/480'},
+  // МАЗ — в наличии
+  {article:'64221-1002260',  brand:'ЯМЗ',         name:'Блок цилиндров ЯМЗ-238М2 голый',        price_retail:78000,price_wholesale:62400,price_input:46800,stock:1,delivery_days:0, vehicle:'МАЗ/КРАЗ ЯМЗ-238'},
+  {article:'238-1011010-А',  brand:'ЯМЗ',         name:'Коленчатый вал ЯМЗ-238',                price_retail:32000,price_wholesale:25600,price_input:19200,stock:2,delivery_days:0, vehicle:'МАЗ/КРАЗ ЯМЗ-238'},
+  // Расходники — в наличии
+  {article:'T402853',        brand:'Castrol',     name:'Моторное масло VECTON 15W-40 20л',       price_retail:4200, price_wholesale:3360,price_input:2520,stock:20, delivery_days:0, vehicle:'все дизельные'},
+  {article:'OAT-CWT5',       brand:'FELIX',       name:'Антифриз готовый -40°C G12+ 10л',        price_retail:1150, price_wholesale:920, price_input:690, stock:30, delivery_days:0, vehicle:'все'},
+];
+
+function seedDemoCatalog(){
+  if(getCatalog().length>0) return; // не перезаписывать если уже есть данные
+  const items = DEMO_PARTS.map((p,i)=>({
+    id: i+1,
+    article: p.article,
+    brand: p.brand,
+    name: p.name,
+    price_retail: p.price_retail,
+    price_wholesale: p.price_wholesale,
+    price_input: p.price_input,
+    stock: p.stock,
+    delivery_days: p.delivery_days,
+    source: '1c',
+    vehicle: p.vehicle||'',
+    inStock: p.stock>0,
+  }));
+  saveCatalog(items);
+  localStorage.setItem('dp_catalog_meta', JSON.stringify({
+    updatedAt: new Date().toISOString(),
+    file: 'Демо-каталог (грузовые запчасти)',
+    count: items.length,
+  }));
+}
+
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 function init(){
   // Apply saved theme
   applyTheme();
+  // Seed demo catalog if empty
+  seedDemoCatalog();
 
   // Restore session
   try{
