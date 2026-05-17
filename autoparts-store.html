@@ -1809,24 +1809,7 @@ footer{
 <header>
   <div class="header-inner">
     <div class="logo" onclick="showPage('home')">
-      <svg class="logo-svg" width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
-        <circle cx="50" cy="50" r="36" stroke="#e8411a" stroke-width="1"/>
-        <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
-        <circle cx="50" cy="50" r="7" fill="#e8411a"/>
-        <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="8"  r="3" fill="#e8411a"/>
-        <circle cx="50" cy="92" r="3" fill="#e8411a"/>
-        <circle cx="8"  cy="50" r="3" fill="#e8411a"/>
-        <circle cx="92" cy="50" r="3" fill="#e8411a"/>
-        <circle cx="21" cy="21" r="2" fill="#e8411a" opacity=".6"/>
-        <circle cx="79" cy="21" r="2" fill="#e8411a" opacity=".6"/>
-        <circle cx="21" cy="79" r="2" fill="#e8411a" opacity=".6"/>
-        <circle cx="79" cy="79" r="2" fill="#e8411a" opacity=".6"/>
-      </svg>
+      <img src="https://sun9-38.userapi.com/s/v1/ig2/gITcNhYsI1MlTyfty4QYumbbw4pzZvvDubzsO4PN2It4OwIxbGI142MljMog4HvuwPfLtAaUdMtBDMGZVGppgMJp.jpg?quality=95&as=32x32,48x48,72x73,108x109,160x161,240x242,360x363,480x484,540x545,640x646,720x727,1080x1090,1280x1292,1440x1453,2140x2160&from=bu&cs=240x0" alt="ГАРАЖ" class="logo-svg" style="width:44px;height:44px;object-fit:contain;border-radius:8px">
       <div class="logo-text">
         <span class="logo-sub">Дорожный комплекс</span>
         <span class="logo-main">ГАРАЖ</span>
@@ -1991,7 +1974,7 @@ footer{
         <div class="footer-links">
           <a href="tel:+78001234567">8 800 123-45-67</a>
           <a href="#">info@detalpro.ru</a>
-          <a href="#">Москва, ул. Авторемонтная, 4</a>
+          <a href="#">ул. Героев Пионеров, 95, Каменск-Шахтинский</a>
         </div>
       </div>
     </div>
@@ -2205,8 +2188,36 @@ footer{
   <div class="success-wrap animate-in">
     <div class="success-icon">✅</div>
     <div class="success-title">Заказ принят!</div>
-    <p class="success-sub">Ваш заказ успешно оформлен и передан в обработку. Мы свяжемся с вами в течение 15 минут для подтверждения.</p>
+    <p class="success-sub">Ваш заказ успешно оформлен и передан в обработку. Менеджер свяжется с вами в течение 15 минут для подтверждения.</p>
     <div class="order-num" id="success-order-num">ЗКл-001337</div>
+
+    <!-- Контакты менеджеров -->
+    <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2);padding:20px;margin:20px 0;text-align:left">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:14px">📞 Наши менеджеры</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Артём</div>
+            <a href="tel:+79281552224" style="font-size:15px;color:var(--green);font-weight:700;text-decoration:none">+7 (928) 155-22-24</a>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="tel:+79281552224" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);border-radius:var(--r);color:#fff;text-decoration:none;font-size:13px;font-weight:600">📞 Позвонить</a>
+            <button onclick="downloadVcf('Артём','79281552224')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer">💾 В контакты</button>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--line2);padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Александр</div>
+            <a href="tel:+79381548030" style="font-size:15px;color:var(--green);font-weight:700;text-decoration:none">+7 (938) 154-80-30</a>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="tel:+79381548030" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);border-radius:var(--r);color:#fff;text-decoration:none;font-size:13px;font-weight:600">📞 Позвонить</a>
+            <button onclick="downloadVcf('Александр','79381548030')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer">💾 В контакты</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div style="display:flex;flex-direction:column;gap:10px">
       <button class="btn btn-primary btn-md" style="width:100%;justify-content:center" onclick="showPage('home')">На главную</button>
       <button class="btn btn-outline btn-md" style="width:100%;justify-content:center" onclick="showPage('search')">Продолжить покупки</button>
@@ -2221,44 +2232,65 @@ footer{
     <h2 style="font-family:var(--font-head);font-size:clamp(36px,5vw,64px);font-weight:900;color:#fff;line-height:.95;margin-bottom:24px">О <em style="font-style:italic;color:var(--accent)">нас</em></h2>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
+      <!-- Left: description -->
       <div>
         <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
           <strong style="color:#fff">Дорожный комплекс «ГАРАЖ»</strong> — профессиональный магазин автозапчастей
-          в городе Каменск-Шахтинский Ростовской области. Мы работаем с 2012 года и за это время
-          стали надёжным партнёром для тысяч автовладельцев и автосервисов региона.
+          и комплектующих, расположенный в Каменск-Шахтинском на 932 км трассы М4 «Дон».
+          Мы работаем с <strong style="color:#fff">2007 года</strong> и за это время стали надёжным
+          партнёром тысяч автовладельцев, дальнобойщиков и автосервисов Ростовской области и всего юга России.
+        </p>
+        <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
+          Наше расположение прямо на федеральной трассе М4 — огромное преимущество: мы доступны
+          круглосуточно для водителей в дороге. В наличии — широкий ассортимент
+          <strong style="color:#fff">расходников, фильтров, тормозных систем, масел и аккумуляторов</strong>
+          для всех категорий транспорта: легковые, грузовые, спецтехника.
         </p>
         <p style="font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:16px">
           В нашем каталоге — более <strong style="color:#fff">2 000 000 артикулов</strong> в наличии
-          и под заказ от ведущих мировых производителей. Мы работаем напрямую с поставщиками,
-          что позволяет предлагать конкурентные цены без переплат.
+          и под заказ от ведущих мировых производителей: Bosch, SKF, Gates, TRW, NGK, MANN и других.
+          Работаем напрямую с поставщиками — без посредников и лишних наценок.
         </p>
         <p style="font-size:16px;color:var(--text2);line-height:1.8">
-          Помимо розничных покупателей, мы активно сотрудничаем с автосервисами и корпоративными
-          клиентами на особых условиях. Для B2B-партнёров — индивидуальные цены, отсрочка платежа
-          и персональный менеджер.
+          Для автосервисов и корпоративных клиентов — <strong style="color:#fff">особые условия</strong>:
+          индивидуальные цены, отсрочка платежа, персональный менеджер и приоритетная обработка заказов.
+          Доставляем по всей России через СДЭК и Почту России.
         </p>
       </div>
+
+      <!-- Right: contacts + managers -->
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px">
           <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Контакты</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px">
               <span style="color:var(--accent);font-size:18px;flex-shrink:0">📍</span>
-              <span style="color:var(--text2)">Ростовская обл., г. Каменск-Шахтинский</span>
+              <span style="color:var(--text2)">ул. Героев Пионеров, 95, Каменск-Шахтинский,<br>Ростовская обл. — 932 км М4 «Дон»</span>
             </div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14px">
               <span style="color:var(--accent);font-size:18px;flex-shrink:0">📞</span>
-              <a href="tel:+78636000000" style="color:var(--text2);transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">+7 (863-6) XX-XX-XX</a>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <a href="tel:+79281552224" style="color:var(--text2);transition:color .15s;font-weight:600" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">+7 (928) 155-22-24 — Артём</a>
+                <a href="tel:+79381548030" style="color:var(--text2);transition:color .15s;font-weight:600" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">+7 (938) 154-80-30 — Александр</a>
+              </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14px">
               <span style="color:var(--accent);font-size:18px;flex-shrink:0">🕐</span>
               <span style="color:var(--text2)">Пн–Пт: 8:00–19:00 · Сб: 9:00–17:00 · Вс: выходной</span>
             </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px">
+              <span style="color:var(--accent);font-size:18px;flex-shrink:0">✉️</span>
+              <a href="mailto:info@detalpro.ru" style="color:var(--text2);transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">info@detalpro.ru</a>
+            </div>
           </div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px">
-          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Менеджеры</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Наши менеджеры</div>
           <div id="about-managers-list"></div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Как нас найти</div>
+          <a href="https://yandex.ru/maps/?text=%D1%83%D0%BB.+%D0%93%D0%B5%D1%80%D0%BE%D0%B5%D0%B2+%D0%9F%D0%B8%D0%BE%D0%BD%D0%B5%D1%80%D0%BE%D0%B2%2C+95%2C+%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D1%81%D0%BA-%D0%A8%D0%B0%D1%85%D1%82%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--accent);border-radius:var(--r);color:#fff;text-decoration:none;font-size:14px;font-weight:600;transition:.15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">🗺️ Открыть на Яндекс.Картах</a>
         </div>
       </div>
     </div>
@@ -2266,7 +2298,7 @@ footer{
     <!-- Stats -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;margin-bottom:48px">
       <div style="background:var(--bg2);padding:24px;text-align:center">
-        <div style="font-family:var(--font-head);font-size:40px;font-weight:700;color:var(--accent);line-height:1">12+</div>
+        <div style="font-family:var(--font-head);font-size:40px;font-weight:700;color:var(--accent);line-height:1">18+</div>
         <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Лет на рынке</div>
       </div>
       <div style="background:var(--bg2);padding:24px;text-align:center">
@@ -2278,8 +2310,8 @@ footer{
         <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Поставщиков</div>
       </div>
       <div style="background:var(--bg2);padding:24px;text-align:center">
-        <div style="font-family:var(--font-head);font-size:40px;font-weight:700;color:#fff;line-height:1">24ч</div>
-        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Обработка заказа</div>
+        <div style="font-family:var(--font-head);font-size:40px;font-weight:700;color:#fff;line-height:1">с 2007</div>
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Год основания</div>
       </div>
     </div>
 
@@ -2882,6 +2914,40 @@ footer{
         </div>
       </div>
 
+      <!-- ── SUPPORT CHAT TAB ─────────────────────────────────────────── -->
+      <div class="admin-section" id="admin-tab-support_chat">
+        <div class="admin-page-title">💬 Чат поддержки</div>
+        <div class="admin-page-sub">Сообщения клиентов с сайта — отвечайте прямо здесь</div>
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;height:calc(100vh - 220px);max-height:680px" id="support-chat-layout">
+          <!-- Conversations list -->
+          <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:12px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Диалоги</div>
+            <div id="support-conv-list" style="flex:1;overflow-y:auto;padding:8px"></div>
+          </div>
+          <!-- Chat area -->
+          <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+              <div id="support-chat-client-name" style="font-weight:600;color:var(--text);font-size:15px">Выберите диалог</div>
+              <div id="support-chat-client-info" style="font-size:12px;color:var(--text3)"></div>
+            </div>
+            <div id="support-chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="text-align:center;color:var(--text3);font-size:13px;margin:auto">← Выберите диалог слева</div>
+            </div>
+            <div style="padding:12px;border-top:1px solid var(--line);display:flex;gap:8px" id="support-chat-input-area">
+              <input id="support-chat-input" class="admin-filter-input" style="flex:1;max-width:none" placeholder="Ответить клиенту..." onkeydown="if(event.key==='Enter')adminSendChatReply()">
+              <button class="admin-btn admin-btn-primary" onclick="adminSendChatReply()">Отправить ➤</button>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile: stacked -->
+        <style>
+          @media(max-width:700px){
+            #support-chat-layout{grid-template-columns:1fr;height:auto;max-height:none}
+            #support-chat-messages{min-height:200px;max-height:300px}
+          }
+        </style>
+      </div>
+
     </div><!-- /admin-content -->
   </div><!-- /admin-layout -->
 </div>
@@ -2977,7 +3043,16 @@ footer{
       </div>
     </div>
     <div class="modal-error" id="reg-error" style="margin-top:8px">Ошибка</div>
-    <button class="modal-btn" onclick="doRegister()" style="margin-top:16px">Создать аккаунт</button>
+    <!-- Согласие на персональные данные -->
+    <label style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer;user-select:none">
+      <input type="checkbox" id="reg-pd-consent" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--accent)">
+      <span style="font-size:12px;color:var(--text3);line-height:1.5">
+        Я даю согласие на обработку <span onclick="showPdPolicy(event)" style="color:var(--accent);cursor:pointer;text-decoration:underline">персональных данных</span>
+        в соответствии с Федеральным законом №&nbsp;152-ФЗ «О персональных данных».
+        Данные используются исключительно для оформления заказов и связи по вопросам покупок.
+      </span>
+    </label>
+    <button class="modal-btn" onclick="doRegister()" style="margin-top:14px">Создать аккаунт</button>
     <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3)">
       Уже есть аккаунт?
       <span onclick="closeRegister();showLogin()" style="color:var(--accent);cursor:pointer;font-weight:600">Войти</span>
@@ -3050,8 +3125,8 @@ footer{
 // AUTH CREDENTIALS (системные аккаунты — не хранятся в localStorage)
 // ═══════════════════════════════════════════════════════════════════════════
 const SYSTEM_ACCOUNTS = {
-  'artem':      {password:'a050525A',   role:'boss',        name:'Артём',      phone:'+7 (928) 123-45-67'},
-  'Alexsandr':  {password:'s050525S',   role:'boss',        name:'Александр',  phone:'+7 (928) 765-43-21'},
+  'artem':      {password:'a050525A',   role:'boss',        name:'Артём',      phone:'+7 (928) 155-22-24'},
+  'Alexsandr':  {password:'s050525S',   role:'boss',        name:'Александр',  phone:'+7 (938) 154-80-30'},
   'buh':        {password:'b050525B',   role:'accountant',  name:'Бухгалтерия',phone:''},
   'manager':    {password:'manager123', role:'manager',     name:'Менеджер',   phone:'+7 (928) 000-00-00'},
   'sklad1':     {password:'sklad123',   role:'warehouse',   name:'Склад #1',   phone:''},
@@ -3150,7 +3225,7 @@ const CATEGORIES = [
 ];
 
 const STORES = [
-  {id:'store1',name:'Авторемонтная, 4',address:'Москва, ул. Авторемонтная, д. 4',tag:'Главный склад'},
+  {id:'store1',name:'Героев Пионеров, 95',address:'Каменск-Шахтинский, ул. Героев Пионеров, д. 95 (932 км М4)',tag:'Главный склад'},
   {id:'store2',name:'Варшавское шоссе',address:'Москва, Варшавское шоссе, д. 87',tag:'Склад'},
   {id:'store3',name:'Митино',address:'Москва, ул. Митинская, д. 16',tag:'Магазин'},
 ];
@@ -3282,6 +3357,8 @@ function doRegister(){
   const errEl   = document.getElementById('reg-error');
   const showErr = msg=>{errEl.style.display='block';errEl.textContent=msg;};
 
+  const pdConsent = document.getElementById('reg-pd-consent');
+  if(pdConsent && !pdConsent.checked) return showErr('Необходимо дать согласие на обработку персональных данных');
   if(!name||!login||!pass) return showErr('Заполните все обязательные поля');
   if(!/^[a-z0-9_]{3,30}$/.test(login)) return showErr('Логин: только латинские буквы, цифры и _, от 3 до 30 символов');
   if(pass.length<6) return showErr('Пароль должен быть не менее 6 символов');
@@ -3880,9 +3957,10 @@ function switchAdminTab(tab){
   if(tab==='my_orders')   renderMyOrders();
   if(tab==='my_profile')  renderMyProfile();
   if(tab==='boss_mgrs')   renderBossMgrs();
-  if(tab==='integrations')renderIntegrations();
-  if(tab==='hk_monitor')  renderHkMonitor();
-  if(tab==='hk_changes')  renderHkChanges();
+  if(tab==='integrations') renderIntegrations();
+  if(tab==='hk_monitor')   renderHkMonitor();
+  if(tab==='hk_changes')   renderHkChanges();
+  if(tab==='support_chat') renderSupportChat();
 }
 
 function renderAdminDashboard(){
@@ -4341,12 +4419,17 @@ async function sendChatMsg(){
   const text=input.value.trim();
   if(!text) return;
   input.value='';
+  const userName=state.user?state.user.name:'Гость';
   const msgs=getChatMsgs();
-  msgs.push({role:'user',text,ts:new Date().toISOString()});
+  msgs.push({role:'user',text,ts:new Date().toISOString(),author:userName});
   saveChatMsgs(msgs);
+  // Mirror to sessions store for admin panel
+  const key=getCustomerSessionKey?getCustomerSessionKey():('guest_'+Date.now());
+  const sessions=getChatSessions?getChatSessions():{};
+  sessions[key]=msgs.map(m=>({...m,author:m.author||(m.role==='user'?userName:'Бот')}));
+  if(saveChatSessions) saveChatSessions(sessions);
   renderChatMessages();
   // Send to Telegram
-  const userName=state.user?state.user.name:'Гость';
   const phone=document.getElementById('co-phone')?.value||'';
   const tgText=`💬 *Сообщение с сайта*\nОт: ${userName}${phone?' · '+phone:''}\n\n${text}`;
   await notifyTelegram(tgText);
@@ -4355,8 +4438,119 @@ async function sendChatMsg(){
     const msgs2=getChatMsgs();
     msgs2.push({role:'bot',text:'Ваше сообщение получено! Менеджер ответит в рабочее время (Пн–Пт 8:00–19:00, Сб 9:00–17:00).',ts:new Date().toISOString()});
     saveChatMsgs(msgs2);
+    // Update sessions with bot reply
+    const sess2=getChatSessions?getChatSessions():{};
+    if(sess2[key]){ sess2[key].push({role:'bot',text:msgs2[msgs2.length-1].text,ts:msgs2[msgs2.length-1].ts,author:'Бот'}); }
+    if(saveChatSessions) saveChatSessions(sess2);
     renderChatMessages();
   },1200);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ADMIN SUPPORT CHAT
+// ═══════════════════════════════════════════════════════════════════════════
+let activeSupportSession = null;
+
+function getChatSessions(){
+  try{ return JSON.parse(localStorage.getItem('dp_chat_sessions')||'{}'); }catch{ return {}; }
+}
+function saveChatSessions(s){ localStorage.setItem('dp_chat_sessions', JSON.stringify(s)); }
+
+function getCustomerSessionKey(){
+  if(state.user && state.user.login) return state.user.login;
+  let k = sessionStorage.getItem('dp_guest_chat_key');
+  if(!k){ k = 'guest_'+Date.now(); sessionStorage.setItem('dp_guest_chat_key',k); }
+  return k;
+}
+
+function mirrorMsgToSessions(msgs){
+  const key = getCustomerSessionKey();
+  const sessions = getChatSessions();
+  sessions[key] = msgs.map(m => ({
+    ...m,
+    author: m.role === 'user' ? (state.user?.name || key) : (m.role === 'manager' ? (m.author||'Менеджер') : 'Бот')
+  }));
+  saveChatSessions(sessions);
+}
+
+function renderSupportChat(){
+  const sessions = getChatSessions();
+  // Also expose legacy dp_chat
+  const legacyMsgs = getChatMsgs();
+  if(legacyMsgs.some(m=>m.role==='user') && !sessions['__legacy__']){
+    sessions['__legacy__'] = legacyMsgs;
+    saveChatSessions(sessions);
+  }
+  const convList = document.getElementById('support-conv-list');
+  if(!convList) return;
+  const allKeys = Object.keys(sessions);
+  if(!allKeys.length){
+    convList.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);text-align:center">Сообщений пока нет</div>';
+    return;
+  }
+  convList.innerHTML = allKeys.map(key => {
+    const msgs = sessions[key]||[];
+    const last = msgs[msgs.length-1];
+    const unread = msgs.filter(m=>m.role==='user'&&!m.readByManager).length;
+    const displayName = key==='__legacy__'?'Гость (онлайн-чат)':key;
+    const isActive = key===activeSupportSession;
+    return `<div onclick="openSupportSession('${escHtml(key)}')" style="padding:10px 12px;border-radius:var(--r);cursor:pointer;background:${isActive?'var(--bg3)':'transparent'};border:1px solid ${isActive?'var(--accent)':'transparent'};margin-bottom:4px;transition:.15s">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(displayName)}</div>
+        ${unread?`<span style="background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px">${unread}</span>`:''}
+      </div>
+      <div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last?escHtml(last.text.slice(0,55)):'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openSupportSession(key){
+  activeSupportSession = key;
+  const sessions = getChatSessions();
+  const msgs = sessions[key]||[];
+  msgs.forEach(m=>{ if(m.role==='user') m.readByManager=true; });
+  sessions[key]=msgs; saveChatSessions(sessions);
+  const nameEl=document.getElementById('support-chat-client-name');
+  const infoEl=document.getElementById('support-chat-client-info');
+  const msgEl =document.getElementById('support-chat-messages');
+  if(!msgEl) return;
+  const displayName=key==='__legacy__'?'Гость (онлайн-чат)':key;
+  if(nameEl) nameEl.textContent=displayName;
+  if(infoEl) infoEl.textContent=`${msgs.length} сообщений`;
+  msgEl.innerHTML = msgs.length ? msgs.map(m=>{
+    const isUser=m.role==='user', isMgr=m.role==='manager';
+    const bg=isUser?'var(--bg3)':isMgr?'rgba(232,65,26,.15)':'var(--bg4)';
+    const align=isUser?'flex-start':'flex-end';
+    const label=isUser?escHtml(m.author||key):isMgr?`👨‍💼 ${escHtml(m.author||'Менеджер')}`:'🤖 Бот';
+    return `<div style="display:flex;flex-direction:column;align-items:${align};max-width:85%">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:2px">${label}</div>
+      <div style="background:${bg};border:1px solid var(--line2);border-radius:var(--r2);padding:10px 14px;font-size:14px;color:var(--text)">${escHtml(m.text).replace(/\n/g,'<br>')}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">${new Date(m.ts).toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})}</div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text3);font-size:13px;padding:24px">Нет сообщений</div>';
+  msgEl.scrollTop=msgEl.scrollHeight;
+  renderSupportChat();
+  activeSupportSession=key;
+}
+
+async function adminSendChatReply(){
+  const input=document.getElementById('support-chat-input');
+  if(!input||!activeSupportSession) return;
+  const text=input.value.trim(); if(!text) return;
+  input.value='';
+  const sessions=getChatSessions();
+  if(!sessions[activeSupportSession]) sessions[activeSupportSession]=[];
+  const msg={role:'manager',text,ts:new Date().toISOString(),author:state.user?.name||'Менеджер'};
+  sessions[activeSupportSession].push(msg);
+  saveChatSessions(sessions);
+  // Mirror back to customer's dp_chat if legacy
+  if(activeSupportSession==='__legacy__'){
+    const chatMsgs=getChatMsgs();
+    chatMsgs.push({role:'bot',text:`👨‍💼 ${state.user?.name||'Менеджер'}: ${text}`,ts:msg.ts});
+    saveChatMsgs(chatMsgs);
+  }
+  await notifyTelegram(`📩 *Ответ менеджера* ${state.user?.name||''}\nДиалог: ${activeSupportSession}\n\n${text}`);
+  openSupportSession(activeSupportSession);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -5486,25 +5680,28 @@ function stopHkPoll(){
 // ═══════════════════════════════════════════════════════════════════════════
 const ROLE_TABS_CONFIG = {
   boss:[
-    {id:'dashboard',   icon:'📊', label:'Дашборд'},
-    {id:'orders',      icon:'📋', label:'Заказы',          badge:true},
-    {id:'boss_mgrs',   icon:'👨‍💼', label:'Менеджеры'},
-    {id:'profit',      icon:'💰', label:'Прибыль'},
-    {id:'logs',        icon:'📝', label:'Журнал'},
-    {id:'users',       icon:'👥', label:'Сотрудники'},
-    {id:'integrations',icon:'🔌', label:'Интеграции'},
+    {id:'dashboard',    icon:'📊', label:'Дашборд'},
+    {id:'orders',       icon:'📋', label:'Заказы',          badge:true},
+    {id:'support_chat', icon:'💬', label:'Чат поддержки'},
+    {id:'boss_mgrs',    icon:'👨‍💼', label:'Менеджеры'},
+    {id:'profit',       icon:'💰', label:'Прибыль'},
+    {id:'logs',         icon:'📝', label:'Журнал'},
+    {id:'users',        icon:'👥', label:'Сотрудники'},
+    {id:'integrations', icon:'🔌', label:'Интеграции'},
   ],
   admin:[
-    {id:'dashboard', icon:'📊', label:'Дашборд'},
-    {id:'orders',    icon:'📋', label:'Заказы',   badge:true},
-    {id:'profit',    icon:'💰', label:'Прибыль'},
-    {id:'logs',      icon:'📝', label:'Журнал'},
-    {id:'users',     icon:'👥', label:'Пользователи'},
+    {id:'dashboard',    icon:'📊', label:'Дашборд'},
+    {id:'orders',       icon:'📋', label:'Заказы',   badge:true},
+    {id:'support_chat', icon:'💬', label:'Чат поддержки'},
+    {id:'profit',       icon:'💰', label:'Прибыль'},
+    {id:'logs',         icon:'📝', label:'Журнал'},
+    {id:'users',        icon:'👥', label:'Пользователи'},
   ],
   manager:[
-    {id:'mgr_home',  icon:'🏠', label:'Главная',   badge:true},
-    {id:'mgr_sales', icon:'💳', label:'Мои продажи'},
-    {id:'orders',    icon:'📋', label:'Онлайн-заказы'},
+    {id:'mgr_home',     icon:'🏠', label:'Главная',   badge:true},
+    {id:'support_chat', icon:'💬', label:'Чат поддержки'},
+    {id:'mgr_sales',    icon:'💳', label:'Мои продажи'},
+    {id:'orders',       icon:'📋', label:'Онлайн-заказы'},
   ],
   accountant:[
     {id:'buh_home',  icon:'📈', label:'Сводка'},
@@ -5938,7 +6135,7 @@ const FAQ_DATA = [
       },
       {
         q: 'Можно ли забрать заказ самовывозом?',
-        a: 'Да, самовывоз доступен со склада по адресу: Москва, ул. Автозаводская, д. 12. Режим работы склада: пн–пт 9:00–18:00, сб 10:00–15:00. Перед приездом убедитесь, что заказ перешёл в статус «Собран».'
+        a: 'Да, самовывоз доступен с нашего склада по адресу: Каменск-Шахтинский, ул. Героев Пионеров, д. 95 (932 км трассы М4 «Дон»). Режим работы: пн–пт 8:00–19:00, сб 9:00–17:00. Перед приездом убедитесь, что заказ перешёл в статус «Собран».'
       },
       {
         q: 'Что делать, если заказ не пришёл вовремя?',
@@ -6115,6 +6312,63 @@ function faqSearch(val){
     document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
   }
   renderFaq();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PERSONAL DATA / VCF / PRIVACY
+// ═══════════════════════════════════════════════════════════════════════════
+function downloadVcf(name, phone){
+  const vcf = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${name} — ДК ГАРАЖ`,
+    `N:ДК ГАРАЖ;${name};;;`,
+    `TEL;TYPE=CELL:+${phone}`,
+    'ORG:Дорожный комплекс ГАРАЖ',
+    'URL:https://rn8mwsb6pf-alt.github.io/detalpro-site/',
+    'ADR;TYPE=WORK:;;ул. Героев Пионеров 95;Каменск-Шахтинский;Ростовская обл.;;Россия',
+    'NOTE:Менеджер магазина автозапчастей ДК ГАРАЖ. 932 км М4 Дон.',
+    'END:VCARD'
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcf);
+  a.download = `${name}_GARAZH.vcf`;
+  a.click();
+}
+
+function showPdPolicy(e){
+  e.stopPropagation();
+  const existing = document.getElementById('pd-policy-modal');
+  if(existing){ existing.classList.add('open'); return; }
+  const div = document.createElement('div');
+  div.id = 'pd-policy-modal';
+  div.className = 'modal-overlay open';
+  div.onclick = (ev) => { if(ev.target === div) div.classList.remove('open'); };
+  div.innerHTML = `<div class="modal-box" style="max-width:540px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="document.getElementById('pd-policy-modal').classList.remove('open')">✕</button>
+    <div class="modal-title">Политика обработки персональных данных</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.75;margin-top:12px">
+      <p><strong style="color:var(--text)">Оператор персональных данных:</strong><br>
+      ИП / ООО «Дорожный комплекс ГАРАЖ», ул. Героев Пионеров, 95, г. Каменск-Шахтинский, Ростовская обл.</p>
+      <p><strong style="color:var(--text)">Цели обработки данных:</strong></p>
+      <ul style="padding-left:20px;margin:8px 0">
+        <li>Оформление и доставка заказов</li>
+        <li>Связь с покупателем по вопросам заказа</li>
+        <li>Ведение клиентской базы</li>
+        <li>Уведомления об акциях и специальных предложениях (только с согласия)</li>
+      </ul>
+      <p><strong style="color:var(--text)">Перечень обрабатываемых данных:</strong><br>
+      Имя, фамилия, номер телефона, адрес доставки.</p>
+      <p><strong style="color:var(--text)">Срок хранения:</strong><br>
+      Данные хранятся в течение 3 лет с момента последнего заказа или до отзыва согласия.</p>
+      <p><strong style="color:var(--text)">Права субъекта данных:</strong><br>
+      Вы имеете право на доступ к своим данным, их исправление, удаление и отзыв согласия.
+      Для этого напишите на <a href="mailto:info@detalpro.ru" style="color:var(--accent)">info@detalpro.ru</a>.</p>
+      <p style="font-size:12px;color:var(--text3)">Обработка персональных данных осуществляется в соответствии с ФЗ-152 «О персональных данных».</p>
+    </div>
+    <button class="modal-btn" onclick="document.getElementById('pd-policy-modal').classList.remove('open')" style="margin-top:16px">Понятно</button>
+  </div>`;
+  document.body.appendChild(div);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
