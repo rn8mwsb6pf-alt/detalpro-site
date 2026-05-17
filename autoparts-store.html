@@ -34,6 +34,30 @@
   --r:4px;
   --r2:8px;
 }
+/* ── LIGHT THEME ──────────────────────────────────────────────────────── */
+:root.light{
+  --bg:#f5f6f7;
+  --bg2:#ffffff;
+  --bg3:#eef0f2;
+  --bg4:#e4e7ea;
+  --line:#d4d8dc;
+  --line2:#c0c6cc;
+  --text:#1a1d20;
+  --text2:#4a5560;
+  --text3:#8a9299;
+  --accentbg:rgba(232,65,26,.08);
+  --greenbg:rgba(34,197,94,.08);
+  --amberbg:rgba(245,158,11,.08);
+  --bluebg:rgba(59,130,246,.08);
+}
+:root.light header{background:rgba(245,246,247,.95)}
+:root.light .admin-sidebar{background:#fff;border-right:1px solid var(--line)}
+:root.light .modal-box{background:#fff}
+:root.light .profile-dropdown{background:#fff}
+:root.light .profile-dd-head{background:var(--bg3)}
+:root.light .chat-window{background:#fff}
+:root.light input,.light select,.light textarea{background:var(--bg3);color:var(--text)}
+
 html{font-size:16px;scroll-behavior:smooth}
 body{
   background:var(--bg);
@@ -43,6 +67,7 @@ body{
   line-height:1.6;
   min-height:100vh;
   overflow-x:hidden;
+  transition:background .25s,color .25s;
 }
 button{font-family:var(--font-body);cursor:pointer;border:none;outline:none}
 input,select{font-family:var(--font-body);outline:none;border:none}
@@ -1380,6 +1405,56 @@ footer{
 .profile-dd-item.green{color:var(--green)}
 .profile-dd-item.green:hover{background:rgba(34,197,94,.1)}
 .profile-dd-sep{height:1px;background:var(--line);margin:4px 0}
+/* ── THEME TOGGLE ────────────────────────────────────────────────────── */
+.theme-toggle-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 16px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s}
+.theme-toggle-btn:hover{background:var(--bg3);color:var(--text)}
+.theme-pill{width:36px;height:20px;border-radius:10px;background:var(--line2);position:relative;transition:background .2s;flex-shrink:0}
+.theme-pill::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s,background .2s}
+:root.light .theme-pill{background:var(--accent)}
+:root.light .theme-pill::after{transform:translateX(16px)}
+/* ── PROFILE AVATAR ──────────────────────────────────────────────────── */
+.prof-avatar-wrap{position:relative;width:80px;height:80px;cursor:pointer;flex-shrink:0}
+.prof-avatar-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--line2)}
+.prof-avatar-letter{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;border:3px solid currentColor;opacity:.8}
+.prof-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px}
+.prof-avatar-wrap:hover .prof-avatar-overlay{opacity:1}
+.auth-avatar-img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.2)}
+/* ── HOME BANNERS ────────────────────────────────────────────────────── */
+.banners-section{max-width:1280px;margin:0 auto;padding:20px 24px 0;display:flex;flex-direction:column;gap:14px}
+.banner-card{border-radius:12px;padding:20px 28px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;cursor:default;animation:fadeIn .4s ease}
+.banner-card.type-sale{background:linear-gradient(135deg,#e8411a22 0%,#ff6b4511 100%);border:1px solid #e8411a44}
+.banner-card.type-promo{background:linear-gradient(135deg,#f59e0b22 0%,#fbbf2411 100%);border:1px solid #f59e0b44}
+.banner-card.type-info{background:linear-gradient(135deg,#3b82f622 0%,#60a5fa11 100%);border:1px solid #3b82f644}
+.banner-card.type-news{background:linear-gradient(135deg,#22c55e22 0%,#4ade8011 100%);border:1px solid #22c55e44}
+.banner-icon{font-size:36px;flex-shrink:0;line-height:1}
+.banner-body{flex:1;min-width:0}
+.banner-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px}
+.banner-text{font-size:13px;color:var(--text2);line-height:1.5}
+.banner-badge{position:absolute;top:12px;right:16px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+.banner-card.type-sale .banner-badge{background:var(--accent);color:#fff}
+.banner-card.type-promo .banner-badge{background:var(--amber);color:#000}
+.banner-card.type-info .banner-badge{background:var(--blue);color:#fff}
+.banner-card.type-news .banner-badge{background:var(--green);color:#000}
+/* ── BANNER EDITOR (admin) ───────────────────────────────────────────── */
+.be-form{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r2);padding:20px;margin-bottom:20px}
+.be-preview-list{display:flex;flex-direction:column;gap:12px}
+.be-item{display:flex;align-items:flex-start;gap:12px;padding:14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r2)}
+.be-item-body{flex:1;min-width:0}
+/* ── CHECKOUT PAYMENT ────────────────────────────────────────────────── */
+.pay-method-tabs{display:flex;gap:10px;margin-top:12px}
+.pay-tab{flex:1;padding:12px;border:2px solid var(--line2);border-radius:var(--r2);cursor:pointer;text-align:center;transition:.15s;background:var(--bg3);display:flex;flex-direction:column;align-items:center;gap:6px}
+.pay-tab.active{border-color:var(--accent);background:var(--accentbg)}
+.pay-tab-icon{font-size:22px}
+.pay-tab-label{font-size:12px;font-weight:600;color:var(--text2)}
+.pay-tab.active .pay-tab-label{color:var(--accent)}
+.client-type-tabs{display:flex;gap:10px;margin-bottom:14px}
+.ct-tab{flex:1;padding:10px;border:2px solid var(--line2);border-radius:var(--r2);cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--text2);background:var(--bg3);transition:.15s}
+.ct-tab.active{border-color:var(--accent);color:var(--accent);background:var(--accentbg)}
+.prepay-info{background:var(--amberbg);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:14px 16px;margin-top:14px;font-size:13px;color:var(--amber);line-height:1.6}
+.prepay-info strong{font-weight:700}
+.pay-detail-box{margin-top:14px;padding:14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r2);font-size:13px;line-height:1.7}
+.sbp-phone{font-size:22px;font-weight:700;color:var(--green);letter-spacing:.04em;margin:6px 0}
+.sbp-bank{font-size:12px;color:var(--text3)}
 #header-auth-area{position:relative}
 
 /* ── LOGIN MODAL ─────────────────────────────────────────────────────── */
@@ -1966,6 +2041,9 @@ footer{
     </div>
   </section>
 
+  <!-- Banners (creator-managed) -->
+  <div id="home-banners-wrap"></div>
+
   <!-- Brands -->
   <div class="brands-bar">
     <div class="brands-track" id="brands-track"></div>
@@ -2209,6 +2287,52 @@ footer{
         </div>
       </div>
 
+      <!-- Client type -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+          Тип клиента
+        </div>
+        <div class="client-type-tabs">
+          <div class="ct-tab active" id="ctab-person" onclick="setClientType('person')">🙋 Физическое лицо</div>
+          <div class="ct-tab" id="ctab-ip" onclick="setClientType('ip')">💼 ИП / Юридическое лицо</div>
+        </div>
+        <div id="ip-fields" style="display:none">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">ИНН</label>
+              <input class="form-input" id="co-inn" placeholder="123456789012">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Наименование организации</label>
+              <input class="form-input" id="co-org" placeholder="ИП Иванов И.И.">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment method -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Способ оплаты
+        </div>
+        <div class="pay-method-tabs">
+          <div class="pay-tab active" id="ptab-sbp" onclick="setPayMethod('sbp')">
+            <div class="pay-tab-icon">⚡</div>
+            <div class="pay-tab-label">СБП</div>
+          </div>
+          <div class="pay-tab" id="ptab-card" onclick="setPayMethod('card')">
+            <div class="pay-tab-icon">💳</div>
+            <div class="pay-tab-label">Банковская карта</div>
+          </div>
+        </div>
+        <!-- Payment info panel -->
+        <div id="pay-info-panel"></div>
+        <!-- Prepayment info -->
+        <div id="prepay-info-panel"></div>
+      </div>
+
       <!-- Comment -->
       <div class="form-section">
         <div class="form-section-title">Комментарий к заказу</div>
@@ -2234,6 +2358,9 @@ footer{
     <div class="success-title">Заказ принят!</div>
     <p class="success-sub">Ваш заказ успешно оформлен и передан в обработку. Менеджер свяжется с вами в течение 15 минут для подтверждения.</p>
     <div class="order-num" id="success-order-num">ЗКл-001337</div>
+
+    <!-- Payment info -->
+    <div id="success-pay-info"></div>
 
     <!-- Контакты менеджеров -->
     <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2);padding:20px;margin:20px 0;text-align:left">
@@ -3028,6 +3155,16 @@ footer{
         <div id="cr-accounts-content"></div>
       </div>
 
+      <!-- ── CREATOR: BANNER EDITOR ──────────────────────────────────────── -->
+      <div class="admin-section" id="admin-tab-cr_banners">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+          <div class="admin-page-title" style="margin-bottom:0;color:#f0c040">🎯 Баннеры главной</div>
+          <span style="font-size:11px;padding:3px 8px;background:rgba(240,192,64,.15);color:#f0c040;border-radius:10px;font-weight:700">CREATOR ONLY</span>
+        </div>
+        <div class="admin-page-sub">Акции, промокоды, объявления — отображаются на главной странице сайта</div>
+        <div id="cr-banners-content"></div>
+      </div>
+
     </div><!-- /admin-content -->
   </div><!-- /admin-layout -->
 </div>
@@ -3380,7 +3517,12 @@ function showPage(name) {
   window.scrollTo(0,0);
   closeMobileMenu();
   if(name==='cart') renderCart();
-  if(name==='checkout') renderCheckoutSummary();
+  if(name==='checkout'){
+    renderCheckoutSummary();
+    setClientType(coClientType);
+    setPayMethod(coPayMethod);
+    updatePrepayPanel();
+  }
   if(name==='admin'){
     renderAdminSidebar();
     updatePendingBadge();
@@ -3558,12 +3700,21 @@ function renderAuthHeader(){
     const r=state.user.role;
     const isStaff=ADMIN_ROLES.includes(r);
     const ROLE_NAMES={creator:'Создатель',boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит'};
-    const avColor=r==='boss'?'var(--accent)':r==='admin'?'var(--accent)':r==='manager'?'var(--blue)':r==='warehouse'?'var(--amber)':r==='accountant'?'var(--green)':'var(--text3)';
+    const avColor=r==='creator'?'#f0c040':r==='boss'?'var(--accent)':r==='admin'?'var(--accent)':r==='manager'?'var(--blue)':r==='warehouse'?'var(--amber)':r==='accountant'?'var(--green)':'var(--text3)';
+    const userAvatar=getUserAvatar(state.user.login);
+    const nickname=getUserNickname(state.user.login)||state.user.name.split(' ')[0];
+    const avatarHdrHtml=userAvatar
+      ? `<img src="${userAvatar}" class="auth-avatar-img" alt="">`
+      : `<div class="auth-avatar" style="background:${avColor}22;color:${avColor};border:1.5px solid ${avColor}44">${state.user.name[0].toUpperCase()}</div>`;
+    const avatarDdHtml=userAvatar
+      ? `<img src="${userAvatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid ${avColor}44;flex-shrink:0" alt="">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${avColor}22;color:${avColor};border:2px solid ${avColor}44;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">${state.user.name[0].toUpperCase()}</div>`;
+    const isLight=document.documentElement.classList.contains('light');
     area.innerHTML=`
       <button class="auth-btn" onclick="toggleProfileDropdown(event)" style="gap:10px" aria-label="Профиль">
-        <div class="auth-avatar" style="background:${avColor}22;color:${avColor};border:1.5px solid ${avColor}44">${state.user.name[0].toUpperCase()}</div>
+        ${avatarHdrHtml}
         <div style="text-align:left;display:flex;flex-direction:column">
-          <div class="auth-name">${state.user.name.split(' ')[0]}</div>
+          <div class="auth-name">${nickname}</div>
           <div class="auth-role-tag">${ROLE_NAMES[r]||r}</div>
         </div>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
@@ -3572,10 +3723,11 @@ function renderAuthHeader(){
         <!-- Head -->
         <div class="profile-dd-head">
           <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:40px;height:40px;border-radius:50%;background:${avColor}22;color:${avColor};border:2px solid ${avColor}44;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">${state.user.name[0].toUpperCase()}</div>
+            ${avatarDdHtml}
             <div>
-              <div style="font-size:14px;font-weight:700;color:#fff">${state.user.name}</div>
-              <div style="font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px">${ROLE_NAMES[r]||r}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text)">${getUserNickname(state.user.login)||state.user.name}</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:1px">@${state.user.login}</div>
+              <div style="font-size:11px;color:${avColor};letter-spacing:.06em;text-transform:uppercase;margin-top:2px;font-weight:700">${ROLE_NAMES[r]||r}</div>
             </div>
           </div>
         </div>
@@ -3597,6 +3749,14 @@ function renderAuthHeader(){
         <button class="profile-dd-item" onclick="closeProfileDropdown();showPage('cart')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61H19.4a2 2 0 001.98-1.69l1.62-9.31H6"/></svg>
           Корзина
+        </button>
+        <div class="profile-dd-sep"></div>
+        <button class="theme-toggle-btn" onclick="toggleTheme();event.stopPropagation()">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:15px">${isLight?'☀️':'🌙'}</span>
+            <span>${isLight?'Светлая тема':'Тёмная тема'}</span>
+          </span>
+          <div class="theme-pill"></div>
         </button>
         <div class="profile-dd-sep"></div>
         <button class="profile-dd-item" onclick="closeProfileDropdown();doLogout()" style="color:var(--text3)">
@@ -4010,6 +4170,7 @@ function setDelivery(type){
     document.getElementById(`delivery-${t}`).style.display=t===type?'block':'none';
   });
   renderCheckoutSummary();
+  updatePrepayPanel();
 }
 
 function renderCheckoutSummary(){
@@ -4203,6 +4364,7 @@ function switchAdminTab(tab){
   if(tab==='hk_changes')    renderHkChanges();
   if(tab==='support_chat')  renderSupportChat();
   if(tab==='cr_accounts')   renderCreatorAccounts();
+  if(tab==='cr_banners')    renderCreatorBanners();
 }
 
 function renderAdminDashboard(){
@@ -4530,6 +4692,12 @@ function placeOrder(){
   const email=document.getElementById('co-email').value.trim();
   if(!name||!phone){showToast('Заполните имя и телефон','red');return;}
 
+  // ИП validation
+  if(coClientType==='ip'){
+    const inn=(document.getElementById('co-inn')?.value||'').trim();
+    if(!inn){showToast('Введите ИНН для ИП/юрлица','red');return;}
+  }
+
   showToast('Отправляем заказ...','amber');
   setTimeout(()=>{
     const orderNum='ЗКл-00'+Math.floor(1000+Math.random()*9000);
@@ -4537,20 +4705,61 @@ function placeOrder(){
     let delivCost=0;
     if(state.delivery==='cdek_pvz') delivCost=state.selectedPvz?.cost||299;
     if(state.delivery==='cdek_courier') delivCost=499;
+    const total=subtotal+delivCost;
+
+    // --- Payment / prepayment rules ---
+    const delivery=state.delivery||'pickup';
+    const hasInStock=state.cart.some(i=>i.source==='1c'||i.inStock);
+    let prepayAmt=0;
+    let prepayNote='';
+    let reserveDays=0;
+
+    if(delivery==='pickup'){
+      if(coClientType==='ip'){
+        // ИП: no prepay, 7-day reserve
+        prepayAmt=0;
+        prepayNote='ИП — предоплата не требуется';
+        reserveDays=7;
+      } else if(hasInStock){
+        // In stock: no prepay, 7-day reserve
+        prepayAmt=0;
+        prepayNote='Товар в наличии — предоплата не требуется';
+        reserveDays=7;
+      } else {
+        // Regular pickup: 20% prepay, 7-day forfeiture
+        prepayAmt=Math.ceil(total*0.2);
+        prepayNote='Предоплата 20% — самовывоз';
+        reserveDays=7;
+      }
+    } else {
+      // Delivery (СДЭК): full payment
+      prepayAmt=total;
+      prepayNote='Полная оплата — доставка СДЭК';
+      reserveDays=0;
+    }
+
+    const inn=document.getElementById('co-inn')?.value.trim()||null;
+    const org=document.getElementById('co-org')?.value.trim()||null;
 
     const order={
       id: orderNum,
       createdAt: new Date().toISOString(),
       status: 'pending',
-      contact: {name:`${name} ${lastname}`.trim(), phone, email, login: state.user?.login||null},
+      contact:{name:`${name} ${lastname}`.trim(), phone, email, login:state.user?.login||null},
+      clientType: coClientType,
+      inn, org,
       delivery: state.delivery,
+      payMethod: coPayMethod,
+      prepayAmt, prepayNote, reserveDays,
       items: state.cart.map(i=>({
         article:i.article, brand:i.brand, name:i.name, source:i.source,
         price_retail:i.price_retail, price_wholesale:i.price_wholesale||null,
         price_input:i.price_input||null, quantity:i.quantity,
+        inStock:!!(i.source==='1c'||i.inStock),
       })),
-      subtotal, deliveryCost:delivCost, total:subtotal+delivCost,
+      subtotal, deliveryCost:delivCost, total,
       comment: document.getElementById('co-comment').value.trim()||null,
+      reserveUntil: reserveDays ? new Date(Date.now()+reserveDays*86400000).toISOString() : null,
     };
 
     saveOrder(order);
@@ -4558,26 +4767,58 @@ function placeOrder(){
       user: state.user?.login||email||'guest',
       role: state.user?.role||'customer',
       action:'order_create',
-      details:`${orderNum} — ${state.cart.length} поз., ${(subtotal+delivCost).toLocaleString('ru-RU')} ₽`
+      details:`${orderNum} — ${state.cart.length} поз., ${total.toLocaleString('ru-RU')} ₽, ${prepayNote}`
     });
 
     // Уведомление менеджеру в Telegram
-    const itemLines=order.items.map(i=>`  • ${i.brand} ${i.article} ×${i.quantity}`).join('\n');
+    const itemLines=order.items.map(i=>`  • ${i.brand} ${i.article} ×${i.quantity}${i.inStock?' ✅':''}`).join('\n');
+    const payMethodLabel=coPayMethod==='sbp'?'СБП':'Банковская карта';
     notifyTelegram(
       `🛒 *Новый заказ* \`${orderNum}\`\n`+
-      `👤 Клиент: ${order.contact.name}\n`+
+      `👤 ${coClientType==='ip'?'💼 ИП':'🙋 Физлицо'}: ${order.contact.name}\n`+
       `📞 Тел: ${order.contact.phone}\n`+
+      (inn?`🏛 ИНН: ${inn}\n`:'')+
+      (org?`🏢 Орг: ${org}\n`:'')+
       `🚚 Доставка: ${delivLabel(state.delivery)}\n`+
-      `💰 Сумма: *${(subtotal+delivCost).toLocaleString('ru-RU')} ₽*\n`+
+      `💳 Оплата: ${payMethodLabel}\n`+
+      `💰 Сумма: *${total.toLocaleString('ru-RU')} ₽*\n`+
+      (prepayAmt&&prepayAmt<total?`💵 Предоплата: *${prepayAmt.toLocaleString('ru-RU')} ₽*\n`:
+       prepayAmt===total?`💵 Полная оплата: *${prepayAmt.toLocaleString('ru-RU')} ₽*\n`:
+       `💵 Предоплата: не требуется\n`)+
+      (reserveDays?`⏰ Резерв: ${reserveDays} дней\n`:'')+
       `📦 Позиций: ${order.items.length}\n\n`+
       itemLines+`\n\n⏳ Ожидает подтверждения менеджера`
     );
 
+    // Show success with payment instructions
     document.getElementById('success-order-num').textContent=orderNum;
+    renderSuccessPayInfo(order);
     state.cart=[];
     updateCartCount();
     showPage('success');
   },1500);
+}
+
+function renderSuccessPayInfo(order){
+  const el=document.getElementById('success-pay-info');
+  if(!el)return;
+  const isFullPay=order.prepayAmt>=order.total;
+  const isNoPrepay=order.prepayAmt===0;
+  if(isNoPrepay){
+    el.innerHTML=`<div style="background:var(--greenbg);border:1px solid rgba(34,197,94,.3);border-radius:var(--r2);padding:16px;margin:16px 0;text-align:left">
+      <div style="font-weight:700;color:var(--green);margin-bottom:4px">✅ Предоплата не требуется</div>
+      <div style="font-size:13px;color:var(--text2)">${order.prepayNote}${order.reserveDays?` · резерв ${order.reserveDays} дней`:''}</div>
+    </div>`;
+  } else {
+    const payHtml=order.payMethod==='sbp'
+      ? `<div class="sbp-phone" style="font-size:20px;color:var(--green)">+7 (928) 155-22-24</div><div class="sbp-bank">СБП · Т-Банк · Артём · ДК ГАРАЖ</div><div style="font-size:12px;color:var(--text3);margin-top:6px">Комментарий к переводу: ${order.id}</div>`
+      : `<div style="font-size:13px;color:var(--text2)">Оплата картой при получении или в нашем офисе.</div>`;
+    el.innerHTML=`<div style="background:var(--amberbg);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:16px;margin:16px 0;text-align:left">
+      <div style="font-weight:700;color:var(--amber);margin-bottom:8px">💳 ${isFullPay?'Полная оплата':'Предоплата'}: ${order.prepayAmt.toLocaleString('ru-RU')} ₽</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${order.prepayNote}</div>
+      ${payHtml}
+    </div>`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -6174,6 +6415,7 @@ const ROLE_TABS_CONFIG = {
     {id:'orders',       icon:'📋', label:'Заказы',         badge:true},
     {id:'support_chat', icon:'💬', label:'Чат поддержки'},
     {id:'cr_accounts',  icon:'🔑', label:'Все аккаунты'},
+    {id:'cr_banners',   icon:'🎯', label:'Баннеры'},
     {id:'boss_mgrs',    icon:'👨‍💼', label:'Менеджеры'},
     {id:'profit',       icon:'💰', label:'Прибыль'},
     {id:'logs',         icon:'📝', label:'Журнал'},
@@ -6477,14 +6719,24 @@ function renderMyProfile(){
   if(!el) return;
 
   const meta = ROLE_META[state.role]||ROLE_META.customer;
+  const avatar=getUserAvatar(u?.login||'');
+  const nickname=getUserNickname(u?.login||'')||u?.name||'';
   el.innerHTML=`
-    <div class="role-panel-hero">
-      <div class="role-panel-avatar" style="background:${meta.bg};color:${meta.color}">
-        ${u?.name?.[0]||'?'}
-      </div>
+    <div class="role-panel-hero" style="align-items:flex-start;gap:20px;flex-wrap:wrap">
+      <!-- Avatar upload -->
       <div>
-        <div class="role-panel-title">${u?.name||'—'}</div>
-        <div class="role-panel-sub">${meta.label} · ${u?.login||''}</div>
+        <div class="prof-avatar-wrap" onclick="document.getElementById('avatar-file-input').click()" title="Нажмите, чтобы сменить фото">
+          ${avatar
+            ? `<img src="${avatar}" class="prof-avatar-img" alt="">`
+            : `<div class="prof-avatar-letter" style="background:${meta.bg};color:${meta.color}">${u?.name?.[0]||'?'}</div>`}
+          <div class="prof-avatar-overlay">📷</div>
+        </div>
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="uploadProfileAvatar(this)">
+        ${avatar?`<button onclick="removeProfileAvatar()" style="display:block;width:80px;margin-top:6px;padding:3px 0;font-size:11px;color:var(--accent);background:transparent;border:none;cursor:pointer;text-align:center">Удалить</button>`:''}
+      </div>
+      <div style="flex:1;min-width:180px">
+        <div class="role-panel-title">${nickname||'—'}</div>
+        <div class="role-panel-sub">${meta.label} · @${u?.login||''}</div>
         ${reg?.phone?`<div style="font-size:13px;color:var(--text3);margin-top:4px">📞 ${reg.phone}</div>`:''}
       </div>
     </div>
@@ -6504,6 +6756,10 @@ function renderMyProfile(){
     </div>`}
 
     <div class="profile-form">
+      <div class="profile-field">
+        <div class="profile-label">Отображаемый ник (необязательно)</div>
+        <input class="profile-input" id="prof-nickname" value="${escHtml(getUserNickname(u?.login||''))}" placeholder="Как вас называть в сервисе?">
+      </div>
       <div class="profile-field">
         <div class="profile-label">Имя</div>
         <input class="profile-input" id="prof-name" value="${escHtml(u?.name||'')}" placeholder="Ваше имя">
@@ -6528,6 +6784,7 @@ function saveMyProfile(){
   const name = document.getElementById('prof-name')?.value.trim();
   const phone = document.getElementById('prof-phone')?.value.trim();
   const newPass = document.getElementById('prof-newpass')?.value;
+  const nickname = document.getElementById('prof-nickname')?.value.trim();
   const login = state.user?.login;
   if(!login||!name){showToast('Заполните имя','red');return;}
 
@@ -6539,6 +6796,7 @@ function saveMyProfile(){
     else if(newPass&&newPass.length<6){showToast('Пароль — минимум 6 символов','red');return;}
     saveUsers(users);
   }
+  if(nickname!==undefined) setUserNickname(login, nickname);
   state.user.name=name;
   sessionStorage.setItem('dp_session',JSON.stringify(state.user));
   renderAuthHeader();
@@ -6547,6 +6805,231 @@ function saveMyProfile(){
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// THEME TOGGLE
+// ═══════════════════════════════════════════════════════════════════════════
+function applyTheme(){
+  const t=localStorage.getItem('dp_theme')||'dark';
+  document.documentElement.classList.toggle('light',t==='light');
+}
+function toggleTheme(){
+  const isLight=document.documentElement.classList.contains('light');
+  localStorage.setItem('dp_theme',isLight?'dark':'light');
+  document.documentElement.classList.toggle('light',!isLight);
+  renderAuthHeader(); // refresh toggle button state
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AVATAR & NICKNAME
+// ═══════════════════════════════════════════════════════════════════════════
+function getAvatarStore(){try{return JSON.parse(localStorage.getItem('dp_avatars')||'{}');}catch{return{};}}
+function saveAvatarStore(obj){localStorage.setItem('dp_avatars',JSON.stringify(obj));}
+function getUserAvatar(login){if(!login)return'';return getAvatarStore()[login]||'';}
+function setUserAvatar(login,b64){const s=getAvatarStore();s[login]=b64;saveAvatarStore(s);}
+function removeUserAvatar(login){const s=getAvatarStore();delete s[login];saveAvatarStore(s);}
+
+function getNicknameStore(){try{return JSON.parse(localStorage.getItem('dp_nicknames')||'{}');}catch{return{};}}
+function saveNicknameStore(obj){localStorage.setItem('dp_nicknames',JSON.stringify(obj));}
+function getUserNickname(login){if(!login)return'';return getNicknameStore()[login]||'';}
+function setUserNickname(login,nick){const s=getNicknameStore();if(nick)s[login]=nick;else delete s[login];saveNicknameStore(s);}
+
+function uploadProfileAvatar(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>2*1024*1024){showToast('Фото не должно превышать 2 МБ','red');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    setUserAvatar(state.user.login,e.target.result);
+    renderAuthHeader();
+    renderMyProfile();
+    showToast('Фото профиля обновлено','green');
+  };
+  reader.readAsDataURL(file);
+}
+function removeProfileAvatar(){
+  removeUserAvatar(state.user.login);
+  renderAuthHeader();
+  renderMyProfile();
+  showToast('Фото удалено','amber');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HOME PAGE BANNERS
+// ═══════════════════════════════════════════════════════════════════════════
+function getBanners(){try{return JSON.parse(localStorage.getItem('dp_banners')||'[]');}catch{return[];}}
+function saveBanners(arr){localStorage.setItem('dp_banners',JSON.stringify(arr));}
+
+function renderHomeBanners(){
+  const wrap=document.getElementById('home-banners-wrap');
+  if(!wrap)return;
+  const banners=getBanners().filter(b=>b.active);
+  if(!banners.length){wrap.innerHTML='';return;}
+  const ICONS={sale:'🔥',promo:'🎁',info:'ℹ️',news:'📢'};
+  const LABELS={sale:'Акция',promo:'Промокод',info:'Инфо',news:'Новость'};
+  wrap.innerHTML=`<div class="banners-section">
+    ${banners.map(b=>`
+    <div class="banner-card type-${b.type||'info'}">
+      <div class="banner-icon">${ICONS[b.type||'info']}</div>
+      <div class="banner-body">
+        <div class="banner-title">${escHtml(b.title)}</div>
+        ${b.text?`<div class="banner-text">${escHtml(b.text)}</div>`:''}
+        ${b.type==='promo'&&b.code?`<div style="margin-top:8px"><span style="font-family:var(--font-mono);font-size:14px;font-weight:700;background:var(--amberbg);color:var(--amber);padding:4px 12px;border-radius:4px;border:1px dashed var(--amber)">${escHtml(b.code)}</span></div>`:''}
+      </div>
+      <div class="banner-badge">${LABELS[b.type||'info']}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderCreatorBanners(){
+  if(state.role!=='creator')return;
+  const el=document.getElementById('cr-banners-content');
+  if(!el)return;
+  const banners=getBanners();
+  const ICONS={sale:'🔥',promo:'🎁',info:'ℹ️',news:'📢'};
+  const LABELS={sale:'Акция',promo:'Промокод',info:'Инфо',news:'Новость'};
+  el.innerHTML=`
+  <!-- Add form -->
+  <div class="be-form">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px">➕ Новый баннер</div>
+    <div class="form-grid" style="gap:12px;margin-bottom:12px">
+      <div class="form-group">
+        <label class="form-label">Тип</label>
+        <select class="admin-filter-select" id="be-type" onchange="renderBePromoField()" style="width:100%">
+          <option value="sale">🔥 Акция</option>
+          <option value="promo">🎁 Промокод</option>
+          <option value="info">ℹ️ Инфо</option>
+          <option value="news">📢 Новость</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Заголовок</label>
+        <input class="admin-filter-input" id="be-title" placeholder="Скидка 20% на тормозные колодки" style="width:100%">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Описание (необязательно)</label>
+        <input class="admin-filter-input" id="be-text" placeholder="Подробнее об акции..." style="width:100%">
+      </div>
+      <div class="form-group" id="be-promo-wrap" style="display:none">
+        <label class="form-label">Промокод</label>
+        <input class="admin-filter-input" id="be-code" placeholder="GARAGE20" style="width:100%;font-family:var(--font-mono);text-transform:uppercase">
+      </div>
+    </div>
+    <button class="admin-btn admin-btn-primary" onclick="addBanner()">Добавить баннер</button>
+  </div>
+  <!-- Existing banners -->
+  <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Баннеры (${banners.length})</div>
+  ${banners.length===0?`<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;background:var(--bg3);border-radius:var(--r2)">Нет баннеров — создайте первый выше</div>`:''}
+  <div class="be-preview-list">
+    ${banners.map((b,i)=>`
+    <div class="be-item">
+      <div style="font-size:24px;width:36px;text-align:center;flex-shrink:0">${ICONS[b.type||'info']}</div>
+      <div class="be-item-body">
+        <div style="font-weight:700;color:var(--text);font-size:14px">${escHtml(b.title)}</div>
+        ${b.text?`<div style="font-size:12px;color:var(--text3);margin-top:2px">${escHtml(b.text)}</div>`:''}
+        ${b.code?`<div style="font-size:11px;color:var(--amber);margin-top:4px;font-family:var(--font-mono)">Промокод: ${escHtml(b.code)}</div>`:''}
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${LABELS[b.type||'info']} · ${b.createdAt?new Date(b.createdAt).toLocaleDateString('ru-RU'):''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap">
+          <input type="checkbox" ${b.active?'checked':''} onchange="toggleBanner(${i},this.checked)"> Активен
+        </label>
+        <button class="admin-btn" style="font-size:11px;padding:3px 10px;color:var(--accent)" onclick="deleteBanner(${i})">Удалить</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+function renderBePromoField(){
+  const t=document.getElementById('be-type')?.value;
+  const wrap=document.getElementById('be-promo-wrap');
+  if(wrap) wrap.style.display=t==='promo'?'':'none';
+}
+function addBanner(){
+  const type=document.getElementById('be-type')?.value||'info';
+  const title=(document.getElementById('be-title')?.value||'').trim();
+  const text=(document.getElementById('be-text')?.value||'').trim();
+  const code=(document.getElementById('be-code')?.value||'').trim().toUpperCase();
+  if(!title){showToast('Введите заголовок','red');return;}
+  const banners=getBanners();
+  banners.unshift({type,title,text,code:type==='promo'?code:'',active:true,createdAt:new Date().toISOString()});
+  saveBanners(banners);
+  renderHomeBanners();
+  renderCreatorBanners();
+  showToast('Баннер добавлен','green');
+}
+function toggleBanner(idx,active){
+  const banners=getBanners();
+  if(banners[idx])banners[idx].active=active;
+  saveBanners(banners);
+  renderHomeBanners();
+}
+function deleteBanner(idx){
+  if(!confirm('Удалить баннер?'))return;
+  const banners=getBanners();
+  banners.splice(idx,1);
+  saveBanners(banners);
+  renderHomeBanners();
+  renderCreatorBanners();
+  showToast('Баннер удалён','amber');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHECKOUT STATE & HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+let coClientType='person'; // 'person' | 'ip'
+let coPayMethod='sbp';     // 'sbp' | 'card'
+
+function setClientType(t){
+  coClientType=t;
+  document.querySelectorAll('.ct-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('ctab-'+t)?.classList.add('active');
+  const ipFields=document.getElementById('ip-fields');
+  if(ipFields) ipFields.style.display=t==='ip'?'':'none';
+  updatePrepayPanel();
+}
+function setPayMethod(m){
+  coPayMethod=m;
+  document.querySelectorAll('.pay-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('ptab-'+m)?.classList.add('active');
+  renderPayInfoPanel();
+}
+function renderPayInfoPanel(){
+  const el=document.getElementById('pay-info-panel');
+  if(!el)return;
+  if(coPayMethod==='sbp'){
+    el.innerHTML=`<div class="pay-detail-box">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Перевод по номеру телефона (СБП)</div>
+      <div class="sbp-phone">+7 (928) 155-22-24</div>
+      <div class="sbp-bank">Банк: Т-Банк · Артём · ДК ГАРАЖ</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text2)">Укажите в комментарии к переводу номер заказа</div>
+    </div>`;
+  } else {
+    el.innerHTML=`<div class="pay-detail-box">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Оплата банковской картой</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7">Оплата картой производится у нас в офисе или через терминал при получении заказа.<br>Принимаем карты Visa, Mastercard, МИР.</div>
+    </div>`;
+  }
+}
+function updatePrepayPanel(){
+  const el=document.getElementById('prepay-info-panel');
+  if(!el)return;
+  const delivery=state.delivery||'pickup';
+  const subtotal=getCartSubtotal();
+  const prepay20=Math.ceil(subtotal*0.2);
+  const hasInStock=state.cart&&state.cart.some(i=>i.source==='1c'||i.inStock);
+
+  let html='';
+  if(delivery==='pickup'&&coClientType==='ip'){
+    html=`<div class="prepay-info">💼 <strong>ИП / Юрлицо + самовывоз:</strong> предоплата не требуется. Резерв товара — <strong>7 дней</strong> с момента поступления на склад. По истечении срока резерв снимается автоматически.</div>`;
+  } else if(delivery==='pickup'&&hasInStock){
+    html=`<div class="prepay-info" style="background:var(--greenbg);border-color:rgba(34,197,94,.3);color:var(--green)">✅ <strong>Товар уже на складе:</strong> предоплата не требуется. За вами закрепляется резерв на <strong>7 дней</strong>. Если не заберёте — резерв снимается.</div>`;
+  } else if(delivery==='pickup'){
+    html=`<div class="prepay-info">🏪 <strong>Самовывоз — предоплата ${prepay20.toLocaleString('ru-RU')} ₽</strong> (20% от суммы заказа).<br>Если не придёте за заказом в течение <strong>7 дней</strong> после доставки к нам — предоплата сгорает.</div>`;
+  } else {
+    html=`<div class="prepay-info" style="background:var(--accentbg);border-color:rgba(232,65,26,.3);color:var(--accent2)">🚚 <strong>Доставка (СДЭК) — полная оплата ${subtotal.toLocaleString('ru-RU')} ₽.</strong><br>Оплата производится до отправки заказа.</div>`;
+  }
+  el.innerHTML=html;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FAQ / SUPPORT PAGE
@@ -6926,6 +7409,9 @@ function showPdPolicy(e){
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 function init(){
+  // Apply saved theme
+  applyTheme();
+
   // Restore session
   try{
     const saved=sessionStorage.getItem('dp_session');
@@ -6958,10 +7444,15 @@ function init(){
       <div class="cat-count">${c.count} артикулов</div>
     </div>`).join('');
 
+  // Home banners
+  renderHomeBanners();
+
   // Checkout init
   renderStores();
   renderPvzList();
   renderCheckoutSummary();
+  renderPayInfoPanel();
+  updatePrepayPanel();
 
   // Уведомление об ожидающих заказах
   setTimeout(()=>{
