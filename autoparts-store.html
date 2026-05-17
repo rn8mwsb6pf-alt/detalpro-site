@@ -84,7 +84,7 @@ header{
   color:var(--text3);letter-spacing:.14em;text-transform:uppercase;
   font-family:var(--font-body);
 }
-.logo-text .logo-main{display:block;font-size:20px;color:var(--accent)}
+.logo-text .logo-main{display:block;font-size:20px;color:#fff}
 .logo-text .logo-main span{color:var(--accent)}
 
 nav{
@@ -1361,6 +1361,27 @@ footer{
 .auth-name{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .auth-role-tag{font-size:10px;color:var(--text3);letter-spacing:.06em}
 
+/* ── PROFILE DROPDOWN ───────────────────────────────────────────────── */
+.profile-dropdown{
+  position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r2);min-width:240px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  z-index:400;padding:0;overflow:hidden;
+  opacity:0;pointer-events:none;transform:translateY(-8px) scale(.98);
+  transition:opacity .18s,transform .18s;
+}
+.profile-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.profile-dd-head{padding:16px;border-bottom:1px solid var(--line);background:var(--bg3)}
+.profile-dd-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s;border:none;background:transparent;width:100%;text-align:left}
+.profile-dd-item:hover{background:var(--bg3);color:var(--text)}
+.profile-dd-item.accent{color:var(--accent)}
+.profile-dd-item.accent:hover{background:rgba(232,65,26,.1)}
+.profile-dd-item.green{color:var(--green)}
+.profile-dd-item.green:hover{background:rgba(34,197,94,.1)}
+.profile-dd-sep{height:1px;background:var(--line);margin:4px 0}
+#header-auth-area{position:relative}
+
 /* ── LOGIN MODAL ─────────────────────────────────────────────────────── */
 .modal-overlay{
   position:fixed;inset:0;z-index:500;
@@ -1809,9 +1830,24 @@ footer{
 <header>
   <div class="header-inner">
     <div class="logo" onclick="showPage('home')">
-      <div style="width:44px;height:44px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
-        <img src="https://sun9-38.userapi.com/s/v1/ig2/gITcNhYsI1MlTyfty4QYumbbw4pzZvvDubzsO4PN2It4OwIxbGI142MljMog4HvuwPfLtAaUdMtBDMGZVGppgMJp.jpg?quality=95&as=32x32,48x48,72x73,108x109,160x161,240x242,360x363,480x484,540x545,640x646,720x727,1080x1090,1280x1292,1440x1453,2140x2160&from=bu&cs=240x0" alt="ГАРАЖ" style="width:44px;height:44px;object-fit:cover;filter:brightness(0) invert(1)">
-      </div>
+      <svg class="logo-svg" width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="36" stroke="#e8411a" stroke-width="1"/>
+        <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
+        <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+        <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="8"  r="3" fill="#e8411a"/>
+        <circle cx="50" cy="92" r="3" fill="#e8411a"/>
+        <circle cx="8"  cy="50" r="3" fill="#e8411a"/>
+        <circle cx="92" cy="50" r="3" fill="#e8411a"/>
+        <circle cx="21" cy="21" r="2" fill="#e8411a" opacity=".6"/>
+        <circle cx="79" cy="21" r="2" fill="#e8411a" opacity=".6"/>
+        <circle cx="21" cy="79" r="2" fill="#e8411a" opacity=".6"/>
+        <circle cx="79" cy="79" r="2" fill="#e8411a" opacity=".6"/>
+      </svg>
       <div class="logo-text">
         <span class="logo-sub">Дорожный комплекс</span>
         <span class="logo-main">ГАРАЖ</span>
@@ -2319,20 +2355,42 @@ footer{
 
     <!-- Why us -->
     <div style="margin-bottom:48px">
-      <div style="font-family:var(--font-head);font-size:32px;font-weight:700;color:#fff;margin-bottom:24px">Почему выбирают нас</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Наши преимущества</div>
+          <div style="font-family:var(--font-head);font-size:clamp(28px,4vw,42px);font-weight:900;color:#fff;line-height:1.05">Почему выбирают<br><em style="font-style:italic;color:var(--accent)">ГАРАЖ</em></div>
+        </div>
+        <div style="font-size:13px;color:var(--text3);max-width:260px;line-height:1.6">Более 18 лет мы помогаем водителям находить нужные запчасти быстро и по честной цене</div>
+      </div>
+
+      <!-- Большая карточка -->
+      <div style="background:linear-gradient(135deg,var(--accent) 0%,#c0341a 100%);border-radius:var(--r2);padding:32px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;overflow:hidden;position:relative">
+        <div style="position:absolute;right:-20px;top:-20px;width:180px;height:180px;border-radius:50%;border:40px solid rgba(255,255,255,.06)"></div>
+        <div style="position:absolute;right:60px;bottom:-40px;width:120px;height:120px;border-radius:50%;border:30px solid rgba(255,255,255,.04)"></div>
+        <div style="position:relative">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:10px">Главное отличие</div>
+          <div style="font-family:var(--font-head);font-size:clamp(22px,3vw,32px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:14px">Мы прямо на трассе М4 —<br>помогаем даже в дороге</div>
+          <p style="font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;margin:0">Наш склад на 932 км федеральной трассы — если сломались в дороге, приезжайте прямо к нам. Широкий ассортимент расходников, масел, фильтров и экстренных запчастей всегда в наличии.</p>
+        </div>
+        <div style="font-size:72px;opacity:.25;flex-shrink:0;position:relative">🛣️</div>
+      </div>
+
+      <!-- Сетка 3×2 -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
         ${[
-          ['🔍','Точный подбор','Подбор по артикулу, VIN-номеру или марке автомобиля. Наши менеджеры помогут найти нужную деталь.'],
-          ['💰','Честные цены','Прямые контракты с производителями позволяют избежать наценок дистрибьюторов.'],
-          ['🚚','Быстрая доставка','Отправляем заказы из Каменск-Шахтинского через СДЭК по всей России.'],
-          ['✅','Гарантия','На все запчасти предоставляется гарантия. Работаем только с проверенными брендами.'],
-          ['📞','Поддержка 6/7','Менеджеры на связи с 8:00 до 19:00 по рабочим дням и в субботу.'],
-          ['🤝','B2B условия','Для автосервисов и корпоративных клиентов — особые цены и персональный менеджер.']
-        ].map(([icon,title,text])=>`<div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px">
-          <div style="font-size:28px;margin-bottom:10px">${icon}</div>
-          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">${title}</div>
-          <div style="font-size:13px;color:var(--text3);line-height:1.6">${text}</div>
-        </div>`).join('')}
+          {n:'01',icon:'🔍',title:'Точный подбор',text:'По артикулу, VIN-номеру или марке. Если сомневаетесь — менеджер поможет за минуту.',color:'var(--blue)'},
+          {n:'02',icon:'💰',title:'Без переплат',text:'Работаем напрямую с поставщиками. Никаких посредников — только честная цена.',color:'var(--green)'},
+          {n:'03',icon:'✅',title:'Гарантия на всё',text:'Гарантия на все позиции. Брак? Заменим без лишних вопросов.',color:'var(--amber)'},
+          {n:'04',icon:'🚚',title:'Доставка по России',text:'Отправляем через СДЭК. 1–7 рабочих дней в любой регион страны.',color:'#a855f7'},
+          {n:'05',icon:'📞',title:'Поддержка 6 дней',text:'Звоните пн–пт 8:00–19:00, сб 9:00–17:00. Отвечаем быстро.',color:'var(--accent)'},
+          {n:'06',icon:'🤝',title:'Условия для бизнеса',text:'Автосервисы и корпоративные клиенты — скидки, отсрочка, персональный менеджер.',color:'var(--green)'},
+        ].map(({n,icon,title,text,color})=>`
+          <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:22px;position:relative;overflow:hidden;transition:.2s" onmouseover="this.style.borderColor='${color}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--line)';this.style.transform=''">
+            <div style="position:absolute;top:16px;right:16px;font-family:var(--font-head);font-size:36px;font-weight:900;color:${color};opacity:.12;line-height:1">${n}</div>
+            <div style="width:44px;height:44px;background:${color}18;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px">${icon}</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">${title}</div>
+            <div style="font-size:13px;color:var(--text3);line-height:1.65">${text}</div>
+          </div>`).join('')}
       </div>
     </div>
   </div>
@@ -3479,21 +3537,68 @@ function renderAuthHeader(){
     const r=state.user.role;
     const isStaff=ADMIN_ROLES.includes(r);
     const ROLE_NAMES={boss:'Начальник',admin:'Администратор',manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',customer:'Покупатель',hacker:'Аудит'};
-    const avColor=r==='boss'||r==='admin'?'var(--accent)':r==='manager'?'var(--blue)':r==='warehouse'?'var(--amber)':'var(--text3)';
-    const av=`<div class="auth-avatar" style="background:${avColor}20;color:${avColor};border-color:${avColor}40">${state.user.name[0]}</div>`;
+    const avColor=r==='boss'?'var(--accent)':r==='admin'?'var(--accent)':r==='manager'?'var(--blue)':r==='warehouse'?'var(--amber)':r==='accountant'?'var(--green)':'var(--text3)';
     area.innerHTML=`
-      ${isStaff?`<button class="auth-btn" onclick="showPage('admin')" style="border-left:none">
-        <span style="font-size:12px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.06em">⚙ Панель</span>
-      </button>`:''}
-      <button class="auth-btn" onclick="doLogout()" title="Выйти">
-        ${av}
-        <div style="text-align:left">
-          <div class="auth-name">${state.user.name}</div>
+      <button class="auth-btn" onclick="toggleProfileDropdown(event)" style="gap:10px" aria-label="Профиль">
+        <div class="auth-avatar" style="background:${avColor}22;color:${avColor};border:1.5px solid ${avColor}44">${state.user.name[0].toUpperCase()}</div>
+        <div style="text-align:left;display:flex;flex-direction:column">
+          <div class="auth-name">${state.user.name.split(' ')[0]}</div>
           <div class="auth-role-tag">${ROLE_NAMES[r]||r}</div>
         </div>
-      </button>`;
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <!-- Head -->
+        <div class="profile-dd-head">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:${avColor}22;color:${avColor};border:2px solid ${avColor}44;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">${state.user.name[0].toUpperCase()}</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#fff">${state.user.name}</div>
+              <div style="font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px">${ROLE_NAMES[r]||r}</div>
+            </div>
+          </div>
+        </div>
+        <!-- Items -->
+        ${isStaff?`
+        <button class="profile-dd-item accent" onclick="closeProfileDropdown();showPage('admin')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Панель управления
+        </button>
+        <div class="profile-dd-sep"></div>`:''}
+        <button class="profile-dd-item" onclick="closeProfileDropdown();showPage('admin');switchAdminTab('my_profile')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Мой профиль
+        </button>
+        <button class="profile-dd-item" onclick="closeProfileDropdown();showPage('admin');switchAdminTab('my_orders')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Мои заказы
+        </button>
+        <button class="profile-dd-item" onclick="closeProfileDropdown();showPage('cart')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61H19.4a2 2 0 001.98-1.69l1.62-9.31H6"/></svg>
+          Корзина
+        </button>
+        <div class="profile-dd-sep"></div>
+        <button class="profile-dd-item" onclick="closeProfileDropdown();doLogout()" style="color:var(--text3)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Выйти
+        </button>
+      </div>`;
   }
 }
+
+function toggleProfileDropdown(e){
+  e.stopPropagation();
+  const dd=document.getElementById('profile-dropdown');
+  if(!dd) return;
+  const isOpen=dd.classList.contains('open');
+  closeProfileDropdown();
+  if(!isOpen) dd.classList.add('open');
+}
+function closeProfileDropdown(){
+  document.getElementById('profile-dropdown')?.classList.remove('open');
+}
+// Close on outside click
+document.addEventListener('click', ()=>closeProfileDropdown());
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SEARCH
