@@ -1496,6 +1496,77 @@ footer{
 .profile-dd-item.green{color:var(--green)}
 .profile-dd-item.green:hover{background:rgba(34,197,94,.1)}
 .profile-dd-sep{height:1px;background:var(--line);margin:4px 0}
+/* ── WELCOME SCREEN ──────────────────────────────────────────────────── */
+#welcome-overlay{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  background:var(--bg);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease;
+}
+#welcome-overlay.show{opacity:1;pointer-events:all}
+#welcome-overlay.hide{opacity:0;pointer-events:none}
+.welcome-logo{
+  margin-bottom:32px;
+  animation:wl-pop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.welcome-avatar{
+  width:88px;height:88px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:800;
+  border:3px solid currentColor;
+  animation:wl-pop .55s .08s cubic-bezier(.34,1.56,.64,1) both;
+}
+.welcome-avatar img{
+  width:88px;height:88px;border-radius:50%;object-fit:cover;
+}
+.welcome-greeting{
+  font-size:15px;font-weight:500;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.12em;
+  margin-bottom:10px;
+  animation:wl-up .45s .18s ease both;
+}
+.welcome-name{
+  font-family:var(--font-head);
+  font-size:clamp(32px,6vw,52px);
+  font-weight:900;
+  color:var(--text);
+  letter-spacing:-.01em;
+  line-height:1.05;
+  text-align:center;
+  animation:wl-up .45s .28s ease both;
+}
+.welcome-role{
+  margin-top:10px;
+  font-size:13px;font-weight:600;
+  padding:4px 14px;border-radius:20px;
+  animation:wl-up .45s .38s ease both;
+}
+.welcome-dots{
+  margin-top:40px;display:flex;gap:8px;
+  animation:wl-up .4s .48s ease both;
+}
+.welcome-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--line2);
+  animation:wl-dot 1.2s .55s ease-in-out infinite;
+}
+.welcome-dot:nth-child(2){animation-delay:.7s}
+.welcome-dot:nth-child(3){animation-delay:.85s}
+@keyframes wl-pop{
+  from{opacity:0;transform:scale(.6)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes wl-up{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes wl-dot{
+  0%,80%,100%{transform:scale(1);opacity:.4}
+  40%{transform:scale(1.5);opacity:1}
+}
+
 /* ── THEME TOGGLE ────────────────────────────────────────────────────── */
 .theme-toggle-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 16px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s}
 .theme-toggle-btn:hover{background:var(--bg3);color:var(--text)}
@@ -3291,6 +3362,22 @@ footer{
   </div>
 </div>
 
+<!-- ═══ WELCOME OVERLAY ═════════════════════════════════════════════════════ -->
+<div id="welcome-overlay">
+  <div class="welcome-logo">
+    <svg width="48" height="48" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="2" stroke-dasharray="4 3"/><circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="3"/><circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/><circle cx="50" cy="50" r="7" fill="#e8411a"/><line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/><line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/><line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/></svg>
+  </div>
+  <div id="welcome-avatar-wrap"></div>
+  <div class="welcome-greeting">Добро пожаловать</div>
+  <div class="welcome-name" id="welcome-name">—</div>
+  <div class="welcome-role" id="welcome-role"></div>
+  <div class="welcome-dots">
+    <div class="welcome-dot" style="background:var(--accent)"></div>
+    <div class="welcome-dot" style="background:var(--accent)"></div>
+    <div class="welcome-dot" style="background:var(--accent)"></div>
+  </div>
+</div>
+
 <!-- ═══ LOGIN MODAL ════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="login-modal" onclick="if(event.target===this)closeLogin()">
   <div class="modal-box">
@@ -3728,7 +3815,9 @@ function doRegister(){
   logActivity({user:login,role:'customer',action:'register',details:`Новый пользователь: ${newUser.name}`});
   closeRegister();
   renderAuthHeader();
-  showToast(`Добро пожаловать, ${name}! Аккаунт создан.`,'green');
+  showWelcome(name,'customer',()=>{
+    showPage('admin'); switchAdminTab('my_profile');
+  });
 }
 function doLogin(){
   const login=document.getElementById('login-user').value.trim();
@@ -3746,9 +3835,10 @@ function doLogin(){
       closeLogin();
       renderAuthHeader();
       if(state.currentResults.length) renderResults();
-      showToast(`Добро пожаловать, ${sysAcc.name}!`,'green');
-      if(STAFF_ROLES.includes(sysAcc.role)) showPage('admin');
-    else { showPage('admin'); switchAdminTab('my_profile'); }
+      showWelcome(sysAcc.name, sysAcc.role, ()=>{
+        if(STAFF_ROLES.includes(sysAcc.role)) showPage('admin');
+        else { showPage('admin'); switchAdminTab('my_profile'); }
+      });
     }catch(err){console.error('Login error:',err);}
     return;
   }
@@ -3763,15 +3853,56 @@ function doLogin(){
     closeLogin();
     renderAuthHeader();
     if(state.currentResults.length) renderResults();
-    showToast(`Добро пожаловать, ${regUser.name}!`,'green');
-    if(STAFF_ROLES.includes(state.role)) showPage('admin');
-    else { showPage('admin'); switchAdminTab('my_profile'); }
+    showWelcome(regUser.name, state.role, ()=>{
+      if(STAFF_ROLES.includes(state.role)) showPage('admin');
+      else { showPage('admin'); switchAdminTab('my_profile'); }
+    });
     return;
   }
 
   errEl.style.display='block';
   errEl.textContent=`Неверный логин или пароль`;
 }
+function showWelcome(name, role, callback){
+  const ROLE_NAMES={creator:'Создатель',boss:'Начальник',admin:'Администратор',
+    manager:'Менеджер',accountant:'Бухгалтер',warehouse:'Склад',
+    customer:'Покупатель',hacker:'Аудит'};
+  const ROLE_COLORS={creator:'#f0c040',boss:'var(--accent)',admin:'var(--accent)',
+    manager:'var(--blue)',accountant:'var(--green)',warehouse:'var(--amber)',
+    customer:'var(--accent)',hacker:'#a855f7'};
+  const login=state.user?.login||'';
+  const avColor=ROLE_COLORS[role]||'var(--accent)';
+  const avatar=getUserAvatar(login);
+  const nickname=getUserNickname(login)||name;
+
+  // Fill content
+  document.getElementById('welcome-name').textContent=nickname;
+  const roleEl=document.getElementById('welcome-role');
+  const roleLabel=ROLE_NAMES[role]||role;
+  roleEl.textContent=roleLabel;
+  roleEl.style.background=`${avColor}22`;
+  roleEl.style.color=avColor;
+
+  const avWrap=document.getElementById('welcome-avatar-wrap');
+  avWrap.innerHTML=avatar
+    ? `<div class="welcome-avatar" style="margin-bottom:20px;border:none;padding:0"><img src="${avatar}" alt=""></div>`
+    : `<div class="welcome-avatar" style="background:${avColor}18;color:${avColor};margin-bottom:20px">${name[0].toUpperCase()}</div>`;
+
+  // Show
+  const ov=document.getElementById('welcome-overlay');
+  ov.classList.remove('hide');
+  ov.classList.add('show');
+
+  // Auto-hide after 2.2s
+  setTimeout(()=>{
+    ov.classList.add('hide');
+    setTimeout(()=>{
+      ov.classList.remove('show','hide');
+      if(callback) callback();
+    },380);
+  },2200);
+}
+
 function doLogout(){
   stopHkPoll();
   closeMobileMenu();
