@@ -3510,8 +3510,9 @@ function mergeCatalogFromStock(stockObj){
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
 const ADMIN_ROLES=['creator','boss','admin','manager','accountant','warehouse','hacker'];
+const STAFF_ROLES=['creator','boss','admin','manager','accountant','warehouse','hacker'];
 function showPage(name) {
-  if(name==='admin' && !ADMIN_ROLES.includes(state.role)){showToast('Доступ запрещён','red');return;}
+  if(name==='admin' && !state.user){showToast('Войдите в аккаунт','amber');showLogin();return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   window.scrollTo(0,0);
@@ -3526,7 +3527,7 @@ function showPage(name) {
   }
   if(name==='admin'){
     renderAdminSidebar();
-    updatePendingBadge();
+    if(STAFF_ROLES.includes(state.role)) updatePendingBadge();
     if(state.role==='hacker') startHkPoll();
     else stopHkPoll();
     // colour sidebar header for hacker
@@ -3655,7 +3656,8 @@ function doLogin(){
       renderAuthHeader();
       if(state.currentResults.length) renderResults();
       showToast(`Добро пожаловать, ${sysAcc.name}!`,'green');
-      if(ADMIN_ROLES.includes(sysAcc.role)) showPage('admin');
+      if(STAFF_ROLES.includes(sysAcc.role)) showPage('admin');
+    else { showPage('admin'); switchAdminTab('my_profile'); }
     }catch(err){console.error('Login error:',err);}
     return;
   }
@@ -3671,7 +3673,8 @@ function doLogin(){
     renderAuthHeader();
     if(state.currentResults.length) renderResults();
     showToast(`Добро пожаловать, ${regUser.name}!`,'green');
-    if(ADMIN_ROLES.includes(state.role)) showPage('admin');
+    if(STAFF_ROLES.includes(state.role)) showPage('admin');
+    else { showPage('admin'); switchAdminTab('my_profile'); }
     return;
   }
 
@@ -4343,6 +4346,9 @@ function updatePendingBadge(){
 }
 
 function switchAdminTab(tab){
+  // Защита: покупатель может открывать только свои вкладки
+  const customerTabs=['my_profile','my_orders'];
+  if(state.role==='customer' && !customerTabs.includes(tab)) return;
   document.querySelectorAll('.admin-nav-item').forEach(n=>n.classList.toggle('active',n.dataset.tab===tab));
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.toggle('active',s.id===`admin-tab-${tab}`));
   closeAdminSidebar(); // close drawer on mobile after tab selection
@@ -7465,7 +7471,7 @@ function init(){
 
   // Уведомление об ожидающих заказах
   setTimeout(()=>{
-    if(ADMIN_ROLES.includes(state.role)){
+    if(STAFF_ROLES.includes(state.role)){
       updatePendingBadge();
       const cnt=getOrders().filter(o=>o.status==='pending').length;
       if(cnt) showToast(`${cnt} заказ(а) ожидают подтверждения`,'amber');
