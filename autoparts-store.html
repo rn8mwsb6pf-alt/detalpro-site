@@ -1759,6 +1759,48 @@ footer{
 }
 .admin-empty-icon{font-size:40px;margin-bottom:12px}
 .admin-empty-text{font-size:14px}
+
+/* ═══ FAQ / SUPPORT PAGE ════════════════════════════════════════════════════ */
+.faq-page{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+.faq-hero{text-align:center;padding:48px 24px 36px;background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border-radius:var(--r2);margin-bottom:36px;border:1px solid var(--line2)}
+.faq-hero-icon{font-size:48px;margin-bottom:16px;display:block}
+.faq-hero h1{font-size:28px;font-weight:700;color:var(--text);margin:0 0 10px}
+.faq-hero p{font-size:15px;color:var(--text2);margin:0 0 24px}
+.faq-search-wrap{max-width:480px;margin:0 auto;position:relative}
+.faq-search-wrap input{width:100%;padding:12px 44px 12px 16px;border:1.5px solid var(--line2);border-radius:var(--r2);background:var(--bg);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;transition:.2s}
+.faq-search-wrap input:focus{border-color:var(--accent)}
+.faq-search-wrap .faq-search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:17px}
+.faq-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.faq-cat-btn{padding:6px 16px;border-radius:20px;border:1.5px solid var(--line2);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}
+.faq-cat-btn:hover,.faq-cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.faq-group{margin-bottom:32px}
+.faq-group-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.faq-item{border:1px solid var(--line2);border-radius:var(--r2);margin-bottom:8px;overflow:hidden;transition:.2s}
+.faq-item:hover{border-color:var(--accent)}
+.faq-item.open{border-color:var(--accent)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;gap:12px;user-select:none}
+.faq-q-text{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.faq-q-arrow{font-size:18px;color:var(--text3);transition:transform .25s;flex-shrink:0}
+.faq-item.open .faq-q-arrow{transform:rotate(180deg);color:var(--accent)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.faq-a-inner{padding:0 18px 16px;font-size:14px;color:var(--text2);line-height:1.7}
+.faq-a-inner a{color:var(--accent);text-decoration:none}
+.faq-a-inner a:hover{text-decoration:underline}
+.faq-item.open .faq-a{max-height:600px}
+.faq-no-results{text-align:center;padding:40px 24px;color:var(--text3)}
+.faq-no-results-icon{font-size:36px;margin-bottom:12px}
+.faq-contact-block{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2);padding:28px 24px;text-align:center;margin-top:16px}
+.faq-contact-block h3{font-size:18px;font-weight:700;color:var(--text);margin:0 0 8px}
+.faq-contact-block p{font-size:14px;color:var(--text2);margin:0 0 20px}
+.faq-contact-links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.faq-contact-link{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--r2);border:1.5px solid var(--line2);background:var(--bg);color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;transition:.15s}
+.faq-contact-link:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:600px){
+  .faq-hero h1{font-size:22px}
+  .faq-hero{padding:32px 16px 24px}
+  .faq-q-text{font-size:14px}
+  .faq-page{padding:24px 16px 60px}
+}
 </style>
 </head>
 <body>
@@ -1796,6 +1838,7 @@ footer{
       <a href="#" onclick="showPage('vin')" style="color:var(--accent)">VIN-поиск</a>
       <a href="#" onclick="showPage('about')">О нас</a>
       <a href="#" onclick="showPage('delivery')">Доставка</a>
+      <a href="#" onclick="showPage('faq')">Помощь</a>
     </nav>
     <div class="header-search">
       <input class="header-search-input" id="header-search-input"
@@ -1837,6 +1880,7 @@ footer{
       <a href="#" onclick="showPage('vin');closeMobileMenu()" style="color:var(--accent)">🚗 VIN-поиск</a>
       <a href="#" onclick="showPage('about');closeMobileMenu()">ℹ️ О нас</a>
       <a href="#" onclick="showPage('delivery');closeMobileMenu()">🚚 Доставка</a>
+      <a href="#" onclick="showPage('faq');closeMobileMenu()">❓ Помощь</a>
       <a href="#" onclick="showPage('cart');closeMobileMenu()">🛒 Корзина</a>
     </div>
     <div class="mobile-nav-search">
@@ -2448,6 +2492,49 @@ footer{
           <button class="admin-btn admin-btn-outline" onclick="vinGoBack('parts')">← Назад</button>
         </div>
         <div id="vin-prods-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ FAQ / SUPPORT PAGE ══════════════════════════════════════════════════ -->
+<div class="page" id="page-faq">
+  <div class="faq-page">
+
+    <!-- Hero -->
+    <div class="faq-hero">
+      <span class="faq-hero-icon">🛠️</span>
+      <h1>Центр помощи</h1>
+      <p>Ответы на часто задаваемые вопросы о заказах, доставке и запчастях</p>
+      <div class="faq-search-wrap">
+        <input type="text" id="faq-search-input" placeholder="Поиск по вопросам..." oninput="faqSearch(this.value)">
+        <span class="faq-search-icon">🔍</span>
+      </div>
+    </div>
+
+    <!-- Category filter -->
+    <div class="faq-cats" id="faq-cats">
+      <button class="faq-cat-btn active" data-cat="all" onclick="faqFilterCat('all',this)">Все вопросы</button>
+      <button class="faq-cat-btn" data-cat="orders" onclick="faqFilterCat('orders',this)">🛒 Заказы</button>
+      <button class="faq-cat-btn" data-cat="delivery" onclick="faqFilterCat('delivery',this)">🚚 Доставка</button>
+      <button class="faq-cat-btn" data-cat="payment" onclick="faqFilterCat('payment',this)">💳 Оплата</button>
+      <button class="faq-cat-btn" data-cat="parts" onclick="faqFilterCat('parts',this)">🔧 Запчасти</button>
+      <button class="faq-cat-btn" data-cat="returns" onclick="faqFilterCat('returns',this)">🔄 Возврат</button>
+      <button class="faq-cat-btn" data-cat="account" onclick="faqFilterCat('account',this)">👤 Аккаунт</button>
+    </div>
+
+    <!-- FAQ list rendered by JS -->
+    <div id="faq-list"></div>
+
+    <!-- Contact block -->
+    <div class="faq-contact-block">
+      <h3>Не нашли ответ?</h3>
+      <p>Наши специалисты готовы помочь в рабочее время: пн–пт с 9:00 до 18:00</p>
+      <div class="faq-contact-links">
+        <a class="faq-contact-link" href="tel:+78001234567">📞 8 800 123-45-67</a>
+        <a class="faq-contact-link" href="mailto:support@detalpro.ru">✉️ support@detalpro.ru</a>
+        <a class="faq-contact-link" href="https://t.me/detalpro_support" target="_blank">💬 Telegram</a>
       </div>
     </div>
 
@@ -3123,6 +3210,7 @@ function showPage(name) {
     if(lbl) lbl.textContent=(meta.label||'Панель')+' — меню';
   }
   if(name==='about') renderAboutManagers();
+  if(name==='faq'){ faqSearchQuery=''; faqActiveCat='all'; renderFaq(); }
 }
 
 // ── Mobile nav ──────────────────────────────────────────────────────────────
@@ -5801,6 +5889,233 @@ function saveMyProfile(){
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FAQ / SUPPORT PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+const FAQ_DATA = [
+  {
+    cat: 'orders',
+    label: '🛒 Заказы',
+    items: [
+      {
+        q: 'Как оформить заказ?',
+        a: 'Найдите нужную запчасть через каталог или поиск по VIN-номеру, добавьте товар в корзину и нажмите «Оформить заказ». Заполните контактные данные и выберите способ доставки и оплаты. После подтверждения вы получите номер заказа.'
+      },
+      {
+        q: 'Как узнать статус заказа?',
+        a: 'Войдите в личный кабинет и перейдите в раздел «Мои заказы». Там отображается текущий статус: Принят → Обрабатывается → Собран → Отгружен → Доставлен. Также мы отправляем уведомления на указанный e-mail.'
+      },
+      {
+        q: 'Можно ли изменить или отменить заказ?',
+        a: 'Заказ можно отменить или изменить в течение 1 часа после оформления, пока он не передан на сборку. Для этого позвоните нам по телефону 8 800 123-45-67 или напишите в Telegram. После начала сборки изменения могут быть ограничены.'
+      },
+      {
+        q: 'Что делать, если товар закончился на складе?',
+        a: 'Если выбранного товара нет в наличии, менеджер свяжется с вами для предложения аналога или уточнения срока поставки. Обычно срок ожидания составляет 3–7 рабочих дней. Вы можете отказаться от заказа без штрафных санкций.'
+      },
+      {
+        q: 'Есть ли минимальная сумма заказа?',
+        a: 'Минимальной суммы заказа нет. Вы можете заказать даже один недорогой расходник. При заказе от 5 000 ₽ доставка по России бесплатна.'
+      }
+    ]
+  },
+  {
+    cat: 'delivery',
+    label: '🚚 Доставка',
+    items: [
+      {
+        q: 'Какие сроки доставки?',
+        a: 'Доставка по Москве и МО: 1–2 рабочих дня. По России (СДЭК, Boxberry, Почта России): 3–10 рабочих дней в зависимости от региона. Самовывоз из нашего склада: в день заказа при наличии товара. Точные сроки уточняются при оформлении.'
+      },
+      {
+        q: 'В какие регионы вы доставляете?',
+        a: 'Мы доставляем по всей России, включая труднодоступные регионы. Для Крыма, ДНР, ЛНР и некоторых других территорий доступна только доставка Почтой России. Доставки за рубеж пока нет.'
+      },
+      {
+        q: 'Сколько стоит доставка?',
+        a: 'Доставка рассчитывается индивидуально в зависимости от веса, габаритов и региона. При заказе от 5 000 ₽ — бесплатно по всей России. Стоимость отображается при оформлении заказа до подтверждения.'
+      },
+      {
+        q: 'Можно ли забрать заказ самовывозом?',
+        a: 'Да, самовывоз доступен со склада по адресу: Москва, ул. Автозаводская, д. 12. Режим работы склада: пн–пт 9:00–18:00, сб 10:00–15:00. Перед приездом убедитесь, что заказ перешёл в статус «Собран».'
+      },
+      {
+        q: 'Что делать, если заказ не пришёл вовремя?',
+        a: 'Если срок доставки истёк — свяжитесь с нами. Мы проверим местонахождение посылки и при необходимости повторно отправим товар или вернём деньги. Вы можете самостоятельно отслеживать трек-номер на сайте службы доставки.'
+      }
+    ]
+  },
+  {
+    cat: 'payment',
+    label: '💳 Оплата',
+    items: [
+      {
+        q: 'Какими способами можно оплатить?',
+        a: 'Принимаем: банковские карты Visa/Mastercard/МИР онлайн, оплату через СБП (Систему быстрых платежей), наличными при самовывозе или курьеру (по Москве), безналичный расчёт для юридических лиц.'
+      },
+      {
+        q: 'Безопасна ли оплата картой?',
+        a: 'Да. Платёж проходит через защищённый шлюз с шифрованием SSL и поддержкой 3D Secure. Мы не храним данные вашей карты — они передаются напрямую в платёжную систему.'
+      },
+      {
+        q: 'Когда спишутся деньги?',
+        a: 'При оплате онлайн — сразу после подтверждения заказа. Если заказ отменяется до отгрузки — возврат поступает на карту в течение 3–5 рабочих дней, в зависимости от банка.'
+      },
+      {
+        q: 'Вы работаете с юридическими лицами?',
+        a: 'Да. Для юрлиц доступен безналичный расчёт с НДС и выпиской всех закрывающих документов (счёт, накладная, счёт-фактура). Для оформления напишите на b2b@detalpro.ru.'
+      }
+    ]
+  },
+  {
+    cat: 'parts',
+    label: '🔧 Запчасти',
+    items: [
+      {
+        q: 'Как правильно подобрать запчасть?',
+        a: 'Самый точный способ — поиск по VIN-номеру автомобиля. VIN (17 символов) указан в ПТС, СТС, на табличке под капотом или у основания лобового стекла. Введите VIN в поле поиска — система определит марку, модель, год и предложит подходящие запчасти.'
+      },
+      {
+        q: 'Где найти VIN-номер автомобиля?',
+        a: 'VIN можно найти в нескольких местах: (1) Паспорт транспортного средства (ПТС); (2) Свидетельство о регистрации (СТС); (3) Таблица под капотом у брандмауэра; (4) У основания лобового стекла со стороны водителя; (5) Порог водительской двери.'
+      },
+      {
+        q: 'Гарантируете ли вы совместимость запчастей?',
+        a: 'Мы делаем всё возможное для точного подбора, особенно при поиске по VIN. Однако итоговую проверку совместимости рекомендуем проводить со специалистом. При несовместимости — принимаем возврат в течение 30 дней.'
+      },
+      {
+        q: 'Продаёте ли вы оригинальные запчасти?',
+        a: 'Да, в нашем каталоге представлены оригинальные запчасти (OEM) и качественные аналоги проверенных производителей (Bosch, Febi, Gates, SKF и другие). Производитель и оригинальность указаны в карточке товара.'
+      },
+      {
+        q: 'Какая гарантия на запчасти?',
+        a: 'Гарантия на большинство запчастей — 12 месяцев или 20 000 км пробега (что наступит раньше). Расходники (фильтры, колодки, лампы) — 3 месяца. Электроника — 6 месяцев. Конкретный срок указан в карточке товара и чеке.'
+      }
+    ]
+  },
+  {
+    cat: 'returns',
+    label: '🔄 Возврат',
+    items: [
+      {
+        q: 'Как вернуть товар?',
+        a: 'Для возврата: (1) Свяжитесь с нами в течение 30 дней с момента получения; (2) Укажите номер заказа и причину возврата; (3) Отправьте товар в оригинальной упаковке без следов монтажа; (4) После проверки вернём деньги в течение 5 рабочих дней.'
+      },
+      {
+        q: 'В каких случаях возврат невозможен?',
+        a: 'Возврат не принимается: если запчасть была установлена на автомобиль; если нарушена заводская упаковка без уважительной причины; если прошло более 30 дней с момента получения; для товаров из перечня технически сложных изделий, не подлежащих возврату.'
+      },
+      {
+        q: 'Пришла бракованная запчасть — что делать?',
+        a: 'Если вы обнаружили брак — не устанавливайте деталь. Сфотографируйте дефект и свяжитесь с нами. Брак подтверждается в течение 3 рабочих дней. Мы бесплатно заменим товар или вернём деньги, включая стоимость обратной доставки.'
+      },
+      {
+        q: 'Когда вернут деньги?',
+        a: 'После получения и проверки возврата деньги поступают: на банковскую карту — 3–5 рабочих дней; наличными при самовывозе — в день проверки; для юрлиц на расчётный счёт — 5–7 рабочих дней.'
+      }
+    ]
+  },
+  {
+    cat: 'account',
+    label: '👤 Аккаунт',
+    items: [
+      {
+        q: 'Как зарегистрироваться?',
+        a: 'Нажмите кнопку «Войти» в правом верхнем углу сайта и выберите «Создать аккаунт». Укажите имя, e-mail и придумайте пароль. После регистрации вам станет доступна история заказов, скидки и личный кабинет.'
+      },
+      {
+        q: 'Забыл пароль — как восстановить?',
+        a: 'На странице входа нажмите «Забыли пароль?» и введите e-mail, привязанный к аккаунту. Мы отправим ссылку для сброса пароля. Письмо приходит в течение 5 минут — проверьте папку «Спам», если не нашли во входящих.'
+      },
+      {
+        q: 'Как изменить контактные данные?',
+        a: 'Войдите в личный кабинет и перейдите в раздел «Настройки профиля». Там можно изменить имя, телефон, адрес доставки и пароль. Смена e-mail требует подтверждения через письмо.'
+      },
+      {
+        q: 'Есть ли программа лояльности?',
+        a: 'Да! За каждый заказ начисляются бонусные баллы: 1 балл = 1 рубль. Баллами можно оплатить до 30% следующего заказа. Постоянным покупателям с оборотом от 30 000 ₽ доступна карта «Про» со скидкой 5% на все заказы.'
+      }
+    ]
+  }
+];
+
+let faqActiveCat = 'all';
+let faqSearchQuery = '';
+
+function renderFaq(){
+  const list = document.getElementById('faq-list');
+  if(!list) return;
+
+  let groups = FAQ_DATA.filter(g => faqActiveCat === 'all' || g.cat === faqActiveCat);
+
+  const q = faqSearchQuery.toLowerCase().trim();
+  if(q){
+    groups = groups.map(g => ({
+      ...g,
+      items: g.items.filter(item =>
+        item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)
+      )
+    })).filter(g => g.items.length > 0);
+  }
+
+  if(groups.length === 0){
+    list.innerHTML = `<div class="faq-no-results"><div class="faq-no-results-icon">🔍</div><div>Ничего не найдено по запросу <b>«${escHtml(q)}»</b><br><span style="font-size:13px;margin-top:6px;display:block">Попробуйте другие слова или выберите другую категорию</span></div></div>`;
+    return;
+  }
+
+  list.innerHTML = groups.map(g => `
+    <div class="faq-group" data-cat="${g.cat}">
+      <div class="faq-group-title">${g.label}</div>
+      ${g.items.map((item, idx) => {
+        const id = `faq-${g.cat}-${idx}`;
+        const highlightedQ = q ? highlightFaq(item.q, q) : item.q;
+        const highlightedA = q ? highlightFaq(item.a, q) : item.a;
+        return `<div class="faq-item" id="${id}">
+          <div class="faq-q" onclick="faqToggle('${id}')">
+            <span class="faq-q-text">${highlightedQ}</span>
+            <span class="faq-q-arrow">⌄</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">${highlightedA}</div></div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+function highlightFaq(text, q){
+  const escaped = escHtml(text);
+  const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return escaped.replace(new RegExp(`(${escapedQ})`, 'gi'),
+    '<mark style="background:rgba(229,77,46,.25);color:inherit;border-radius:2px;padding:0 2px">$1</mark>'
+  );
+}
+
+function faqToggle(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const isOpen = el.classList.contains('open');
+  // close others in same group
+  el.closest('.faq-group').querySelectorAll('.faq-item.open').forEach(o => o.classList.remove('open'));
+  if(!isOpen) el.classList.add('open');
+}
+
+function faqFilterCat(cat, btn){
+  faqActiveCat = cat;
+  document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderFaq();
+}
+
+function faqSearch(val){
+  faqSearchQuery = val;
+  if(val.trim()){
+    // expand all cats when searching
+    faqActiveCat = 'all';
+    document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
+  }
+  renderFaq();
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
