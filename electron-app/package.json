@@ -28,7 +28,8 @@
       "main.js",
       "preload.js",
       "splash.html",
-      "assets/**/*"
+      "assets/**/*",
+      "app/**/*"
     ],
     "win": {
       "target": [

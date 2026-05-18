@@ -9,8 +9,9 @@ const fs   = require('fs');
 const Store = require('electron-store');
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const APP_URL     = 'https://detalpro.netlify.app';
-const APP_TITLE   = 'Дорожный комплекс Гараж';
+const APP_FILE   = path.join(__dirname, 'app', 'index.html');
+const APP_REMOTE = 'https://detalpro.netlify.app'; // только для "Открыть в браузере"
+const APP_TITLE  = 'Дорожный комплекс Гараж';
 const IS_DEV      = process.argv.includes('--dev');
 const ASSETS_DIR  = path.join(__dirname, 'assets');
 const ICON_ICO    = path.join(ASSETS_DIR, 'icon.ico');
@@ -99,9 +100,9 @@ function createMainWindow() {
   if (store.get('windowMaximized')) mainWindow.maximize();
 
   // ── Navigation policy ──────────────────────────────────────────────────────
-  // Keep same-origin navigation inside the app; send everything else to browser.
+  // file:// stays inside the app; http/https goes to the system browser.
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(APP_URL)) {
+    if (!url.startsWith('file://')) {
       event.preventDefault();
       shell.openExternal(url);
     }
@@ -109,16 +110,12 @@ function createMainWindow() {
 
   // Handle target="_blank" and window.open() calls.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith(APP_URL)) {
-      mainWindow.loadURL(url);
-    } else {
-      shell.openExternal(url);
-    }
+    if (!url.startsWith('file://')) shell.openExternal(url);
     return { action: 'deny' };
   });
 
   // ── Page load sequence ─────────────────────────────────────────────────────
-  mainWindow.loadURL(APP_URL);
+  mainWindow.loadFile(APP_FILE);
 
   mainWindow.webContents.once('did-finish-load', () => {
     closeSplash();
@@ -130,33 +127,10 @@ function createMainWindow() {
   });
 
   // ── Error page ─────────────────────────────────────────────────────────────
-  mainWindow.webContents.on('did-fail-load', (_e, _code, desc) => {
+  // For a local file, failures are rare (missing file). Reload it directly.
+  mainWindow.webContents.on('did-fail-load', () => {
     closeSplash();
-    mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(`<!DOCTYPE html>
-<html lang="ru">
-<head><meta charset="UTF-8"><title>Нет соединения</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0d0f10;color:#e8eaeb;font-family:'Segoe UI',sans-serif;
-       display:flex;align-items:center;justify-content:center;height:100vh}
-  .wrap{text-align:center;max-width:420px;padding:2rem}
-  h1{color:#e8411a;font-size:2rem;margin-bottom:1rem}
-  p{color:#9da5ab;line-height:1.6}
-  small{display:block;margin-top:.5rem;font-size:.75rem;color:#3d4549}
-  button{margin-top:1.5rem;padding:.65rem 1.8rem;background:#e8411a;color:#fff;
-         border:none;border-radius:4px;cursor:pointer;font-size:1rem;font-weight:600}
-  button:hover{background:#c73516}
-</style></head>
-<body>
-  <div class="wrap">
-    <h1>Нет соединения</h1>
-    <p>Не удалось загрузить сайт.<br>Проверьте интернет-соединение и попробуйте снова.</p>
-    <small>${desc}</small>
-    <br><button onclick="location.href='${APP_URL}'">Повторить</button>
-  </div>
-</body>
-</html>`)}
-    `);
+    mainWindow.loadFile(APP_FILE);
     mainWindow.show();
   });
 
@@ -255,7 +229,7 @@ function buildMenu() {
               type:    'info',
               title:   'О программе',
               message: APP_TITLE,
-              detail:  `Версия: ${app.getVersion()}\nИнтернет-магазин автозапчастей\n${APP_URL}`,
+              detail:  `Версия: ${app.getVersion()}\nИнтернет-магазин автозапчастей\n${APP_REMOTE}`,
               icon:    WIN_ICON ? nativeImage.createFromPath(WIN_ICON) : undefined,
               buttons: ['OK'],
             });
@@ -263,7 +237,7 @@ function buildMenu() {
         },
         {
           label: 'Открыть в браузере',
-          click: () => shell.openExternal(APP_URL)
+          click: () => shell.openExternal(APP_REMOTE)
         }
       ]
     }
