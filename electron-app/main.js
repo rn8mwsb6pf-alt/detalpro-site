@@ -10,7 +10,7 @@ const Store = require('electron-store');
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const APP_URL     = 'https://detalpro.netlify.app';
-const APP_TITLE   = 'ДЕТАЛЬПРО';
+const APP_TITLE   = 'Дорожный комплекс Гараж';
 const IS_DEV      = process.argv.includes('--dev');
 const ASSETS_DIR  = path.join(__dirname, 'assets');
 const ICON_ICO    = path.join(ASSETS_DIR, 'icon.ico');
@@ -202,7 +202,7 @@ function createTray() {
 
   const menu = Menu.buildFromTemplate([
     {
-      label: 'Открыть ДЕТАЛЬПРО',
+      label: 'Открыть Дорожный комплекс Гараж',
       click: () => { mainWindow.show(); mainWindow.focus(); }
     },
     { type: 'separator' },

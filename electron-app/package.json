@@ -1,9 +1,9 @@
 {
   "name": "detalpro",
   "version": "1.0.0",
-  "description": "ДЕТАЛЬПРО — Интернет-магазин автозапчастей",
+  "description": "Дорожный комплекс Гараж — Интернет-магазин автозапчастей",
   "main": "main.js",
-  "author": "ДЕТАЛЬПРО",
+  "author": "Дорожный комплекс Гараж",
   "private": true,
   "scripts": {
     "start": "electron .",
@@ -22,8 +22,8 @@
   },
   "build": {
     "appId": "ru.detalpro.app",
-    "productName": "ДЕТАЛЬПРО",
-    "copyright": "Copyright © 2025 ДЕТАЛЬПРО",
+    "productName": "Дорожный комплекс Гараж",
+    "copyright": "Copyright © 2025 Дорожный комплекс Гараж",
     "files": [
       "main.js",
       "preload.js",
@@ -46,10 +46,10 @@
       "installerHeaderIcon": "assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "ДЕТАЛЬПРО"
+      "shortcutName": "Дорожный комплекс Гараж"
     },
     "portable": {
-      "artifactName": "ДЕТАЛЬПРО-Portable-${version}.exe"
+      "artifactName": "Дорожный комплекс Гараж-Portable-${version}.exe"
     }
   }
 }
