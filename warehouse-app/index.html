@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Склад — Гараж</title>
+<style>
+:root {
+  --bg:       #0d0f10;
+  --bg2:      #141719;
+  --bg3:      #1a1d20;
+  --border:   #2a2f33;
+  --text:     #e8eaeb;
+  --text2:    #9da5ab;
+  --text3:    #5a6268;
+  --accent:   #e8411a;
+  --accent2:  #c73516;
+  --green:    #22c55e;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --radius:   8px;
+  --font:     'Segoe UI', system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+
+/* ── Layout ── */
+.app{display:grid;grid-template-rows:56px 1fr;height:100vh}
+
+/* ── Header ── */
+header{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  -webkit-app-region:drag;
+}
+header .logo{font-size:1.1rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+header .sub{font-size:.75rem;color:var(--text3);margin-left:4px}
+header .spacer{flex:1}
+.sync-badge{
+  -webkit-app-region:no-drag;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;font-size:.75rem;color:var(--text2);cursor:pointer;
+  transition:border-color .15s;
+}
+.sync-badge:hover{border-color:var(--accent)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.offline{background:var(--red)}
+
+/* ── Main body ── */
+.body{display:grid;grid-template-columns:220px 1fr;overflow:hidden}
+
+/* ── Sidebar ── */
+nav{
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;
+}
+.nav-section{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:12px 8px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--radius);cursor:pointer;color:var(--text2);
+  transition:background .12s,color .12s;font-size:.875rem;
+}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(232,65,26,.15);color:var(--accent)}
+.nav-item .ico{font-size:1rem;width:20px;text-align:center}
+.nav-count{
+  margin-left:auto;background:var(--bg3);color:var(--text3);
+  font-size:.65rem;padding:2px 6px;border-radius:10px;min-width:22px;text-align:center;
+}
+
+/* ── Content ── */
+.content{overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* ── Stats row ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;
+}
+.stat-val{font-size:1.6rem;font-weight:700;color:var(--text)}
+.stat-lbl{font-size:.75rem;color:var(--text3);margin-top:2px}
+.stat.warn .stat-val{color:var(--amber)}
+.stat.danger .stat-val{color:var(--red)}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-wrap{flex:1;position:relative;min-width:200px}
+.search-wrap input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 12px 8px 36px;
+  color:var(--text);font-size:.875rem;outline:none;
+  transition:border-color .15s;
+}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.9rem}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 14px;
+  border:none;border-radius:var(--radius);cursor:pointer;font-size:.875rem;
+  font-family:var(--font);font-weight:600;transition:background .12s,opacity .12s;
+}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--accent2)}
+.btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,.25)}
+
+/* ── Table ── */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:auto;flex:1}
+table{width:100%;border-collapse:collapse}
+th{
+  background:var(--bg3);padding:10px 12px;text-align:left;
+  font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+  cursor:pointer;user-select:none;
+}
+th:hover{color:var(--text2)}
+td{padding:10px 12px;border-bottom:1px solid rgba(42,47,51,.6);color:var(--text2);font-size:.875rem}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--text)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.badge-red  {background:rgba(239,68,68,.15); color:var(--red)}
+.actions{display:flex;gap:6px}
+.icon-btn{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;color:var(--text3);font-size:1rem;transition:background .1s,color .1s}
+.icon-btn:hover{background:var(--bg3);color:var(--text)}
+.icon-btn.del:hover{color:var(--red)}
+.empty{padding:48px;text-align:center;color:var(--text3)}
+.empty .ico{font-size:2.5rem;margin-bottom:12px}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.hidden{display:none}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:28px;width:560px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal h2{font-size:1.1rem;margin-bottom:20px;color:var(--text)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.field input,.field select{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:9px 11px;color:var(--text);font-size:.875rem;font-family:var(--font);outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text3)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* ── Toast ── */
+.toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200}
+.toast{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 16px;font-size:.875rem;color:var(--text);min-width:240px;
+  animation:slideIn .2s ease;box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error  {border-color:var(--red);  color:var(--red)}
+.toast.info   {border-color:var(--accent);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Header -->
+<header>
+  <div class="logo">Гараж <span class="sub">/ Склад</span></div>
+  <div class="spacer"></div>
+  <div class="sync-badge" onclick="openSharedDir()" title="Папка с данными">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncLabel">Данные: загрузка…</span>
+  </div>
+  <button class="btn btn-ghost" style="-webkit-app-region:no-drag;margin-left:8px" onclick="syncNow()">⟳ Синхронизация</button>
+</header>
+
+<!-- Body -->
+<div class="body">
+
+  <!-- Sidebar -->
+  <nav>
+    <div class="nav-section">Разделы</div>
+    <div class="nav-item active" onclick="setView('products')">
+      <span class="ico">📦</span> Товары
+      <span class="nav-count" id="navCountProducts">0</span>
+    </div>
+    <div class="nav-item" onclick="setView('lowstock')">
+      <span class="ico">⚠️</span> Мало на складе
+      <span class="nav-count" id="navCountLow" style="background:rgba(245,158,11,.2);color:#f59e0b">0</span>
+    </div>
+    <div class="nav-section" style="margin-top:auto">Действия</div>
+    <div class="nav-item" onclick="openAddModal()">
+      <span class="ico">➕</span> Добавить товар
+    </div>
+    <div class="nav-item" onclick="importCSV()">
+      <span class="ico">📥</span> Импорт CSV
+    </div>
+    <div class="nav-item" onclick="openSharedDir()">
+      <span class="ico">📁</span> Открыть данные
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="content" id="content">
+
+    <!-- Stats -->
+    <div class="stats" id="statsRow">
+      <div class="stat"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Всего товаров</div></div>
+      <div class="stat"><div class="stat-val" id="statInStock">0</div><div class="stat-lbl">В наличии</div></div>
+      <div class="stat warn"><div class="stat-val" id="statLow">0</div><div class="stat-lbl">Мало (< 5 шт.)</div></div>
+      <div class="stat danger"><div class="stat-val" id="statZero">0</div><div class="stat-lbl">Нет в наличии</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="ico">🔍</span>
+        <input type="text" id="searchInput" placeholder="Поиск по артикулу, названию, бренду…" oninput="renderTable()">
+      </div>
+      <button class="btn btn-ghost" onclick="renderTable()">Обновить</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить</button>
+      <button class="btn btn-ghost" onclick="importCSV()">📥 CSV</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('article')">Артикул ↕</th>
+            <th onclick="sortBy('brand')">Бренд ↕</th>
+            <th onclick="sortBy('name')">Наименование ↕</th>
+            <th onclick="sortBy('price_retail')" style="text-align:right">Цена розн. ↕</th>
+            <th onclick="sortBy('price_wholesale')" style="text-align:right">Цена опт. ↕</th>
+            <th onclick="sortBy('stock')" style="text-align:right">Кол-во ↕</th>
+            <th>Статус</th>
+            <th>Обновлено</th>
+            <th style="width:80px"></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /body -->
+</div><!-- /app -->
+
+<!-- Add/Edit Modal -->
+<div class="overlay hidden" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="modalTitle">Добавить товар</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Артикул *</label>
+        <input id="fArticle" placeholder="например: 04E115561B">
+      </div>
+      <div class="field">
+        <label>Бренд / Производитель</label>
+        <input id="fBrand" placeholder="например: VAG, Bosch, NGK">
+      </div>
+      <div class="field full">
+        <label>Наименование *</label>
+        <input id="fName" placeholder="Масляный фильтр, Тормозные колодки…">
+      </div>
+      <div class="field">
+        <label>Цена розничная (₽)</label>
+        <input id="fPriceR" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Цена оптовая (₽)</label>
+        <input id="fPriceW" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Количество (шт.)</label>
+        <input id="fStock" type="number" min="0" step="1" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Срок доставки (дней)</label>
+        <input id="fDays" type="number" min="0" step="1" placeholder="0">
+      </div>
+      <div class="field full">
+        <label>Категория</label>
+        <input id="fCategory" placeholder="Фильтры, Тормоза, Масла…">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let products = [];
+let editingId = null;
+let currentView = 'products';
+let sortField = 'article';
+let sortAsc = true;
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+async function init() {
+  products = await warehouseAPI.getProducts();
+  renderAll();
+  updateSyncStatus();
+
+  warehouseAPI.onProductsChanged(items => {
+    products = items;
+    renderAll();
+  });
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderAll() {
+  updateStats();
+  updateNavCounts();
+  renderTable();
+}
+
+function updateStats() {
+  const total = products.length;
+  const inStock = products.filter(p => p.stock > 0).length;
+  const low  = products.filter(p => p.stock > 0 && p.stock < 5).length;
+  const zero = products.filter(p => !p.stock || p.stock <= 0).length;
+  document.getElementById('statTotal').textContent   = total;
+  document.getElementById('statInStock').textContent = inStock;
+  document.getElementById('statLow').textContent     = low;
+  document.getElementById('statZero').textContent    = zero;
+}
+
+function updateNavCounts() {
+  document.getElementById('navCountProducts').textContent = products.length;
+  document.getElementById('navCountLow').textContent = products.filter(p => p.stock > 0 && p.stock < 5).length;
+}
+
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const q = document.getElementById('searchInput').value.trim().toUpperCase();
+  let items = currentView === 'lowstock'
+    ? products.filter(p => p.stock > 0 && p.stock < 5)
+    : products;
+
+  if (q) {
+    items = items.filter(p =>
+      (p.article||'').toUpperCase().includes(q) ||
+      (p.name||'').toUpperCase().includes(q) ||
+      (p.brand||'').toUpperCase().includes(q)
+    );
+  }
+
+  // Sort
+  items = [...items].sort((a,b) => {
+    const va = a[sortField] ?? '';
+    const vb = b[sortField] ?? '';
+    const r = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'ru');
+    return sortAsc ? r : -r;
+  });
+
+  const tbody = document.getElementById('tableBody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ico">📦</div>Товаров нет. Добавьте или импортируйте из CSV.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(p => {
+    const stock = parseInt(p.stock) || 0;
+    const badge = stock <= 0 ? '<span class="badge badge-red">Нет</span>'
+                : stock < 5  ? '<span class="badge badge-amber">Мало</span>'
+                :               '<span class="badge badge-green">В наличии</span>';
+    const updated = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('ru') : '—';
+    const priceR = p.price_retail ? numFmt(p.price_retail) + ' ₽' : '—';
+    const priceW = p.price_wholesale ? numFmt(p.price_wholesale) + ' ₽' : '—';
+    return `<tr>
+      <td><b style="color:var(--text)">${esc(p.article||'—')}</b></td>
+      <td>${esc(p.brand||'—')}</td>
+      <td>${esc(p.name||'—')}</td>
+      <td style="text-align:right">${priceR}</td>
+      <td style="text-align:right">${priceW}</td>
+      <td style="text-align:right"><b style="color:${stock<=0?'var(--red)':stock<5?'var(--amber)':'var(--text)'}">${stock}</b></td>
+      <td>${badge}</td>
+      <td style="font-size:.8rem">${updated}</td>
+      <td><div class="actions">
+        <button class="icon-btn" onclick="openEditModal('${p.id}')" title="Редактировать">✏️</button>
+        <button class="icon-btn del" onclick="deleteProduct('${p.id}')" title="Удалить">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function sortBy(field) {
+  if (sortField === field) sortAsc = !sortAsc;
+  else { sortField = field; sortAsc = true; }
+  renderTable();
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────────
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Добавить товар';
+  clearForm();
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('fArticle').focus();
+}
+
+function openEditModal(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Редактировать товар';
+  document.getElementById('fArticle').value  = p.article || '';
+  document.getElementById('fBrand').value    = p.brand   || '';
+  document.getElementById('fName').value     = p.name    || '';
+  document.getElementById('fPriceR').value   = p.price_retail    || '';
+  document.getElementById('fPriceW').value   = p.price_wholesale || '';
+  document.getElementById('fStock').value    = p.stock   ?? '';
+  document.getElementById('fDays').value     = p.delivery_days   || '';
+  document.getElementById('fCategory').value = p.category || '';
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('fArticle').focus();
+}
+
+function clearForm() {
+  ['fArticle','fBrand','fName','fPriceR','fPriceW','fStock','fDays','fCategory']
+    .forEach(id => document.getElementById(id).value = '');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  editingId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+async function saveProduct() {
+  const article = document.getElementById('fArticle').value.trim();
+  const name    = document.getElementById('fName').value.trim();
+  if (!article || !name) { toast('Заполните Артикул и Наименование', 'error'); return; }
+
+  const item = {
+    article,
+    brand:   document.getElementById('fBrand').value.trim(),
+    name,
+    price_retail:    parseFloat(document.getElementById('fPriceR').value) || 0,
+    price_wholesale: parseFloat(document.getElementById('fPriceW').value) || 0,
+    stock:           parseInt(document.getElementById('fStock').value)    || 0,
+    delivery_days:   parseInt(document.getElementById('fDays').value)     || 0,
+    category:        document.getElementById('fCategory').value.trim(),
+  };
+
+  let res;
+  if (editingId) {
+    res = await warehouseAPI.updateProduct({ ...item, id: editingId });
+    if (res.ok) toast('Товар обновлён', 'success');
+  } else {
+    res = await warehouseAPI.addProduct(item);
+    if (res.ok) toast('Товар добавлен', 'success');
+  }
+
+  if (!res.ok) { toast(res.error || 'Ошибка сохранения', 'error'); return; }
+  closeModal();
+}
+
+// ── Delete ─────────────────────────────────────────────────────────────────────
+async function deleteProduct(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!confirm(`Удалить "${p?.name || p?.article}"?`)) return;
+  const res = await warehouseAPI.deleteProduct(id);
+  if (res.ok) toast('Товар удалён', 'info');
+}
+
+// ── Import ─────────────────────────────────────────────────────────────────────
+async function importCSV() {
+  const res = await warehouseAPI.importCSV();
+  if (!res.ok) { if (res.error) toast(res.error, 'error'); return; }
+  toast(`Импорт: +${res.added} добавлено, ${res.updated} обновлено. Итого: ${res.total}`, 'success');
+}
+
+// ── Sync ───────────────────────────────────────────────────────────────────────
+async function updateSyncStatus() {
+  const s = await warehouseAPI.getSyncStatus();
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  dot.className = 'sync-dot';
+  lbl.textContent = `Товаров в базе: ${s.count}`;
+}
+
+async function syncNow() {
+  const res = await warehouseAPI.syncNow();
+  toast(`База сохранена (${res.count} товаров)`, 'success');
+  updateSyncStatus();
+}
+
+async function openSharedDir() {
+  await warehouseAPI.openSharedDir();
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function numFmt(n) {
+  return Number(n).toLocaleString('ru-RU', { maximumFractionDigits: 0 });
+}
+
+function toast(msg, type='info') {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && !document.getElementById('modalOverlay').classList.contains('hidden')) {
+    saveProduct();
+  }
+});
+
+init();
+</script>
+</body>
+</html>

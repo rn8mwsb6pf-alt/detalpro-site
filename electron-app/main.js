@@ -13,6 +13,38 @@ const APP_FILE   = path.join(__dirname, 'app', 'index.html');
 const APP_REMOTE = 'https://detalpro.netlify.app'; // только для "Открыть в браузере"
 const APP_TITLE  = 'Дорожный комплекс Гараж';
 const IS_DEV      = process.argv.includes('--dev');
+
+// ── Shared product DB (same path as warehouse-app) ────────────────────────────
+const SHARED_DIR     = path.join(app.getPath('appData'), 'GarageShared');
+const PRODUCTS_FILE  = path.join(SHARED_DIR, 'products.json');
+
+function readSharedProducts() {
+  try {
+    if (!fs.existsSync(PRODUCTS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf8'));
+  } catch { return []; }
+}
+
+async function injectProductsIntoPage(win) {
+  const items = readSharedProducts();
+  if (!items.length) return;
+  try {
+    await win.webContents.executeJavaScript(`
+      (function(){
+        try {
+          const items = ${JSON.stringify(items)};
+          localStorage.setItem('dp_catalog', JSON.stringify(items));
+          localStorage.setItem('dp_catalog_meta', JSON.stringify({
+            updatedAt: new Date().toISOString(),
+            file: 'Склад (локально)',
+            count: items.length
+          }));
+          if(typeof renderAdminDashboard==='function') renderAdminDashboard();
+        } catch(e) { console.warn('inject error',e); }
+      })();
+    `);
+  } catch(e) { /* renderer not ready */ }
+}
 const ASSETS_DIR  = path.join(__dirname, 'assets');
 const ICON_ICO    = path.join(ASSETS_DIR, 'icon.ico');
 const ICON_PNG    = path.join(ASSETS_DIR, 'icon.png');
@@ -117,7 +149,10 @@ function createMainWindow() {
   // ── Page load sequence ─────────────────────────────────────────────────────
   mainWindow.loadFile(APP_FILE);
 
-  mainWindow.webContents.once('did-finish-load', () => {
+  mainWindow.webContents.once('did-finish-load', async () => {
+    // Inject warehouse products into the site's localStorage
+    await injectProductsIntoPage(mainWindow);
+
     closeSplash();
     if (store.get('windowMaximized')) {
       mainWindow.maximize();
@@ -125,6 +160,20 @@ function createMainWindow() {
     mainWindow.show();
     mainWindow.focus();
   });
+
+  // Watch shared products file — re-inject when warehouse app saves
+  if (fs.existsSync(SHARED_DIR) || (fs.mkdirSync(SHARED_DIR, { recursive: true }), true)) {
+    let watchDebounce = null;
+    fs.watch(SHARED_DIR, (event, filename) => {
+      if (filename !== 'products.json') return;
+      clearTimeout(watchDebounce);
+      watchDebounce = setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          injectProductsIntoPage(mainWindow);
+        }
+      }, 500);
+    });
+  }
 
   // ── Error page ─────────────────────────────────────────────────────────────
   // For a local file, failures are rare (missing file). Reload it directly.
