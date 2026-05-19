@@ -14,6 +14,7 @@ const SHARED_DIR      = path.join(app.getPath('appData'), 'GarageShared');
 const PRODUCTS_FILE   = path.join(SHARED_DIR, 'products.json');
 const MOVEMENTS_FILE  = path.join(SHARED_DIR, 'movements.json');
 const CONFIG_FILE     = path.join(SHARED_DIR, 'sync-config.json');
+const TRANSFERS_FILE  = path.join(SHARED_DIR, 'transfers.json');
 const IS_DEV          = process.argv.includes('--dev');
 
 if (!fs.existsSync(SHARED_DIR)) fs.mkdirSync(SHARED_DIR, { recursive: true });
@@ -43,6 +44,96 @@ function logMovement(entry) {
 ipcMain.handle('movements:get',    (_e, limit = 500) => readMovements().slice(0, limit));
 ipcMain.handle('movements:clear',  ()  => { fs.writeFileSync(MOVEMENTS_FILE, '[]', 'utf8'); return { ok: true }; });
 
+// ── Transfer Documents ────────────────────────────────────────────────────────
+function readTransfers() {
+  try {
+    if (!fs.existsSync(TRANSFERS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(TRANSFERS_FILE, 'utf8'));
+  } catch { return []; }
+}
+function writeTransfers(docs) {
+  fs.writeFileSync(TRANSFERS_FILE, JSON.stringify(docs, null, 2), 'utf8');
+}
+function nextTransferNumber() {
+  const all = readTransfers();
+  const max = all.reduce((m, d) => Math.max(m, parseInt(d.number) || 0), 0);
+  return String(max + 1).padStart(4, '0');
+}
+
+ipcMain.handle('transfers:get', () => readTransfers());
+
+ipcMain.handle('transfers:save', (_e, doc) => {
+  const all = readTransfers();
+  if (doc.id) {
+    const idx = all.findIndex(d => d.id === doc.id);
+    if (idx >= 0) {
+      all[idx] = { ...doc, updatedAt: new Date().toISOString() };
+      writeTransfers(all);
+      return { ok: true, doc: all[idx] };
+    }
+  }
+  const newDoc = {
+    ...doc,
+    id:        String(Date.now()),
+    number:    nextTransferNumber(),
+    status:    doc.status || 'draft',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  all.unshift(newDoc);
+  writeTransfers(all);
+  return { ok: true, doc: newDoc };
+});
+
+ipcMain.handle('transfers:post', (_e, { id, user }) => {
+  const all = readTransfers();
+  const idx = all.findIndex(d => d.id === id);
+  if (idx < 0) return { ok: false, error: 'Документ не найден' };
+
+  const doc = all[idx];
+  if (doc.status === 'posted') return { ok: false, error: 'Документ уже проведён' };
+  if (!doc.items || !doc.items.length) return { ok: false, error: 'Нет позиций для перемещения' };
+
+  const prods = readProducts();
+  const errors = [];
+
+  for (const item of doc.items) {
+    const pIdx = prods.findIndex(p => String(p.id) === String(item.productId));
+    if (pIdx < 0) { errors.push(`Товар ${item.article} не найден`); continue; }
+    const p = prods[pIdx];
+    logMovement({
+      action: 'move',
+      productId: p.id, article: p.article, brand: p.brand,
+      productName: p.name, name: p.name,
+      fromWarehouse: doc.fromWarehouse, fromShelf: item.fromShelf || p.shelf || '—',
+      toWarehouse:   doc.toWarehouse,   toShelf:   item.toShelf   || '—',
+      qty: item.qty || 0,
+      userRole: user?.role || 'warehouse',
+      reason: `Документ №${doc.number}${doc.reason ? ': ' + doc.reason : ''}`,
+    });
+    prods[pIdx] = {
+      ...p,
+      warehouse:  doc.toWarehouse,
+      shelf:      item.toShelf || p.shelf,
+      updatedAt:  new Date().toISOString(),
+    };
+  }
+
+  all[idx] = { ...doc, status: 'posted', postedAt: new Date().toISOString(), postedBy: user };
+  writeTransfers(all);
+  writeProducts(prods);
+  win?.webContents.send('products:changed', prods);
+  scheduleSync(prods);
+
+  return { ok: errors.length === 0, errors, postedCount: doc.items.length - errors.length };
+});
+
+ipcMain.handle('transfers:delete', (_e, id) => {
+  const filtered = readTransfers().filter(d => d.id !== id);
+  writeTransfers(filtered);
+  return { ok: true };
+});
+
 // ── Move product between shelves/warehouses ───────────────────────────────────
 ipcMain.handle('products:move', (_e, { productId, toWarehouse, toShelf, qty, reason, user }) => {
   const all = readProducts();
@@ -54,13 +145,14 @@ ipcMain.handle('products:move', (_e, { productId, toWarehouse, toShelf, qty, rea
   const fromShelf     = p.shelf     || '—';
 
   logMovement({
-    type: 'move',
-    productId, article: p.article, brand: p.brand, name: p.name,
+    action: 'move',
+    productId, article: p.article, brand: p.brand,
+    productName: p.name, name: p.name,
     fromWarehouse, fromShelf,
     toWarehouse,   toShelf,
     qty:        qty || p.stock,
     qtyChange:  0,
-    user:       user || 'склад',
+    userRole:   user?.role || 'warehouse',
     reason:     reason || '',
   });
 
@@ -224,16 +316,18 @@ ipcMain.handle('products:add', (_e, { item, user }) => {
   const isUpdate = idx >= 0;
   if (isUpdate) {
     const old = all[idx];
-    logMovement({ type: 'update', productId: old.id, article: old.article, brand: old.brand, name: old.name,
-      fromWarehouse: old.warehouse||1, fromShelf: old.shelf||'—',
-      toWarehouse: item.warehouse||old.warehouse||1, toShelf: item.shelf||old.shelf||'—',
-      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), user: user||'склад', reason: 'Редактирование' });
+    logMovement({ action: 'update', productId: old.id, article: old.article, brand: old.brand,
+      productName: old.name, name: old.name,
+      fromWarehouse: old.warehouse||'wh1', fromShelf: old.shelf||'—',
+      toWarehouse: item.warehouse||old.warehouse||'wh1', toShelf: item.shelf||old.shelf||'—',
+      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), userRole: user?.role||'warehouse', reason: 'Редактирование' });
     all[idx] = { ...all[idx], ...item, updatedAt: new Date().toISOString() };
   } else {
-    logMovement({ type: 'add', productId: newItem.id, article: newItem.article, brand: newItem.brand, name: newItem.name,
+    logMovement({ action: 'add', productId: newItem.id, article: newItem.article, brand: newItem.brand,
+      productName: newItem.name, name: newItem.name,
       fromWarehouse: null, fromShelf: null,
       toWarehouse: newItem.warehouse, toShelf: newItem.shelf||'—',
-      qty: newItem.stock||0, qtyChange: newItem.stock||0, user: user||'склад', reason: 'Добавление' });
+      qty: newItem.stock||0, qtyChange: newItem.stock||0, userRole: user?.role||'warehouse', reason: 'Добавление' });
     all.push(newItem);
   }
   writeProducts(all);
@@ -247,10 +341,11 @@ ipcMain.handle('products:update', (_e, { item, user }) => {
   const idx = all.findIndex(p => p.id == item.id);
   if (idx >= 0) {
     const old = all[idx];
-    logMovement({ type: 'update', productId: old.id, article: old.article, brand: old.brand, name: old.name,
-      fromWarehouse: old.warehouse||1, fromShelf: old.shelf||'—',
-      toWarehouse: item.warehouse||old.warehouse||1, toShelf: item.shelf||old.shelf||'—',
-      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), user: user||'склад', reason: 'Редактирование' });
+    logMovement({ action: 'update', productId: old.id, article: old.article, brand: old.brand,
+      productName: old.name, name: old.name,
+      fromWarehouse: old.warehouse||'wh1', fromShelf: old.shelf||'—',
+      toWarehouse: item.warehouse||old.warehouse||'wh1', toShelf: item.shelf||old.shelf||'—',
+      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), userRole: user?.role||'warehouse', reason: 'Редактирование' });
     all[idx] = { ...all[idx], ...item, updatedAt: new Date().toISOString() };
     writeProducts(all);
     win?.webContents.send('products:changed', all);
@@ -263,10 +358,11 @@ ipcMain.handle('products:update', (_e, { item, user }) => {
 ipcMain.handle('products:delete', (_e, { id, user }) => {
   const all = readProducts();
   const p   = all.find(x => x.id == id);
-  if (p) logMovement({ type: 'delete', productId: p.id, article: p.article, brand: p.brand, name: p.name,
-    fromWarehouse: p.warehouse||1, fromShelf: p.shelf||'—',
+  if (p) logMovement({ action: 'delete', productId: p.id, article: p.article, brand: p.brand,
+    productName: p.name, name: p.name,
+    fromWarehouse: p.warehouse||'wh1', fromShelf: p.shelf||'—',
     toWarehouse: null, toShelf: null,
-    qty: p.stock||0, qtyChange: -(p.stock||0), user: user||'склад', reason: 'Удаление' });
+    qty: p.stock||0, qtyChange: -(p.stock||0), userRole: user?.role||'warehouse', reason: 'Удаление' });
   const updated = all.filter(x => x.id != id);
   writeProducts(updated);
   win?.webContents.send('products:changed', updated);
@@ -468,10 +564,11 @@ ipcMain.handle('products:importFile', async () => {
   if (!items.length) return { ok: false, error: 'Не удалось найти товары в файле. Убедитесь, что есть колонка «Артикул».' };
 
   const result = mergeIntoDB(items);
-  logMovement({ type: 'import', productId: null, article: '—', brand: '—',
+  logMovement({ action: 'import', productId: null, article: '—', brand: '—',
+    productName: `Импорт: ${path.basename(filePath)}`,
     name: `Импорт: ${path.basename(filePath)} (${result.added} доб., ${result.updated} обн.)`,
     fromWarehouse: null, fromShelf: null, toWarehouse: null, toShelf: null,
-    qty: result.total, qtyChange: result.added, user: 'склад', reason: 'Импорт файла' });
+    qty: result.total, qtyChange: result.added, userRole: 'warehouse', reason: 'Импорт файла' });
   scheduleSync(readProducts());
   return { ok: true, ...result, fileName: path.basename(filePath) };
 });

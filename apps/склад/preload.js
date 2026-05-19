@@ -25,6 +25,12 @@ contextBridge.exposeInMainWorld('warehouseAPI', {
   getVersion:    () => ipcRenderer.invoke('app:version'),
   openSharedDir: () => ipcRenderer.invoke('app:openSharedDir'),
 
+  // Transfer documents
+  getTransfers:   ()        => ipcRenderer.invoke('transfers:get'),
+  saveTransfer:   (doc)     => ipcRenderer.invoke('transfers:save', doc),
+  postTransfer:   (id, user)=> ipcRenderer.invoke('transfers:post', { id, user }),
+  deleteTransfer: (id)      => ipcRenderer.invoke('transfers:delete', id),
+
   // Events main → renderer
   onProductsChanged: (cb) => ipcRenderer.on('products:changed', (_e, items) => cb(items)),
   onSyncOk:    (cb) => ipcRenderer.on('sync:ok',    (_e, d) => cb(d)),
