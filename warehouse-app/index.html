@@ -203,8 +203,8 @@ tr:hover td{background:var(--bg3);color:var(--text)}
     <div class="nav-item" onclick="openAddModal()">
       <span class="ico">➕</span> Добавить товар
     </div>
-    <div class="nav-item" onclick="importCSV()">
-      <span class="ico">📥</span> Импорт CSV
+    <div class="nav-item" onclick="importFile()">
+      <span class="ico">📥</span> Загрузить файл
     </div>
     <div class="nav-item" onclick="openSharedDir()">
       <span class="ico">📁</span> Открыть данные
@@ -230,7 +230,7 @@ tr:hover td{background:var(--bg3);color:var(--text)}
       </div>
       <button class="btn btn-ghost" onclick="renderTable()">Обновить</button>
       <button class="btn btn-primary" onclick="openAddModal()">+ Добавить</button>
-      <button class="btn btn-ghost" onclick="importCSV()">📥 CSV</button>
+      <button class="btn btn-ghost" onclick="importFile()">📥 Загрузить файл</button>
     </div>
 
     <!-- Table -->
@@ -245,6 +245,7 @@ tr:hover td{background:var(--bg3);color:var(--text)}
             <th onclick="sortBy('price_wholesale')" style="text-align:right">Цена опт. ↕</th>
             <th onclick="sortBy('stock')" style="text-align:right">Кол-во ↕</th>
             <th>Статус</th>
+            <th>Категория</th>
             <th>Обновлено</th>
             <th style="width:80px"></th>
           </tr>
@@ -285,10 +286,6 @@ tr:hover td{background:var(--bg3);color:var(--text)}
       <div class="field">
         <label>Количество (шт.)</label>
         <input id="fStock" type="number" min="0" step="1" placeholder="0">
-      </div>
-      <div class="field">
-        <label>Срок доставки (дней)</label>
-        <input id="fDays" type="number" min="0" step="1" placeholder="0">
       </div>
       <div class="field full">
         <label>Категория</label>
@@ -399,6 +396,7 @@ function renderTable() {
       <td style="text-align:right">${priceW}</td>
       <td style="text-align:right"><b style="color:${stock<=0?'var(--red)':stock<5?'var(--amber)':'var(--text)'}">${stock}</b></td>
       <td>${badge}</td>
+      <td style="font-size:.8rem;color:var(--text3)">${esc(p.category||'—')}</td>
       <td style="font-size:.8rem">${updated}</td>
       <td><div class="actions">
         <button class="icon-btn" onclick="openEditModal('${p.id}')" title="Редактировать">✏️</button>
@@ -428,20 +426,19 @@ function openEditModal(id) {
   if (!p) return;
   editingId = id;
   document.getElementById('modalTitle').textContent = 'Редактировать товар';
-  document.getElementById('fArticle').value  = p.article || '';
-  document.getElementById('fBrand').value    = p.brand   || '';
-  document.getElementById('fName').value     = p.name    || '';
-  document.getElementById('fPriceR').value   = p.price_retail    || '';
-  document.getElementById('fPriceW').value   = p.price_wholesale || '';
-  document.getElementById('fStock').value    = p.stock   ?? '';
-  document.getElementById('fDays').value     = p.delivery_days   || '';
-  document.getElementById('fCategory').value = p.category || '';
+  document.getElementById('fArticle').value  = p.article          || '';
+  document.getElementById('fBrand').value    = p.brand            || '';
+  document.getElementById('fName').value     = p.name             || '';
+  document.getElementById('fPriceR').value   = p.price_retail     || '';
+  document.getElementById('fPriceW').value   = p.price_wholesale  || '';
+  document.getElementById('fStock').value    = p.stock            ?? '';
+  document.getElementById('fCategory').value = p.category         || '';
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('fArticle').focus();
 }
 
 function clearForm() {
-  ['fArticle','fBrand','fName','fPriceR','fPriceW','fStock','fDays','fCategory']
+  ['fArticle','fBrand','fName','fPriceR','fPriceW','fStock','fCategory']
     .forEach(id => document.getElementById(id).value = '');
 }
 
@@ -461,12 +458,11 @@ async function saveProduct() {
 
   const item = {
     article,
-    brand:   document.getElementById('fBrand').value.trim(),
+    brand:           document.getElementById('fBrand').value.trim(),
     name,
     price_retail:    parseFloat(document.getElementById('fPriceR').value) || 0,
     price_wholesale: parseFloat(document.getElementById('fPriceW').value) || 0,
     stock:           parseInt(document.getElementById('fStock').value)    || 0,
-    delivery_days:   parseInt(document.getElementById('fDays').value)     || 0,
     category:        document.getElementById('fCategory').value.trim(),
   };
 
@@ -492,10 +488,15 @@ async function deleteProduct(id) {
 }
 
 // ── Import ─────────────────────────────────────────────────────────────────────
-async function importCSV() {
-  const res = await warehouseAPI.importCSV();
-  if (!res.ok) { if (res.error) toast(res.error, 'error'); return; }
-  toast(`Импорт: +${res.added} добавлено, ${res.updated} обновлено. Итого: ${res.total}`, 'success');
+async function importFile() {
+  toast('Выберите файл…', 'info');
+  const res = await warehouseAPI.importFile();
+  if (!res) return;
+  if (!res.ok) {
+    toast(res.error || 'Не удалось прочитать файл', 'error');
+    return;
+  }
+  toast(`✓ "${res.fileName}": +${res.added} добавлено, ${res.updated} обновлено. Всего в базе: ${res.total}`, 'success');
 }
 
 // ── Sync ───────────────────────────────────────────────────────────────────────

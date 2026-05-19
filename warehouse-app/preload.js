@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld('warehouseAPI', {
   addProduct:     (item)   => ipcRenderer.invoke('products:add', item),
   updateProduct:  (item)   => ipcRenderer.invoke('products:update', item),
   deleteProduct:  (id)     => ipcRenderer.invoke('products:delete', id),
-  importCSV:      ()       => ipcRenderer.invoke('products:importCSV'),
+  importFile:     ()       => ipcRenderer.invoke('products:importFile'),
 
   // Sync
   getSyncStatus:  ()       => ipcRenderer.invoke('sync:status'),

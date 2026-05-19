@@ -89,53 +89,201 @@ ipcMain.handle('products:delete', (_e, id) => {
   return { ok: true };
 });
 
-ipcMain.handle('products:importCSV', async () => {
-  const { filePaths } = await dialog.showOpenDialog(win, {
-    title: 'Импорт CSV',
-    filters: [{ name: 'CSV / JSON', extensions: ['csv', 'json'] }],
-    properties: ['openFile'],
-  });
-  if (!filePaths.length) return { ok: false };
-  const raw = fs.readFileSync(filePaths[0], 'utf8');
-  let items = [];
+// ── Smart column mapper ───────────────────────────────────────────────────────
+function mapHeader(h) {
+  const s = h.toLowerCase().trim()
+    .replace(/["'«»\[\]()]/g, '')
+    .replace(/\s+/g, ' ');
 
-  if (filePaths[0].endsWith('.json')) {
-    try { items = JSON.parse(raw); } catch { return { ok: false, error: 'Неверный JSON' }; }
-  } else {
-    // Simple CSV parser: first row = headers
-    const lines = raw.split(/\r?\n/).filter(Boolean);
-    const headers = lines[0].split(';').map(h => h.trim().toLowerCase()
-      .replace('артикул','article').replace('бренд','brand').replace('производитель','brand')
-      .replace('наименование','name').replace('название','name')
-      .replace('цена розн','price_retail').replace('цена опт','price_wholesale')
-      .replace('количество','stock').replace('кол-во','stock')
-      .replace('дней доставки','delivery_days')
-    );
-    items = lines.slice(1).map(line => {
-      const vals = line.split(';');
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = vals[i]?.trim() || ''; });
-      obj.price_retail    = parseFloat(obj.price_retail)    || 0;
-      obj.price_wholesale = parseFloat(obj.price_wholesale) || 0;
-      obj.stock           = parseInt(obj.stock)             || 0;
-      obj.delivery_days   = parseInt(obj.delivery_days)     || 0;
-      return obj;
-    }).filter(it => it.article);
-  }
+  if (/артикул|article|арт\b|part.?no|part.?number|код\b|sku/.test(s))         return 'article';
+  if (/бренд|brand|производитель|марка|manufacturer|maker/.test(s))             return 'brand';
+  if (/наименован|назван|name|описан|товар|номенклатур|title/.test(s))          return 'name';
+  if (/цена.?розн|розн.?цена|retail|price_retail|цена\b(?!.*опт)|прайс/.test(s)) return 'price_retail';
+  if (/цена.?опт|опт.?цена|wholesale|price_wholesale|оптов/.test(s))            return 'price_wholesale';
+  if (/кол.?во|количеств|stock|остаток|склад|qty|count|наличи/.test(s))         return 'stock';
+  if (/категор|categ|группа|раздел|тип\b|вид\b/.test(s))                        return 'category';
+  return s; // unknown — keep as-is
+}
 
+function rowToProduct(obj) {
+  return {
+    article:         String(obj.article || obj['арт'] || obj['код'] || '').trim(),
+    brand:           String(obj.brand   || '').trim(),
+    name:            String(obj.name    || '').trim(),
+    price_retail:    parseFloat(String(obj.price_retail    || '0').replace(/[^\d.,]/g,'').replace(',','.')) || 0,
+    price_wholesale: parseFloat(String(obj.price_wholesale || '0').replace(/[^\d.,]/g,'').replace(',','.')) || 0,
+    stock:           parseInt(String(obj.stock || '0').replace(/[^\d]/g,'')) || 0,
+    category:        String(obj.category || '').trim(),
+  };
+}
+
+function parseTableRows(headers, dataRows, delimiter) {
+  return dataRows.map(line => {
+    if (!line.trim()) return null;
+    const vals = line.split(delimiter);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (vals[i] || '').replace(/^["']|["']$/g,'').trim(); });
+    return rowToProduct(obj);
+  }).filter(p => p && p.article);
+}
+
+function mergeIntoDB(items) {
   const all = readProducts();
   const map = {};
   all.forEach(it => { map[((it.article||'')+'|'+(it.brand||'')).toUpperCase()] = it; });
   let added = 0, updated = 0;
   items.forEach(it => {
     const key = ((it.article||'')+'|'+(it.brand||'')).toUpperCase();
-    if (map[key]) { Object.assign(map[key], it, { source:'warehouse', updatedAt: new Date().toISOString() }); updated++; }
-    else { map[key] = { ...it, id: Date.now()+Math.random(), source:'warehouse', importedAt: new Date().toISOString() }; added++; }
+    if (map[key]) {
+      Object.assign(map[key], it, { source: 'warehouse', updatedAt: new Date().toISOString() });
+      updated++;
+    } else {
+      map[key] = { ...it, id: Date.now()+Math.random(), source: 'warehouse', importedAt: new Date().toISOString() };
+      added++;
+    }
   });
   const merged = Object.values(map);
   writeProducts(merged);
   win?.webContents.send('products:changed', merged);
-  return { ok: true, added, updated, total: merged.length };
+  return { added, updated, total: merged.length };
+}
+
+// ── Smart file import ─────────────────────────────────────────────────────────
+ipcMain.handle('products:importFile', async () => {
+  const { filePaths } = await dialog.showOpenDialog(win, {
+    title: 'Загрузить файл с товарами',
+    filters: [
+      { name: 'Все поддерживаемые', extensions: ['xlsx','xls','csv','tsv','txt','json','pdf','docx'] },
+      { name: 'Excel',  extensions: ['xlsx','xls'] },
+      { name: 'CSV/TXT', extensions: ['csv','tsv','txt'] },
+      { name: 'JSON',   extensions: ['json'] },
+      { name: 'PDF',    extensions: ['pdf'] },
+      { name: 'Word',   extensions: ['docx'] },
+    ],
+    properties: ['openFile'],
+  });
+  if (!filePaths.length) return { ok: false };
+
+  const filePath = filePaths[0];
+  const ext = path.extname(filePath).toLowerCase();
+  let items = [];
+
+  try {
+    // ── Excel ──────────────────────────────────────────────────────────────────
+    if (ext === '.xlsx' || ext === '.xls') {
+      const XLSX = require('xlsx');
+      const wb = XLSX.readFile(filePath);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      if (rows.length < 2) return { ok: false, error: 'Файл пустой или нет данных' };
+
+      // Find the header row (first row with >2 non-empty cells)
+      let headerIdx = 0;
+      for (let i = 0; i < Math.min(10, rows.length); i++) {
+        if (rows[i].filter(c => String(c).trim()).length > 2) { headerIdx = i; break; }
+      }
+      const rawHeaders = rows[headerIdx].map(h => mapHeader(String(h)));
+      items = rows.slice(headerIdx + 1).map(row => {
+        const obj = {};
+        rawHeaders.forEach((h, i) => { obj[h] = String(row[i] ?? ''); });
+        return rowToProduct(obj);
+      }).filter(p => p.article);
+    }
+
+    // ── CSV / TSV / TXT ────────────────────────────────────────────────────────
+    else if (['.csv','.tsv','.txt'].includes(ext)) {
+      const raw = fs.readFileSync(filePath, { encoding: 'utf8' });
+      const lines = raw.split(/\r?\n/).filter(Boolean);
+      if (lines.length < 2) return { ok: false, error: 'Файл пустой' };
+
+      // Auto-detect delimiter
+      const sample = lines[0];
+      const delim = sample.includes('\t') ? '\t' : sample.includes(';') ? ';' : ',';
+      const headers = lines[0].split(delim).map(h => mapHeader(h.replace(/^["']|["']$/g,'').trim()));
+      items = parseTableRows(headers, lines.slice(1), delim);
+    }
+
+    // ── JSON ───────────────────────────────────────────────────────────────────
+    else if (ext === '.json') {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      let data;
+      try { data = JSON.parse(raw); } catch { return { ok: false, error: 'Неверный JSON' }; }
+      const arr = Array.isArray(data) ? data : (data.items || data.products || data.catalog || data.Товары || []);
+      items = arr.map(it => {
+        // Normalize keys
+        const n = {};
+        Object.keys(it).forEach(k => { n[mapHeader(k)] = it[k]; });
+        return rowToProduct(n);
+      }).filter(p => p.article);
+    }
+
+    // ── PDF ────────────────────────────────────────────────────────────────────
+    else if (ext === '.pdf') {
+      const pdfParse = require('pdf-parse');
+      const buf = fs.readFileSync(filePath);
+      const data = await pdfParse(buf);
+      const text = data.text;
+
+      // Try to extract tabular data from text
+      const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+      // Heuristic: find lines that look like product rows (contain digit prices / article-like strings)
+      const articleRe = /[A-Z0-9]{4,}[-\/]?[A-Z0-9]*/;
+      const priceRe   = /\d[\d\s]*[.,]\d{2}/;
+      items = lines.map(line => {
+        const parts = line.split(/\s{2,}|\t/);
+        if (parts.length < 2) return null;
+        const articleMatch = line.match(articleRe);
+        if (!articleMatch) return null;
+        const prices = line.match(/\d+[.,]\d+/g) || [];
+        const nums   = line.match(/\b\d+\b/g) || [];
+        return {
+          article: articleMatch[0],
+          brand: '',
+          name: parts.find(p => p.length > 5 && !/^\d/.test(p) && p !== articleMatch[0]) || parts[0],
+          price_retail:    parseFloat((prices[0]||'0').replace(',','.')) || 0,
+          price_wholesale: parseFloat((prices[1]||'0').replace(',','.')) || 0,
+          stock: parseInt(nums.find(n => parseInt(n) < 10000 && parseInt(n) > 0) || '0') || 0,
+          category: '',
+        };
+      }).filter(p => p && p.article && p.article.length >= 4);
+    }
+
+    // ── Word DOCX ──────────────────────────────────────────────────────────────
+    else if (ext === '.docx') {
+      const mammoth = require('mammoth');
+      const result  = await mammoth.extractRawText({ path: filePath });
+      const lines   = result.value.split(/\n/).map(l => l.trim()).filter(Boolean);
+      const articleRe = /[A-Z0-9]{4,}[-\/]?[A-Z0-9]*/;
+      items = lines.map(line => {
+        const parts = line.split(/\s{2,}|\t/);
+        if (parts.length < 2) return null;
+        const am = line.match(articleRe);
+        if (!am) return null;
+        const prices = line.match(/\d+[.,]\d+/g) || [];
+        const nums   = line.match(/\b\d+\b/g) || [];
+        return {
+          article: am[0], brand: '',
+          name: parts.find(p => p.length > 5 && !/^\d/.test(p) && p !== am[0]) || parts[0],
+          price_retail:    parseFloat((prices[0]||'0').replace(',','.')) || 0,
+          price_wholesale: parseFloat((prices[1]||'0').replace(',','.')) || 0,
+          stock: parseInt(nums.find(n => parseInt(n) < 10000 && parseInt(n) > 0) || '0') || 0,
+          category: '',
+        };
+      }).filter(p => p && p.article && p.article.length >= 4);
+    }
+
+    else {
+      return { ok: false, error: `Формат ${ext} не поддерживается` };
+    }
+
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+
+  if (!items.length) return { ok: false, error: 'Не удалось найти товары в файле. Убедитесь, что есть колонка «Артикул».' };
+
+  const result = mergeIntoDB(items);
+  return { ok: true, ...result, fileName: path.basename(filePath) };
 });
 
 ipcMain.handle('sync:status', () => {
