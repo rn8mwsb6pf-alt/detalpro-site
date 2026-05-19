@@ -10,12 +10,66 @@ const https = require('https');
 const Store = require('electron-store');
 
 // ── Shared data directory (accessible by both apps) ───────────────────────────
-const SHARED_DIR    = path.join(app.getPath('appData'), 'GarageShared');
-const PRODUCTS_FILE = path.join(SHARED_DIR, 'products.json');
-const CONFIG_FILE   = path.join(SHARED_DIR, 'sync-config.json');
-const IS_DEV        = process.argv.includes('--dev');
+const SHARED_DIR      = path.join(app.getPath('appData'), 'GarageShared');
+const PRODUCTS_FILE   = path.join(SHARED_DIR, 'products.json');
+const MOVEMENTS_FILE  = path.join(SHARED_DIR, 'movements.json');
+const CONFIG_FILE     = path.join(SHARED_DIR, 'sync-config.json');
+const IS_DEV          = process.argv.includes('--dev');
 
 if (!fs.existsSync(SHARED_DIR)) fs.mkdirSync(SHARED_DIR, { recursive: true });
+
+// ── Movements (audit log) ─────────────────────────────────────────────────────
+function readMovements() {
+  try {
+    if (!fs.existsSync(MOVEMENTS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(MOVEMENTS_FILE, 'utf8'));
+  } catch { return []; }
+}
+
+function logMovement(entry) {
+  const all = readMovements();
+  const record = {
+    id:           Date.now() + Math.random(),
+    timestamp:    new Date().toISOString(),
+    ...entry,
+  };
+  all.unshift(record); // newest first
+  // Keep last 10 000 records
+  if (all.length > 10000) all.length = 10000;
+  fs.writeFileSync(MOVEMENTS_FILE, JSON.stringify(all, null, 2), 'utf8');
+  return record;
+}
+
+ipcMain.handle('movements:get',    (_e, limit = 500) => readMovements().slice(0, limit));
+ipcMain.handle('movements:clear',  ()  => { fs.writeFileSync(MOVEMENTS_FILE, '[]', 'utf8'); return { ok: true }; });
+
+// ── Move product between shelves/warehouses ───────────────────────────────────
+ipcMain.handle('products:move', (_e, { productId, toWarehouse, toShelf, qty, reason, user }) => {
+  const all = readProducts();
+  const idx = all.findIndex(p => p.id == productId);
+  if (idx < 0) return { ok: false, error: 'Товар не найден' };
+
+  const p = all[idx];
+  const fromWarehouse = p.warehouse || 1;
+  const fromShelf     = p.shelf     || '—';
+
+  logMovement({
+    type: 'move',
+    productId, article: p.article, brand: p.brand, name: p.name,
+    fromWarehouse, fromShelf,
+    toWarehouse,   toShelf,
+    qty:        qty || p.stock,
+    qtyChange:  0,
+    user:       user || 'склад',
+    reason:     reason || '',
+  });
+
+  all[idx] = { ...p, warehouse: toWarehouse, shelf: toShelf, updatedAt: new Date().toISOString() };
+  writeProducts(all);
+  win?.webContents.send('products:changed', all);
+  scheduleSync(all);
+  return { ok: true };
+});
 
 // ── Persistent window state ───────────────────────────────────────────────────
 const store = new Store({
@@ -152,35 +206,51 @@ ipcMain.handle('products:save', (_e, items) => {
   return { ok: true, count: items.length };
 });
 
-ipcMain.handle('products:add', (_e, item) => {
+ipcMain.handle('products:add', (_e, { item, user }) => {
   const all = readProducts();
   const newItem = {
     ...item,
     id: Date.now() + Math.random(),
-    source: 'warehouse',
+    warehouse: item.warehouse || 1,
+    shelf:     item.shelf     || '',
+    source:    'warehouse',
     importedAt: new Date().toISOString(),
     updatedAt:  new Date().toISOString(),
   };
-  // Upsert by article+brand
   const key = ((item.article || '') + '|' + (item.brand || '')).toUpperCase();
   const idx = all.findIndex(p =>
     ((p.article || '') + '|' + (p.brand || '')).toUpperCase() === key
   );
-  if (idx >= 0) {
+  const isUpdate = idx >= 0;
+  if (isUpdate) {
+    const old = all[idx];
+    logMovement({ type: 'update', productId: old.id, article: old.article, brand: old.brand, name: old.name,
+      fromWarehouse: old.warehouse||1, fromShelf: old.shelf||'—',
+      toWarehouse: item.warehouse||old.warehouse||1, toShelf: item.shelf||old.shelf||'—',
+      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), user: user||'склад', reason: 'Редактирование' });
     all[idx] = { ...all[idx], ...item, updatedAt: new Date().toISOString() };
   } else {
+    logMovement({ type: 'add', productId: newItem.id, article: newItem.article, brand: newItem.brand, name: newItem.name,
+      fromWarehouse: null, fromShelf: null,
+      toWarehouse: newItem.warehouse, toShelf: newItem.shelf||'—',
+      qty: newItem.stock||0, qtyChange: newItem.stock||0, user: user||'склад', reason: 'Добавление' });
     all.push(newItem);
   }
   writeProducts(all);
   win?.webContents.send('products:changed', all);
   scheduleSync(all);
-  return { ok: true, item: idx >= 0 ? all[idx] : newItem };
+  return { ok: true, item: isUpdate ? all[idx] : newItem };
 });
 
-ipcMain.handle('products:update', (_e, item) => {
+ipcMain.handle('products:update', (_e, { item, user }) => {
   const all = readProducts();
   const idx = all.findIndex(p => p.id == item.id);
   if (idx >= 0) {
+    const old = all[idx];
+    logMovement({ type: 'update', productId: old.id, article: old.article, brand: old.brand, name: old.name,
+      fromWarehouse: old.warehouse||1, fromShelf: old.shelf||'—',
+      toWarehouse: item.warehouse||old.warehouse||1, toShelf: item.shelf||old.shelf||'—',
+      qty: item.stock ?? old.stock, qtyChange: (item.stock??0)-(old.stock??0), user: user||'склад', reason: 'Редактирование' });
     all[idx] = { ...all[idx], ...item, updatedAt: new Date().toISOString() };
     writeProducts(all);
     win?.webContents.send('products:changed', all);
@@ -190,11 +260,17 @@ ipcMain.handle('products:update', (_e, item) => {
   return { ok: false, error: 'Не найден' };
 });
 
-ipcMain.handle('products:delete', (_e, id) => {
-  const all = readProducts().filter(p => p.id != id);
-  writeProducts(all);
-  win?.webContents.send('products:changed', all);
-  scheduleSync(all);
+ipcMain.handle('products:delete', (_e, { id, user }) => {
+  const all = readProducts();
+  const p   = all.find(x => x.id == id);
+  if (p) logMovement({ type: 'delete', productId: p.id, article: p.article, brand: p.brand, name: p.name,
+    fromWarehouse: p.warehouse||1, fromShelf: p.shelf||'—',
+    toWarehouse: null, toShelf: null,
+    qty: p.stock||0, qtyChange: -(p.stock||0), user: user||'склад', reason: 'Удаление' });
+  const updated = all.filter(x => x.id != id);
+  writeProducts(updated);
+  win?.webContents.send('products:changed', updated);
+  scheduleSync(updated);
   return { ok: true };
 });
 
@@ -392,6 +468,10 @@ ipcMain.handle('products:importFile', async () => {
   if (!items.length) return { ok: false, error: 'Не удалось найти товары в файле. Убедитесь, что есть колонка «Артикул».' };
 
   const result = mergeIntoDB(items);
+  logMovement({ type: 'import', productId: null, article: '—', brand: '—',
+    name: `Импорт: ${path.basename(filePath)} (${result.added} доб., ${result.updated} обн.)`,
+    fromWarehouse: null, fromShelf: null, toWarehouse: null, toShelf: null,
+    qty: result.total, qtyChange: result.added, user: 'склад', reason: 'Импорт файла' });
   scheduleSync(readProducts());
   return { ok: true, ...result, fileName: path.basename(filePath) };
 });
