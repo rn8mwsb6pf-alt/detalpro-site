@@ -178,11 +178,11 @@ tr:hover td{background:var(--bg3);color:var(--text)}
 <header>
   <div class="logo">Гараж <span class="sub">/ Склад</span></div>
   <div class="spacer"></div>
-  <div class="sync-badge" onclick="openSharedDir()" title="Папка с данными">
+  <div class="sync-badge" id="syncBadge" onclick="openSettingsModal()" title="Настройки синхронизации">
     <div class="sync-dot" id="syncDot"></div>
-    <span id="syncLabel">Данные: загрузка…</span>
+    <span id="syncLabel">Синхронизация…</span>
   </div>
-  <button class="btn btn-ghost" style="-webkit-app-region:no-drag;margin-left:8px" onclick="syncNow()">⟳ Синхронизация</button>
+  <button class="btn btn-ghost" style="-webkit-app-region:no-drag;margin-left:8px" onclick="pushNow()" id="syncBtn">↑ Синхр. сейчас</button>
 </header>
 
 <!-- Body -->
@@ -299,6 +299,35 @@ tr:hover td{background:var(--bg3);color:var(--text)}
   </div>
 </div>
 
+<!-- Settings Modal -->
+<div class="overlay hidden" id="settingsOverlay" onclick="closeSettingsOutside(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <h2>⚙️ Настройки облачной синхронизации</h2>
+    <p style="color:var(--text3);font-size:.8rem;margin-bottom:16px;line-height:1.6">
+      Используется <b style="color:var(--text)">JSONBin.io</b> — бесплатное облачное хранилище.<br>
+      1. Зарегистрируйтесь на <a href="#" onclick="openLink('https://jsonbin.io')" style="color:var(--accent)">jsonbin.io</a><br>
+      2. Скопируйте Master Key из раздела API Keys<br>
+      3. Нажмите «Создать хранилище» — Bin ID появится автоматически
+    </p>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="field">
+        <label>Master Key (API Key)</label>
+        <input id="sCfgKey" type="password" placeholder="$2b$10$…" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Bin ID <span style="color:var(--text3)">(заполняется автоматически)</span></label>
+        <input id="sCfgBin" placeholder="64abc123..." autocomplete="off">
+      </div>
+    </div>
+    <div id="settingsStatus" style="margin-top:12px;font-size:.8rem;color:var(--text3);min-height:20px"></div>
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px">
+      <button class="btn btn-ghost" onclick="closeSettingsModal()">Закрыть</button>
+      <button class="btn btn-ghost" onclick="createBin()" id="btnCreateBin">📦 Создать хранилище</button>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toasts -->
 <div class="toast-container" id="toasts"></div>
 
@@ -319,6 +348,7 @@ async function init() {
   warehouseAPI.onProductsChanged(items => {
     products = items;
     renderAll();
+    updateSyncStatus();
   });
 }
 
@@ -499,20 +529,94 @@ async function importFile() {
   toast(`✓ "${res.fileName}": +${res.added} добавлено, ${res.updated} обновлено. Всего в базе: ${res.total}`, 'success');
 }
 
-// ── Sync ───────────────────────────────────────────────────────────────────────
+// ── Sync status ────────────────────────────────────────────────────────────────
 async function updateSyncStatus() {
-  const s = await warehouseAPI.getSyncStatus();
+  const cfg = await warehouseAPI.getConfig();
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
-  dot.className = 'sync-dot';
-  lbl.textContent = `Товаров в базе: ${s.count}`;
+  if (!cfg.apiKey || !cfg.binId) {
+    dot.className = 'sync-dot offline';
+    lbl.textContent = 'Синхронизация не настроена';
+  } else {
+    dot.className = 'sync-dot';
+    lbl.textContent = `Синхр. активна • ${products.length} тов.`;
+  }
 }
 
-async function syncNow() {
-  const res = await warehouseAPI.syncNow();
-  toast(`База сохранена (${res.count} товаров)`, 'success');
-  updateSyncStatus();
+async function pushNow() {
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true;
+  btn.textContent = '↑ Отправка…';
+  const res = await warehouseAPI.pushNow();
+  btn.disabled = false;
+  btn.textContent = '↑ Синхр. сейчас';
+  if (res.ok) toast('✓ Данные отправлены на сайт', 'success');
+  else toast(res.error || 'Ошибка синхронизации', 'error');
 }
+
+// Авто-статус из main process
+warehouseAPI.onSyncOk(d => {
+  const lbl = document.getElementById('syncLabel');
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot';
+  lbl.textContent = `✓ Синхр. ${new Date(d.at).toLocaleTimeString('ru')} • ${d.count} тов.`;
+});
+warehouseAPI.onSyncError(e => {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot offline';
+  toast(`Ошибка синхронизации: ${e}`, 'error');
+});
+
+// ── Settings modal ─────────────────────────────────────────────────────────────
+async function openSettingsModal() {
+  const cfg = await warehouseAPI.getConfig();
+  document.getElementById('sCfgKey').value = cfg.apiKey || '';
+  document.getElementById('sCfgBin').value = cfg.binId  || '';
+  document.getElementById('settingsStatus').textContent = '';
+  document.getElementById('settingsOverlay').classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsOverlay').classList.add('hidden');
+}
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settingsOverlay')) closeSettingsModal();
+}
+
+async function createBin() {
+  const apiKey = document.getElementById('sCfgKey').value.trim();
+  if (!apiKey) { document.getElementById('settingsStatus').textContent = '⚠ Введите Master Key'; return; }
+  const btn = document.getElementById('btnCreateBin');
+  btn.disabled = true;
+  btn.textContent = '…создание';
+  document.getElementById('settingsStatus').textContent = 'Создаём хранилище…';
+  const res = await warehouseAPI.createBin(apiKey);
+  btn.disabled = false;
+  btn.textContent = '📦 Создать хранилище';
+  if (res.ok) {
+    document.getElementById('sCfgBin').value = res.binId;
+    document.getElementById('settingsStatus').textContent = `✓ Хранилище создано! Bin ID: ${res.binId}`;
+    toast('Хранилище JSONBin создано', 'success');
+  } else {
+    document.getElementById('settingsStatus').textContent = `✗ Ошибка: ${res.error}`;
+  }
+}
+
+async function saveSettings() {
+  const apiKey = document.getElementById('sCfgKey').value.trim();
+  const binId  = document.getElementById('sCfgBin').value.trim();
+  await warehouseAPI.saveConfig({ apiKey, binId });
+  closeSettingsModal();
+  updateSyncStatus();
+  if (apiKey && binId) {
+    toast('Настройки сохранены. Синхронизация активна!', 'success');
+    pushNow();
+  } else {
+    toast('Настройки сохранены', 'info');
+  }
+}
+
+function openLink(url) { warehouseAPI.openSharedDir && window.warehouseAPI && ipcRenderer?.invoke('app:openLink', url); }
 
 async function openSharedDir() {
   await warehouseAPI.openSharedDir();

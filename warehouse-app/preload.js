@@ -10,15 +10,21 @@ contextBridge.exposeInMainWorld('warehouseAPI', {
   deleteProduct:  (id)     => ipcRenderer.invoke('products:delete', id),
   importFile:     ()       => ipcRenderer.invoke('products:importFile'),
 
-  // Sync
-  getSyncStatus:  ()       => ipcRenderer.invoke('sync:status'),
-  syncNow:        ()       => ipcRenderer.invoke('sync:now'),
+  // Cloud sync
+  getConfig:    ()       => ipcRenderer.invoke('sync:getConfig'),
+  saveConfig:   (cfg)    => ipcRenderer.invoke('sync:saveConfig', cfg),
+  createBin:    (apiKey) => ipcRenderer.invoke('sync:createBin', apiKey),
+  pushNow:      ()       => ipcRenderer.invoke('sync:pushNow'),
+
+  // Status
+  getSyncStatus:  ()    => ipcRenderer.invoke('sync:status'),
 
   // App
-  getVersion:     ()       => ipcRenderer.invoke('app:version'),
-  openSharedDir:  ()       => ipcRenderer.invoke('app:openSharedDir'),
+  getVersion:     ()    => ipcRenderer.invoke('app:version'),
+  openSharedDir:  ()    => ipcRenderer.invoke('app:openSharedDir'),
 
-  // Events from main → renderer
-  onSyncStatus:   (cb) => ipcRenderer.on('sync:statusChanged', (_e, s) => cb(s)),
+  // Events main → renderer
   onProductsChanged: (cb) => ipcRenderer.on('products:changed', (_e, items) => cb(items)),
+  onSyncOk:    (cb) => ipcRenderer.on('sync:ok',    (_e, d) => cb(d)),
+  onSyncError: (cb) => ipcRenderer.on('sync:error', (_e, e) => cb(e)),
 });

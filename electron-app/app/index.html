@@ -8405,6 +8405,56 @@ function vinAddToCart(prod){
 }
 
 init();
+
+// ── Авто-загрузка товаров со склада (JSONBin.io) ──────────────────────────────
+(function loadWarehouseProducts() {
+  // Bin ID задаётся через localStorage ключ 'dp_sync_bin' или хардкодится ниже
+  const JSONBIN_URL_KEY = 'dp_sync_url'; // пользователь может задать через консоль
+
+  function getSyncUrl() {
+    const stored = localStorage.getItem(JSONBIN_URL_KEY);
+    if (stored) return stored;
+    // Если не задан — не загружаем (нет смысла без конфига)
+    return null;
+  }
+
+  async function fetchAndMerge() {
+    const url = getSyncUrl();
+    if (!url) return;
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return;
+      const json = await res.json();
+      const items = json.record?.products || json.products || [];
+      if (Array.isArray(items) && items.length > 0) {
+        mergeCatalog(items, 'warehouse');
+        localStorage.setItem('dp_catalog_meta', JSON.stringify({
+          updatedAt: new Date().toISOString(),
+          file: 'Склад (облако)',
+          count: items.length
+        }));
+        console.log(`[Склад] Загружено ${items.length} товаров из облака`);
+      }
+    } catch (e) {
+      console.warn('[Склад] Ошибка загрузки:', e.message);
+    }
+  }
+
+  // Загружаем сразу и потом каждые 5 минут
+  fetchAndMerge();
+  setInterval(fetchAndMerge, 5 * 60 * 1000);
+
+  // Публичная функция для настройки
+  window.setWarehouseSyncUrl = function(binId, apiKey) {
+    // Для JSONBin public bins используем публичный URL
+    // Для private bins нужен X-Master-Key заголовок — используем прокси или публичный бин
+    const url = `https://api.jsonbin.io/v3/b/${binId}/latest`;
+    localStorage.setItem(JSONBIN_URL_KEY, url);
+    if (apiKey) localStorage.setItem('dp_sync_key', apiKey);
+    fetchAndMerge();
+    console.log('[Склад] URL синхронизации установлен:', url);
+  };
+})();
 </script>
 </body>
 </html>

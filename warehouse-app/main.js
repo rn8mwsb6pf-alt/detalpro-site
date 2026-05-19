@@ -3,21 +3,126 @@
 const {
   app, BrowserWindow, ipcMain, dialog, shell, Menu
 } = require('electron');
-const path = require('path');
-const fs   = require('fs');
-const os   = require('os');
+const path  = require('path');
+const fs    = require('fs');
+const os    = require('os');
+const https = require('https');
 const Store = require('electron-store');
 
 // ── Shared data directory (accessible by both apps) ───────────────────────────
-const SHARED_DIR  = path.join(app.getPath('appData'), 'GarageShared');
+const SHARED_DIR    = path.join(app.getPath('appData'), 'GarageShared');
 const PRODUCTS_FILE = path.join(SHARED_DIR, 'products.json');
-const IS_DEV = process.argv.includes('--dev');
+const CONFIG_FILE   = path.join(SHARED_DIR, 'sync-config.json');
+const IS_DEV        = process.argv.includes('--dev');
 
 if (!fs.existsSync(SHARED_DIR)) fs.mkdirSync(SHARED_DIR, { recursive: true });
 
 // ── Persistent window state ───────────────────────────────────────────────────
 const store = new Store({
   defaults: { windowBounds: { width: 1200, height: 750 }, windowMaximized: false }
+});
+
+// ── Sync config helpers ───────────────────────────────────────────────────────
+function readSyncConfig() {
+  try {
+    if (!fs.existsSync(CONFIG_FILE)) return { apiKey: '', binId: '' };
+    return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+  } catch { return { apiKey: '', binId: '' }; }
+}
+function writeSyncConfig(cfg) {
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
+}
+
+// ── Cloud sync (JSONBin.io) ───────────────────────────────────────────────────
+let syncTimer = null;
+
+function httpRequest(options, body) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, res => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
+        catch { resolve({ status: res.statusCode, data }); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+async function pushToCloud(items) {
+  const { apiKey, binId } = readSyncConfig();
+  if (!apiKey || !binId) return { ok: false, error: 'Не настроена синхронизация' };
+
+  const body = JSON.stringify({ products: items, updatedAt: new Date().toISOString(), count: items.length });
+  try {
+    const res = await httpRequest({
+      hostname: 'api.jsonbin.io',
+      path:     `/v3/b/${binId}`,
+      method:   'PUT',
+      headers:  {
+        'Content-Type':  'application/json',
+        'X-Master-Key':  apiKey,
+        'X-Bin-Versioning': 'false',
+      },
+    }, body);
+
+    if (res.status === 200) {
+      win?.webContents.send('sync:ok', { count: items.length, at: new Date().toISOString() });
+      return { ok: true };
+    }
+    win?.webContents.send('sync:error', `HTTP ${res.status}`);
+    return { ok: false, error: `HTTP ${res.status}` };
+  } catch (e) {
+    win?.webContents.send('sync:error', e.message);
+    return { ok: false, error: e.message };
+  }
+}
+
+// Debounced auto-sync: waits 1.5s after last change, then pushes
+function scheduleSync(items) {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => pushToCloud(items), 1500);
+}
+
+// IPC: create a new bin (first-time setup)
+ipcMain.handle('sync:createBin', async (_e, apiKey) => {
+  try {
+    const res = await httpRequest({
+      hostname: 'api.jsonbin.io',
+      path:     '/v3/b',
+      method:   'POST',
+      headers:  {
+        'Content-Type':   'application/json',
+        'X-Master-Key':   apiKey,
+        'X-Bin-Name':     'garage-products',
+        'X-Bin-Private':  'true',
+      },
+    }, JSON.stringify({ products: [], updatedAt: new Date().toISOString(), count: 0 }));
+
+    if (res.status === 200 || res.status === 201) {
+      const binId = res.data?.metadata?.id;
+      if (binId) {
+        writeSyncConfig({ apiKey, binId });
+        return { ok: true, binId };
+      }
+    }
+    return { ok: false, error: `HTTP ${res.status}: ${JSON.stringify(res.data)}` };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
+ipcMain.handle('sync:saveConfig', (_e, cfg) => {
+  writeSyncConfig(cfg);
+  return { ok: true };
+});
+ipcMain.handle('sync:getConfig', () => readSyncConfig());
+ipcMain.handle('sync:pushNow',   async () => {
+  const items = readProducts();
+  return pushToCloud(items);
 });
 
 // ── Single-instance lock ──────────────────────────────────────────────────────
@@ -43,6 +148,7 @@ ipcMain.handle('products:get', () => readProducts());
 ipcMain.handle('products:save', (_e, items) => {
   writeProducts(items);
   win?.webContents.send('products:changed', items);
+  scheduleSync(items);
   return { ok: true, count: items.length };
 });
 
@@ -67,6 +173,7 @@ ipcMain.handle('products:add', (_e, item) => {
   }
   writeProducts(all);
   win?.webContents.send('products:changed', all);
+  scheduleSync(all);
   return { ok: true, item: idx >= 0 ? all[idx] : newItem };
 });
 
@@ -77,6 +184,7 @@ ipcMain.handle('products:update', (_e, item) => {
     all[idx] = { ...all[idx], ...item, updatedAt: new Date().toISOString() };
     writeProducts(all);
     win?.webContents.send('products:changed', all);
+    scheduleSync(all);
     return { ok: true };
   }
   return { ok: false, error: 'Не найден' };
@@ -86,6 +194,7 @@ ipcMain.handle('products:delete', (_e, id) => {
   const all = readProducts().filter(p => p.id != id);
   writeProducts(all);
   win?.webContents.send('products:changed', all);
+  scheduleSync(all);
   return { ok: true };
 });
 
@@ -283,6 +392,7 @@ ipcMain.handle('products:importFile', async () => {
   if (!items.length) return { ok: false, error: 'Не удалось найти товары в файле. Убедитесь, что есть колонка «Артикул».' };
 
   const result = mergeIntoDB(items);
+  scheduleSync(readProducts());
   return { ok: true, ...result, fileName: path.basename(filePath) };
 });
 
@@ -298,6 +408,9 @@ ipcMain.handle('sync:now', () => {
 
 ipcMain.handle('app:version', () => app.getVersion());
 ipcMain.handle('app:openSharedDir', () => { shell.openPath(SHARED_DIR); return true; });
+
+// Allow renderer to open external links (e.g. jsonbin.io)
+ipcMain.handle('app:openLink', (_e, url) => { shell.openExternal(url); return true; });
 
 // ── Window ────────────────────────────────────────────────────────────────────
 function createWindow() {
