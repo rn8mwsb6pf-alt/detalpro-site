@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ДЕТАЛЬПРО — Управление</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f10;--bg2:#131618;--bg3:#1a1d20;
+  --line:#2a2f33;--line2:#363c41;
+  --text:#e8eaeb;--text2:#9da5ab;--text3:#5a6268;
+  --accent:#e8411a;--accent2:#ff6b45;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
+  --r:4px;--r2:8px;
+  --font:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-head:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','Consolas',monospace;
+  --sidebar-w:220px;--hdr-h:56px;
+  /* legacy aliases */
+  --border:var(--line);--radius:var(--r2);--accent2:#c73516;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── Login ── */
+#loginScreen{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  padding:16px;
+}
+.login-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:36px 32px;width:100%;max-width:400px;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);
+}
+.login-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px}
+.login-brand-icon{font-size:1.9rem}
+.login-brand-name{font-size:1.25rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.login-sub{text-align:center;color:var(--text3);font-size:.78rem;margin-bottom:24px}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.login-field label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.login-field input{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:11px 14px;color:var(--text);font-size:16px;font-family:var(--font);
+  outline:none;transition:border-color .15s;-webkit-appearance:none;
+}
+.login-field input:focus{border-color:var(--accent)}
+.login-field input::placeholder{color:var(--text3)}
+.login-error{
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
+  color:var(--red);border-radius:8px;padding:9px 13px;font-size:.8rem;
+  margin-bottom:12px;display:none;
+}
+.login-error.visible{display:block}
+.login-hints{
+  margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 13px;font-size:.73rem;color:var(--text3);line-height:1.7;
+}
+.login-hints b{color:var(--text2)}
+.login-btn{
+  width:100%;padding:13px;background:var(--accent);color:#fff;border:none;
+  border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;
+  font-family:var(--font);transition:background .12s;touch-action:manipulation;
+}
+.login-btn:hover{background:var(--accent2)}
+.login-btn:active{background:var(--accent2);transform:scale(.98)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── App shell ── */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── Header ── */
+header{
+  flex-shrink:0;height:var(--hdr-h);
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;padding:0 16px;
+  -webkit-app-region:drag;z-index:50;
+}
+.hdr-burger{
+  -webkit-app-region:no-drag;
+  display:none;align-items:center;justify-content:center;
+  width:36px;height:36px;border:none;background:var(--bg3);border-radius:6px;
+  cursor:pointer;font-size:1.1rem;flex-shrink:0;
+}
+.logo{font-size:.9rem;font-weight:800;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.logo-sub{font-size:.68rem;color:var(--text3);margin-left:2px}
+.hdr-spacer{flex:1}
+.hdr-chip{
+  -webkit-app-region:no-drag;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:4px 11px;font-size:.73rem;color:var(--text2);white-space:nowrap;
+}
+.hdr-chip.clickable{cursor:pointer;transition:border-color .15s}
+.hdr-chip.clickable:hover{border-color:var(--accent)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.offline{background:var(--red)}
+.hdr-btn{
+  -webkit-app-region:no-drag;
+  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border:1px solid var(--border);border-radius:6px;background:var(--bg3);
+  color:var(--text2);font-size:.8rem;cursor:pointer;font-family:var(--font);
+  transition:background .12s;touch-action:manipulation;
+}
+.hdr-btn:hover{background:var(--bg);color:var(--text)}
+
+/* ── Body ── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar overlay (mobile) ── */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;
+}
+.sidebar-overlay.open{display:block}
+
+/* ── Sidebar ── */
+nav{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;
+  transition:transform .25s ease;z-index:41;
+}
+.nav-section{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;padding:12px 8px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 10px;
+  border-radius:var(--radius);cursor:pointer;color:var(--text2);
+  transition:background .12s,color .12s;font-size:.875rem;
+  touch-action:manipulation;
+}
+.nav-item:hover,.nav-item:active{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(232,65,26,.15);color:var(--accent)}
+.nav-ico{font-size:1rem;width:22px;text-align:center}
+.nav-badge{
+  margin-left:auto;background:var(--bg3);color:var(--text3);
+  font-size:.65rem;padding:2px 7px;border-radius:10px;min-width:22px;text-align:center;
+}
+.nav-badge.warn{background:rgba(245,158,11,.15);color:var(--amber)}
+.nav-badge.danger{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.view-panel{display:none;flex-direction:column;gap:14px}
+.view-panel.active{display:flex}
+
+/* ── KPI grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 12px;
+}
+.kpi-val{font-size:1.7rem;font-weight:800;color:var(--text);line-height:1}
+.kpi-lbl{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:5px}
+.kpi.warn .kpi-val{color:var(--amber)}
+.kpi.danger .kpi-val{color:var(--red)}
+.kpi.ok .kpi-val{color:var(--green)}
+
+/* ── Dash grid ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.widget{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px}
+.widget-title{font-size:.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em}
+.widget-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(42,47,51,.5)}
+.widget-row:last-child{border-bottom:none}
+.widget-row-lbl{color:var(--text3);font-size:.82rem}
+.widget-row-val{color:var(--text);font-weight:600;font-size:.88rem}
+.wh-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.wh-bar-lbl{width:64px;font-size:.76rem;color:var(--text3);flex-shrink:0}
+.wh-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.wh-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.wh-bar-val{width:36px;text-align:right;font-size:.76rem;color:var(--text2);font-weight:600}
+.tl-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(42,47,51,.4)}
+.tl-item:last-child{border-bottom:none}
+.tl-ico{font-size:.95rem;width:22px;flex-shrink:0;margin-top:1px}
+.tl-title{font-size:.82rem;color:var(--text)}
+.tl-meta{font-size:.7rem;color:var(--text3);margin-top:1px}
+
+/* ── Section header ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.sec-title{font-size:.95rem;font-weight:700;color:var(--text)}
+.sec-sub{font-size:.76rem;color:var(--text3);margin-top:2px}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:160px;position:relative}
+.search-wrap input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 10px 8px 34px;
+  color:var(--text);font-size:.875rem;outline:none;transition:border-color .15s;
+  font-family:var(--font);-webkit-appearance:none;
+}
+.search-wrap input:focus{border-color:var(--accent)}
+.s-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;padding:8px 13px;
+  border:none;border-radius:var(--radius);cursor:pointer;font-size:.875rem;
+  font-family:var(--font);font-weight:600;transition:background .12s;
+  touch-action:manipulation;white-space:nowrap;
+}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--accent2)}
+.btn-primary:active:not(:disabled){background:var(--accent2);transform:scale(.97)}
+.btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,.2)}
+.btn-sm{padding:5px 9px;font-size:.78rem}
+
+/* ── Table ── */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:auto;flex:1;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{
+  background:var(--bg3);padding:9px 11px;text-align:left;
+  font-size:.67rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;
+}
+th:hover{color:var(--text2)}
+th.no-sort{cursor:default}th.no-sort:hover{color:var(--text3)}
+td{padding:9px 11px;border-bottom:1px solid rgba(42,47,51,.6);color:var(--text2);font-size:.855rem}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600}
+.badge-green{background:rgba(34,197,94,.12);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--amber)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red)}
+.badge-blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.badge-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+.badge-gray{background:var(--bg3);color:var(--text3)}
+.empty{padding:40px;text-align:center;color:var(--text3)}
+.empty .ei{font-size:2.2rem;margin-bottom:10px}
+
+/* ── Reports ── */
+.report-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.rcard-val{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.rcard-lbl{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.rcard.money .rcard-val{color:var(--green)}
+.rcard.cost .rcard-val{color:var(--blue)}
+
+/* ── Users ── */
+.user-input{
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:5px 8px;color:var(--text);font-size:.82rem;font-family:var(--font);
+  outline:none;width:100%;transition:border-color .12s;
+}
+.user-input:focus{border-color:var(--accent)}
+.user-input[readonly]{background:transparent;border-color:transparent}
+.user-role-select{
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:5px 8px;color:var(--text);font-size:.8rem;font-family:var(--font);outline:none;
+}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:200;pointer-events:none}
+.toast{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 15px;font-size:.85rem;color:var(--text);min-width:220px;max-width:300px;
+  animation:slideIn .2s ease;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:auto;
+}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+.toast.info{border-color:var(--accent);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+════════════════════════════════ */
+
+/* Tablet: 1024px */
+@media(max-width:1024px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .report-cards{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Tablet portrait / large phone: 768px */
+@media(max-width:768px){
+  :root{--sidebar-w:240px}
+  .hdr-burger{display:flex}
+  .sidebar-overlay{display:none}
+  nav{
+    position:fixed;top:0;left:0;bottom:0;
+    transform:translateX(-100%);
+    padding-top:calc(var(--hdr-h) + 8px);
+    box-shadow:4px 0 24px rgba(0,0,0,.4);
+  }
+  nav.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .content{padding:12px}
+  .hdr-chip:not(#syncBadge):not(#roleBadge){display:none}
+}
+
+/* Phone: 480px */
+@media(max-width:480px){
+  .login-box{padding:24px 18px;border-radius:12px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi-val{font-size:1.4rem}
+  .kpi-lbl{font-size:.62rem}
+  .report-cards{grid-template-columns:1fr}
+  .toolbar{gap:6px}
+  .btn{padding:7px 11px;font-size:.82rem}
+  .content{padding:10px;gap:10px}
+  .sec-hdr{flex-direction:column;align-items:flex-start}
+  th{padding:8px 9px;font-size:.62rem}
+  td{padding:8px 9px;font-size:.82rem}
+  .toast-wrap{left:12px;right:12px;bottom:12px}
+  .toast{min-width:unset}
+}
+
+/* Very small phones */
+@media(max-width:360px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .kpi-val{font-size:1.2rem}
+  header{padding:0 10px;gap:5px}
+  .logo-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-brand-icon" style="width:32px;height:32px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
+      <div class="login-brand-name" style="font-family:var(--font-head);font-size:1.5rem;font-weight:900;letter-spacing:.05em">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></div>
+    </div>
+    <div class="login-sub">Панель управления</div>
+    <div id="siteStatusBar" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:var(--r);font-size:.78rem;border:1px solid"></div>
+    <div class="login-field">
+      <label>Email / Логин</label>
+      <input type="email" id="loginEmail" placeholder="artem@detalpro.ru или artem"
+             autocomplete="email" inputmode="email"
+             onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+    </div>
+    <div class="login-field">
+      <label>Пароль</label>
+      <input type="password" id="loginPassword" placeholder="Введите пароль"
+             autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hints" id="loginHints">
+      Подключение к сайту…
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти →</button>
+    <div style="margin-top:14px;text-align:center">
+      <span style="font-size:.75rem;color:var(--text3);cursor:pointer" onclick="toggleSiteSettings()">⚙ Адрес сайта</span>
+    </div>
+    <div id="siteSettingsPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
+      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">URL сайта ДЕТАЛЬПРО</div>
+      <input type="text" id="siteUrlInput" placeholder="http://localhost:3000"
+        style="width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:.85rem;font-family:var(--font-mono);outline:none;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')saveSiteUrl()">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="saveSiteUrl()" style="flex:1;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.8rem;font-weight:600;cursor:pointer">Сохранить</button>
+        <button onclick="pingSite()" style="padding:7px 12px;background:var(--bg2);border:1px solid var(--line2);color:var(--text2);border-radius:var(--r);font-size:.8rem;cursor:pointer">Проверить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" id="mainApp" style="display:none">
+
+  <header>
+    <button class="hdr-burger" id="burgerBtn" onclick="toggleSidebar()">☰</button>
+    <div class="logo" style="display:flex;align-items:center;gap:8px">
+      <div style="width:22px;height:22px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
+      <span style="font-family:var(--font-head);font-weight:900;font-size:1.1rem;letter-spacing:.05em;color:#fff">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></span>
+      <span class="logo-sub">/ Управление</span>
+    </div>
+    <div class="hdr-spacer"></div>
+    <div class="hdr-chip" id="roleBadge">👤 —</div>
+    <div class="hdr-chip clickable" id="syncBadge" onclick="pushNow()" title="Синхронизировать">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">Синхр.</span>
+    </div>
+    <button class="hdr-btn" style="-webkit-app-region:no-drag" onclick="logout()">🚪</button>
+  </header>
+
+  <div class="body">
+
+    <!-- Sidebar overlay (mobile tap-to-close) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ── Sidebar ── -->
+    <nav id="sidebar">
+      <div class="nav-section">Панель</div>
+      <div class="nav-item active" id="navDash" onclick="setView('dash',this)">
+        <span class="nav-ico">📊</span>Дашборд
+      </div>
+
+      <div class="nav-section">Данные</div>
+      <div class="nav-item" id="navProducts" onclick="setView('products',this)">
+        <span class="nav-ico">📦</span>Каталог
+        <span class="nav-badge" id="nbProducts">0</span>
+      </div>
+      <div class="nav-item" id="navLow" onclick="setView('lowstock',this)">
+        <span class="nav-ico">⚠️</span>Мало на складе
+        <span class="nav-badge warn" id="nbLow">0</span>
+      </div>
+      <div class="nav-item" id="navTransfers" onclick="setView('transfers',this)">
+        <span class="nav-ico">🔄</span>Перемещения
+        <span class="nav-badge" id="nbTransfers">0</span>
+      </div>
+
+      <div class="nav-section">Аналитика</div>
+      <div class="nav-item" id="navAudit" onclick="setView('audit',this)">
+        <span class="nav-ico">📋</span>Аудит
+        <span class="nav-badge" id="nbAudit">0</span>
+      </div>
+      <div class="nav-item" id="navReports" onclick="setView('reports',this)">
+        <span class="nav-ico">💰</span>Финансы
+      </div>
+
+      <div class="nav-section" id="navAdminSec" style="display:none">Администрирование</div>
+      <div class="nav-item" id="navUsers" onclick="setView('users',this)" style="display:none">
+        <span class="nav-ico">👥</span>Пользователи
+      </div>
+
+      <div class="nav-section" style="margin-top:auto">Система</div>
+      <div class="nav-item" onclick="openSharedDir()">
+        <span class="nav-ico">📁</span>Данные
+      </div>
+      <div class="nav-item" onclick="logout()">
+        <span class="nav-ico">🚪</span>Выйти
+      </div>
+    </nav>
+
+    <!-- ── Content ── -->
+    <div class="content" id="content">
+
+      <!-- DASHBOARD -->
+      <div class="view-panel active" id="view-dash">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-lbl">Позиций</div></div>
+          <div class="kpi ok"><div class="kpi-val" id="kpiInStock">0</div><div class="kpi-lbl">В наличии</div></div>
+          <div class="kpi warn"><div class="kpi-val" id="kpiLow">0</div><div class="kpi-lbl">Мало (≤5)</div></div>
+          <div class="kpi danger"><div class="kpi-val" id="kpiZero">0</div><div class="kpi-lbl">Нет</div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="widget">
+            <div class="widget-title">Остатки по складам</div>
+            <div id="whBars"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Последние движения</div>
+            <div id="dashTimeline"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Топ категорий</div>
+            <div id="dashCategories"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Синхронизация с сайтом</div>
+            <div id="dashSyncInfo"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATALOG -->
+      <div class="view-panel" id="view-products">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="s-ico">🔍</span>
+            <input type="search" id="productSearch" placeholder="Артикул, название, бренд…" oninput="renderProducts()">
+          </div>
+          <select id="productWh" onchange="renderProducts()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--font);outline:none">
+            <option value="all">Все склады</option>
+            <option value="wh1">Склад 1</option>
+            <option value="wh2">Склад 2</option>
+            <option value="wh3">Склад 3</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadAll()">↺</button>
+          <button class="btn btn-primary" onclick="pushNow()">☁ Синхр.</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th onclick="sortProducts('article')">Артикул ↕</th>
+              <th onclick="sortProducts('brand')">Бренд ↕</th>
+              <th onclick="sortProducts('name')">Наименование ↕</th>
+              <th onclick="sortProducts('warehouse')">Склад</th>
+              <th onclick="sortProducts('shelf')">Полка</th>
+              <th onclick="sortProducts('price_retail')" style="text-align:right">Розн. ↕</th>
+              <th onclick="sortProducts('price_wholesale')" style="text-align:right">Опт. ↕</th>
+              <th onclick="sortProducts('stock')" style="text-align:right">Кол-во ↕</th>
+              <th>Статус</th>
+            </tr></thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LOW STOCK -->
+      <div class="view-panel" id="view-lowstock">
+        <div class="sec-hdr">
+          <div><div class="sec-title">⚠️ Мало на складе</div><div class="sec-sub">Остаток ≤ 5 штук</div></div>
+          <button class="btn btn-ghost" onclick="loadAll()">↺ Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Артикул</th><th>Бренд</th><th>Наименование</th>
+              <th>Склад</th><th>Полка</th>
+              <th style="text-align:right">Остаток</th><th>Статус</th>
+            </tr></thead>
+            <tbody id="lowBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRANSFERS -->
+      <div class="view-panel" id="view-transfers">
+        <div class="sec-hdr">
+          <div><div class="sec-title">🔄 Перемещения</div><div class="sec-sub">Документы из приложения Склад</div></div>
+          <button class="btn btn-ghost" onclick="loadAll()">↺ Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>№</th><th>Дата</th><th>Откуда</th><th>Куда</th>
+              <th style="text-align:right">Позиций</th><th>Статус</th><th>Комментарий</th>
+            </tr></thead>
+            <tbody id="transfersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AUDIT -->
+      <div class="view-panel" id="view-audit">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="s-ico">🔍</span>
+            <input type="search" id="auditSearch" placeholder="Артикул, действие, роль…" oninput="renderAudit()">
+          </div>
+          <select id="auditAction" onchange="renderAudit()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--font);outline:none">
+            <option value="all">Все</option>
+            <option value="add">Добавление</option>
+            <option value="update">Изменение</option>
+            <option value="delete">Удаление</option>
+            <option value="move">Перемещение</option>
+            <option value="import">Импорт</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadAll()">↺</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Время</th><th>Действие</th><th>Артикул</th><th>Бренд</th>
+              <th>Наименование</th><th>Откуда</th><th>Куда</th>
+              <th style="text-align:right">Кол-во</th><th>Роль</th>
+            </tr></thead>
+            <tbody id="auditBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="view-panel" id="view-reports">
+        <div class="sec-hdr">
+          <div><div class="sec-title">💰 Финансовый отчёт</div><div class="sec-sub">По данным каталога</div></div>
+          <button class="btn btn-ghost" onclick="loadAll()">↺ Обновить</button>
+        </div>
+        <div class="report-cards" id="reportCards"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Категория</th>
+              <th style="text-align:right">Позиций</th>
+              <th style="text-align:right">Кол-во</th>
+              <th style="text-align:right">Сумма опт.</th>
+              <th style="text-align:right">Сумма розн.</th>
+              <th style="text-align:right">Маржа</th>
+            </tr></thead>
+            <tbody id="reportBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="view-panel" id="view-users">
+        <div class="sec-hdr">
+          <div><div class="sec-title">👥 Пользователи</div><div class="sec-sub">Только для Создателя</div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="addUserRow()">+ Добавить</button>
+            <button class="btn btn-ghost btn-sm" onclick="pullUsersCloud()" title="Загрузить пользователей с сайта">↓ С сайта</button>
+            <button class="btn btn-ghost btn-sm" onclick="pushUsersCloud()" title="Отправить пользователей на сайт">↑ На сайт</button>
+            <button class="btn btn-primary btn-sm" onclick="saveUsers()">💾 Сохранить</button>
+          </div>
+        </div>
+        <!-- Cloud sync status -->
+        <div id="userSyncInfo" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span>☁ Синхронизация пользователей с сайтом:</span>
+          <span id="userBinStatus" style="color:var(--text3)">Проверяем…</span>
+          <button class="btn btn-ghost btn-sm" id="btnCreateUsersBin" onclick="createUsersBin()" style="display:none">📦 Создать хранилище</button>
+        </div>
+        <div class="table-wrap">
+          <table style="min-width:400px">
+            <thead><tr>
+              <th>Имя</th><th>Логин</th><th>Пароль</th><th>Роль</th><th class="no-sort" style="width:50px"></th>
+            </tr></thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /body -->
+</div><!-- /app -->
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ══════════ ROLES (синхронизированы с сайтом ДЕТАЛЬПРО) ══════════
+// Сайт использует: admin, manager, customer
+// Маппинг на права приложения:
+const ROLES = {
+  // Роли сайта
+  admin:     {name:'Администратор', icon:'⚡', reports:true, admin:true,  audit:true  },
+  manager:   {name:'Менеджер',      icon:'👔', reports:true, admin:false, audit:true  },
+  customer:  {name:'Клиент',        icon:'👤', reports:false,admin:false, audit:false },
+  // Локальные роли (запасные)
+  creator:   {name:'Создатель',     icon:'⚡', reports:true, admin:true,  audit:true  },
+  boss:      {name:'Директор',      icon:'🎯', reports:true, admin:false, audit:true  },
+  accountant:{name:'Бухгалтер',     icon:'📊', reports:true, admin:false, audit:true  },
+  warehouse: {name:'Кладовщик',     icon:'📦', reports:false,admin:false, audit:true  },
+};
+const WHL = {wh1:'Склад 1',wh2:'Склад 2',wh3:'Склад 3',all:'Все'};
+
+let currentUser=null, products=[], movements=[], transfers=[], users=[];
+let prodSort={key:'article',asc:true};
+
+// ══════════ SIDEBAR (mobile) ══════════
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ══════════ SITE SETTINGS ══════════
+async function initSiteSettings(){
+  const r=await adminAPI.getSiteUrl();
+  const url=r.siteUrl||'http://localhost:3000';
+  document.getElementById('siteUrlInput').value=url;
+  const ping=await adminAPI.pingSite();
+  const bar=document.getElementById('siteStatusBar');
+  const hints=document.getElementById('loginHints');
+  if(ping.ok){
+    bar.style.display='block';
+    bar.style.background='rgba(34,197,94,.1)';bar.style.borderColor='rgba(34,197,94,.3)';bar.style.color='#22c55e';
+    bar.textContent=`✓ Сайт доступен: ${url}`;
+    hints.innerHTML='Используйте email и пароль от сайта ДЕТАЛЬПРО.<br><b>artem</b> / <b>a050525A</b> — Администратор';
+  } else {
+    bar.style.display='block';
+    bar.style.background='rgba(245,158,11,.1)';bar.style.borderColor='rgba(245,158,11,.3)';bar.style.color='var(--amber)';
+    bar.textContent='⚡ Сайт недоступен — используется локальный вход';
+    hints.innerHTML='Локальный: <b>admin / admin</b> · <b>boss / boss1234</b> · <b>manager / 1234</b>';
+  }
+}
+function toggleSiteSettings(){
+  const p=document.getElementById('siteSettingsPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+async function saveSiteUrl(){
+  const url=document.getElementById('siteUrlInput').value.trim()||'http://localhost:3000';
+  await adminAPI.setSiteUrl(url);
+  toast('Адрес сохранён','green');
+  initSiteSettings();
+}
+async function pingSite(){
+  const r=await adminAPI.pingSite();
+  toast(r.ok?`Сайт доступен (${r.status})`:`Недоступен: ${r.error}`,'white');
+}
+
+// ══════════ LOGIN ══════════
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const p=document.getElementById('loginPassword').value;
+  const err=document.getElementById('loginError');
+  const btn=document.getElementById('loginBtn');
+  if(!email||!p){err.textContent='Введите email и пароль';err.classList.add('visible');return;}
+  btn.disabled=true;btn.textContent='Проверка…';err.classList.remove('visible');
+
+  // Сначала пробуем авторизацию через сайт
+  let res=await adminAPI.validateWithSite(email,p);
+
+  // Если сайт недоступен — пробуем локальных пользователей
+  if(!res.ok && res.source==='offline'){
+    res=await adminAPI.validateUser(email,p);
+  }
+
+  btn.disabled=false;btn.textContent='Войти →';
+  if(!res.ok){
+    err.textContent=res.error||'Неверный логин или пароль';
+    err.classList.add('visible');
+    document.getElementById('loginPassword').value='';
+    return;
+  }
+  const rd=ROLES[res.user.role]||ROLES.manager;
+  currentUser={...rd,...res.user,icon:rd.icon,name:res.user.name||rd.name};
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='';
+  applyRole();
+  await loadAll();
+  if(currentUser?.admin) checkUsersBinStatus();
+}
+function logout(){
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginPassword').value='';
+  document.getElementById('loginError').classList.remove('visible');
+  currentUser=null;
+}
+function applyRole(){
+  const badge=document.getElementById('roleBadge');
+  badge.textContent=`${currentUser.icon} ${currentUser.name}`;
+  // Показываем источник авторизации
+  if(currentUser.source==='site') badge.title='Авторизован через сайт ДЕТАЛЬПРО';
+  const show=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'':'none'};
+  const flex=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'flex':'none'};
+  flex('navAudit',   currentUser.audit);
+  flex('navReports', currentUser.reports);
+  flex('navUsers',   currentUser.admin);
+  show('navAdminSec',currentUser.admin);
+}
+
+// ══════════ NAVIGATION ══════════
+function setView(name,el){
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('view-'+name)?.classList.add('active');
+  el?.classList.add('active');
+  closeSidebar();
+  if(name==='dash')      renderDash();
+  if(name==='products')  renderProducts();
+  if(name==='lowstock')  renderLowStock();
+  if(name==='transfers') renderTransfers();
+  if(name==='audit')     renderAudit();
+  if(name==='reports')   renderReports();
+  if(name==='users')     {renderUsers();if(currentUser?.role==='creator')checkUsersBinStatus();}
+}
+
+// ══════════ DATA ══════════
+async function loadAll(){
+  try{
+    [products,movements,transfers,users]=await Promise.all([
+      adminAPI.getProducts(),
+      adminAPI.getMovements(500),
+      adminAPI.getTransfers(),
+      adminAPI.getUsers(),
+    ]);
+  }catch(e){toast('Ошибка загрузки: '+e.message,'error');}
+  updateBadges();
+  renderDash();
+}
+function updateBadges(){
+  const low=products.filter(p=>(+p.stock||0)>0&&(+p.stock||0)<=5);
+  setEl('nbProducts',products.length);
+  setEl('nbLow',low.length);
+  setEl('nbTransfers',transfers.length);
+  setEl('nbAudit',movements.length);
+}
+
+// ══════════ DASHBOARD ══════════
+function renderDash(){
+  const total=products.length;
+  const inStock=products.filter(p=>(+p.stock||0)>0).length;
+  const low=products.filter(p=>(+p.stock||0)>0&&(+p.stock||0)<=5).length;
+  const zero=products.filter(p=>(+p.stock||0)===0).length;
+  setEl('kpiTotal',total);setEl('kpiInStock',inStock);setEl('kpiLow',low);setEl('kpiZero',zero);
+
+  // Warehouse bars
+  const cols={wh1:'#e8411a',wh2:'#3b82f6',wh3:'#22c55e'};
+  const counts={};
+  ['wh1','wh2','wh3'].forEach(w=>counts[w]=products.filter(p=>p.warehouse===w).reduce((s,p)=>s+(+p.stock||0),0));
+  const mx=Math.max(1,...Object.values(counts));
+  setEl('whBars',['wh1','wh2','wh3'].map(w=>`
+    <div class="wh-bar-row">
+      <div class="wh-bar-lbl">${WHL[w]}</div>
+      <div class="wh-bar-track"><div class="wh-bar-fill" style="width:${Math.round(counts[w]/mx*100)}%;background:${cols[w]}"></div></div>
+      <div class="wh-bar-val">${counts[w]}</div>
+    </div>`).join(''));
+
+  // Timeline
+  const AI={add:'➕',update:'✏️',delete:'🗑️',move:'🔄',import:'📥'};
+  const AL={add:'Добавлен',update:'Изменён',delete:'Удалён',move:'Перемещён',import:'Импорт'};
+  setEl('dashTimeline',movements.slice(0,8).map(m=>`
+    <div class="tl-item">
+      <div class="tl-ico">${AI[m.action]||'📝'}</div>
+      <div><div class="tl-title">${AL[m.action]||m.action}: <b>${m.article||'—'}</b>${m.brand?' · '+m.brand:''}</div>
+      <div class="tl-meta">${fmtDt(m.timestamp)} · ${m.userRole||'—'}</div></div>
+    </div>`).join('')||'<div class="empty" style="padding:16px">Нет данных</div>');
+
+  // Categories
+  const cats={};
+  products.forEach(p=>{const c=p.category||'Без категории';cats[c]=(cats[c]||0)+1;});
+  setEl('dashCategories',Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([c,n])=>`
+    <div class="widget-row"><div class="widget-row-lbl">${c}</div><div class="widget-row-val">${n} поз.</div></div>`
+  ).join('')||'<div class="empty" style="padding:16px">Нет данных</div>');
+
+  // Sync info
+  setEl('dashSyncInfo',`
+    <div class="widget-row"><div class="widget-row-lbl">Товаров</div><div class="widget-row-val">${total}</div></div>
+    <div class="widget-row"><div class="widget-row-lbl">Перемещений</div><div class="widget-row-val">${transfers.length}</div></div>
+    <div class="widget-row"><div class="widget-row-lbl">Записей аудита</div><div class="widget-row-val">${movements.length}</div></div>
+    <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="pushNow()">☁ Синхронизировать с сайтом</button></div>`);
+}
+
+// ══════════ PRODUCTS ══════════
+function sortProducts(key){
+  if(prodSort.key===key)prodSort.asc=!prodSort.asc;else{prodSort.key=key;prodSort.asc=true;}
+  renderProducts();
+}
+function renderProducts(){
+  const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
+  const wh=document.getElementById('productWh')?.value||'all';
+  let list=products.filter(p=>{
+    if(wh!=='all'&&p.warehouse!==wh)return false;
+    if(!q)return true;
+    return(p.article||'').toLowerCase().includes(q)||(p.name||'').toLowerCase().includes(q)||(p.brand||'').toLowerCase().includes(q);
+  });
+  const{key,asc}=prodSort;
+  list.sort((a,b)=>{
+    let av=a[key]??'',bv=b[key]??'';
+    if(!isNaN(+av)&&!isNaN(+bv)){av=+av;bv=+bv;}else{av=String(av).toLowerCase();bv=String(bv).toLowerCase();}
+    return asc?(av<bv?-1:av>bv?1:0):(av>bv?-1:av<bv?1:0);
+  });
+  const tbody=document.getElementById('productsBody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="ei">📦</div>Не найдено</div></td></tr>`;return;}
+  tbody.innerHTML=list.map(p=>{
+    const s=+p.stock||0;
+    const sb=s===0?'badge-red':s<=5?'badge-amber':'badge-green';
+    const wb={wh1:'badge-red',wh2:'badge-blue',wh3:'badge-green'}[p.warehouse]||'badge-gray';
+    return`<tr>
+      <td><b>${p.article||'—'}</b></td>
+      <td>${p.brand||'—'}</td>
+      <td>${p.name||'—'}</td>
+      <td><span class="badge ${wb}">${WHL[p.warehouse]||p.warehouse||'—'}</span></td>
+      <td>${p.shelf||'—'}</td>
+      <td style="text-align:right">${fmtP(p.price_retail)}</td>
+      <td style="text-align:right">${fmtP(p.price_wholesale)}</td>
+      <td style="text-align:right;font-weight:700">${s}</td>
+      <td><span class="badge ${sb}">${s===0?'Нет':s<=5?'Мало':'Есть'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════ LOW STOCK ══════════
+function renderLowStock(){
+  const list=products.filter(p=>(+p.stock||0)<=5).sort((a,b)=>(+a.stock||0)-(+b.stock||0));
+  const tbody=document.getElementById('lowBody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">✅</div>Всё в порядке!</div></td></tr>`;return;}
+  tbody.innerHTML=list.map(p=>{
+    const s=+p.stock||0;
+    const sb=s===0?'badge-red':'badge-amber';
+    const wb={wh1:'badge-red',wh2:'badge-blue',wh3:'badge-green'}[p.warehouse]||'badge-gray';
+    return`<tr>
+      <td><b>${p.article||'—'}</b></td><td>${p.brand||'—'}</td><td>${p.name||'—'}</td>
+      <td><span class="badge ${wb}">${WHL[p.warehouse]||'—'}</span></td>
+      <td>${p.shelf||'—'}</td>
+      <td style="text-align:right;font-weight:700"><span class="badge ${sb}">${s}</span></td>
+      <td><span class="badge ${sb}">${s===0?'Нет':'Мало'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════ TRANSFERS ══════════
+function renderTransfers(){
+  const tbody=document.getElementById('transfersBody');
+  if(!transfers.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">🔄</div>Документов нет</div></td></tr>`;return;}
+  tbody.innerHTML=[...transfers].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(t=>{
+    const sb=t.status==='posted'?'badge-green':'badge-amber';
+    return`<tr>
+      <td><b>${t.number||'—'}</b></td>
+      <td style="white-space:nowrap;font-size:.78rem">${fmtDt(t.createdAt)}</td>
+      <td>${WHL[t.fromWarehouse]||t.fromWarehouse||'—'}</td>
+      <td>${WHL[t.toWarehouse]||t.toWarehouse||'—'}</td>
+      <td style="text-align:right">${(t.items||[]).length}</td>
+      <td><span class="badge ${sb}">${t.status==='posted'?'Проведён':'Черновик'}</span></td>
+      <td style="color:var(--text3);font-size:.78rem">${t.reason||''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════ AUDIT ══════════
+const ACT_CLS={add:'badge-green',update:'badge-blue',delete:'badge-red',move:'badge-amber',import:'badge-purple'};
+const ACT_LBL={add:'Добавление',update:'Изменение',delete:'Удаление',move:'Перемещение',import:'Импорт'};
+function renderAudit(){
+  const q=(document.getElementById('auditSearch')?.value||'').toLowerCase();
+  const f=document.getElementById('auditAction')?.value||'all';
+  const list=movements.filter(m=>{
+    if(f!=='all'&&m.action!==f)return false;
+    if(!q)return true;
+    return(m.article||'').toLowerCase().includes(q)||(m.action||'').toLowerCase().includes(q)
+        ||(m.userRole||'').toLowerCase().includes(q)||(m.brand||'').toLowerCase().includes(q)
+        ||(m.productName||m.name||'').toLowerCase().includes(q);
+  });
+  const tbody=document.getElementById('auditBody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="ei">📋</div>Нет записей</div></td></tr>`;return;}
+  tbody.innerHTML=list.map(m=>`
+    <tr>
+      <td style="white-space:nowrap;font-size:.76rem">${fmtDt(m.timestamp)}</td>
+      <td><span class="badge ${ACT_CLS[m.action]||'badge-gray'}">${ACT_LBL[m.action]||m.action||'—'}</span></td>
+      <td><b>${m.article||'—'}</b></td>
+      <td>${m.brand||'—'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.productName||m.name||'—'}</td>
+      <td style="font-size:.76rem">${whFmt(m.fromWarehouse,m.fromShelf)}</td>
+      <td style="font-size:.76rem">${whFmt(m.toWarehouse,m.toShelf)}</td>
+      <td style="text-align:right">${m.qty??'—'}</td>
+      <td><span class="badge badge-gray">${m.userRole||'—'}</span></td>
+    </tr>`).join('');
+}
+function whFmt(wh,shelf){if(!wh)return'—';const l=WHL[wh]||wh;return shelf&&shelf!=='—'?`${l}/${shelf}`:l;}
+
+// ══════════ REPORTS ══════════
+function renderReports(){
+  const retail   =products.reduce((s,p)=>s+(+p.price_retail||0)*(+p.stock||0),0);
+  const wholesale=products.reduce((s,p)=>s+(+p.price_wholesale||0)*(+p.stock||0),0);
+  const margin   =retail-wholesale;
+  setEl('reportCards',`
+    <div class="rcard money"><div class="rcard-val">${fmtP(retail)}</div><div class="rcard-lbl">Сумма по розничным ценам</div></div>
+    <div class="rcard cost"><div class="rcard-val">${fmtP(wholesale)}</div><div class="rcard-lbl">Сумма по оптовым ценам</div></div>
+    <div class="rcard"><div class="rcard-val" style="color:${margin>=0?'var(--green)':'var(--red)'}">${fmtP(margin)}</div><div class="rcard-lbl">Потенциальная маржа</div></div>`);
+  const cats={};
+  products.forEach(p=>{
+    const c=p.category||'Без категории';
+    if(!cats[c])cats[c]={n:0,qty:0,r:0,w:0};
+    cats[c].n++;cats[c].qty+=(+p.stock||0);
+    cats[c].r+=(+p.price_retail||0)*(+p.stock||0);
+    cats[c].w+=(+p.price_wholesale||0)*(+p.stock||0);
+  });
+  document.getElementById('reportBody').innerHTML=Object.entries(cats).sort((a,b)=>b[1].r-a[1].r).map(([c,d])=>{
+    const m=d.r-d.w;
+    return`<tr>
+      <td>${c}</td>
+      <td style="text-align:right">${d.n}</td>
+      <td style="text-align:right">${d.qty}</td>
+      <td style="text-align:right">${fmtP(d.w)}</td>
+      <td style="text-align:right">${fmtP(d.r)}</td>
+      <td style="text-align:right;color:${m>=0?'var(--green)':'var(--red)'}">${fmtP(m)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════ USERS ══════════
+function renderUsers(){
+  const isAdmin=currentUser?.role==='creator';
+  document.getElementById('usersBody').innerHTML=users.map((u,i)=>`
+    <tr>
+      <td><input class="user-input" value="${esc(u.name||'')}" ${!isAdmin?'readonly':''} onchange="users[${i}].name=this.value"></td>
+      <td><input class="user-input" value="${esc(u.username||'')}" ${!isAdmin?'readonly':''} onchange="users[${i}].username=this.value"></td>
+      <td><input class="user-input" type="password" placeholder="••••••" ${!isAdmin?'disabled':''} onchange="users[${i}].password=this.value"></td>
+      <td>
+        <select class="user-role-select" ${!isAdmin?'disabled':''} onchange="users[${i}].role=this.value">
+          ${Object.entries(ROLES).map(([r,rd])=>`<option value="${r}"${u.role===r?' selected':''}>${rd.name}</option>`).join('')}
+        </select>
+      </td>
+      <td>${isAdmin?`<button class="btn btn-danger btn-sm" onclick="removeUser(${i})">✕</button>`:''}</td>
+    </tr>`).join('');
+}
+function addUserRow(){
+  if(currentUser?.role!=='creator')return;
+  users.push({id:Date.now(),username:'',password:'1234',role:'manager',name:'Новый'});
+  renderUsers();
+}
+function removeUser(i){
+  if(currentUser?.role!=='creator')return;
+  if(!confirm('Удалить пользователя?'))return;
+  users.splice(i,1);renderUsers();
+}
+async function saveUsers(){
+  if(currentUser?.role!=='creator')return;
+  // Re-collect passwords from inputs before saving
+  document.querySelectorAll('#usersBody tr').forEach((tr,i)=>{
+    const pwInput=tr.querySelector('input[type="password"]');
+    if(pwInput&&pwInput.value)users[i].password=pwInput.value;
+  });
+  const res=await adminAPI.saveUsers(users);
+  if(res.ok){
+    toast(res.synced?'✓ Сохранено и синхронизировано с сайтом':'✓ Сохранено (синхронизация не настроена)','success');
+    checkUsersBinStatus();
+  }else{toast('Ошибка сохранения','error');}
+}
+
+async function pushUsersCloud(){
+  if(currentUser?.role!=='creator')return;
+  toast('Отправка пользователей на сайт…','info');
+  const res=await adminAPI.pushUsers();
+  res.ok?toast('✓ Пользователи синхронизированы с сайтом','success'):toast('Ошибка: '+(res.error||'?'),'error');
+}
+
+async function pullUsersCloud(){
+  if(currentUser?.role!=='creator')return;
+  toast('Загрузка пользователей с сайта…','info');
+  const res=await adminAPI.pullUsers();
+  if(res.ok){
+    users=await adminAPI.getUsers();
+    renderUsers();
+    toast(`✓ Загружено ${res.count} пользователей с сайта`,'success');
+  }else{
+    toast('Ошибка: '+(res.error||'?'),'error');
+  }
+}
+
+async function createUsersBin(){
+  if(currentUser?.role!=='creator')return;
+  const cfg=await adminAPI.getConfig();
+  if(!cfg.apiKey){toast('Сначала настройте API-ключ JSONBin в синхронизации','error');return;}
+  toast('Создание хранилища пользователей…','info');
+  const res=await adminAPI.createUsersBin(cfg.apiKey);
+  if(res.ok){
+    toast(`✓ Хранилище создано: ${res.usersBinId}`,'success');
+    checkUsersBinStatus();
+  }else{
+    toast('Ошибка: '+(res.error||'?'),'error');
+  }
+}
+
+async function checkUsersBinStatus(){
+  try{
+    const{usersBinId}=await adminAPI.getUsersBinId();
+    const statusEl=document.getElementById('userBinStatus');
+    const createBtn=document.getElementById('btnCreateUsersBin');
+    if(usersBinId){
+      statusEl.innerHTML=`<span style="color:var(--green)">✓ Активно</span> · Bin ID: <code style="font-size:.75rem;color:var(--blue)">${usersBinId}</code>`;
+      if(createBtn)createBtn.style.display='none';
+      // Show site URL
+      const siteUrl=`https://api.jsonbin.io/v3/b/${usersBinId}/latest`;
+      if(!document.getElementById('userBinUrl')){
+        const urlEl=document.createElement('span');
+        urlEl.id='userBinUrl';
+        urlEl.innerHTML=` · <a href="#" style="color:var(--text3);font-size:.72rem" onclick="event.preventDefault();navigator.clipboard?.writeText('${usersBinId}');toast('ID скопирован','info')">📋 Копировать ID</a>`;
+        statusEl.parentNode.appendChild(urlEl);
+      }
+    }else{
+      statusEl.innerHTML='<span style="color:var(--amber)">⚠ Не создано</span> — пользователи не синхронизируются с сайтом';
+      if(createBtn)createBtn.style.display='';
+    }
+  }catch(e){}
+}
+
+// ══════════ SYNC ══════════
+async function pushNow(){
+  setEl('syncLabel','Синхр…');
+  const res=await adminAPI.pushNow();
+  res.ok?toast('Синхронизировано с сайтом','success'):toast('Ошибка: '+(res.error||'?'),'error');
+}
+function openSharedDir(){adminAPI.openSharedDir();}
+
+// ══════════ HELPERS ══════════
+function fmtP(n){n=+n||0;return n.toLocaleString('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0});}
+function fmtDt(ts){
+  if(!ts)return'—';
+  try{return new Date(ts).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+  catch{return ts;}
+}
+function setEl(id,v){const el=document.getElementById(id);if(el){if(typeof v==='string'&&v.includes('<'))el.innerHTML=v;else el.textContent=v;}}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg,type='info'){
+  const c=document.getElementById('toasts');
+  const t=Object.assign(document.createElement('div'),{className:`toast ${type}`,textContent:msg});
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+// ══════════ EVENTS ══════════
+if(typeof adminAPI!=='undefined'){
+  adminAPI.onProductsChanged(items=>{
+    products=items;updateBadges();
+    const active=document.querySelector('.view-panel.active')?.id;
+    if(active==='view-products')renderProducts();
+    if(active==='view-dash')renderDash();
+    if(active==='view-lowstock')renderLowStock();
+    toast('Данные склада обновлены','info');
+  });
+  adminAPI.onSyncOk(d=>{
+    document.getElementById('syncDot').className='sync-dot';
+    setEl('syncLabel',`✓ ${d.count} поз.`);
+  });
+  adminAPI.onSyncError(e=>{
+    document.getElementById('syncDot').className='sync-dot offline';
+    setEl('syncLabel','Ошибка');
+    toast('Ошибка синхронизации: '+e,'error');
+  });
+}
+
+// Close sidebar on escape key
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSidebar();});
+
+// Инициализация настроек сайта при загрузке
+if(typeof adminAPI!=='undefined'){
+  initSiteSettings();
+}
+</script>
+</body>
+</html>
