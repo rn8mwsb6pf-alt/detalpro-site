@@ -260,6 +260,22 @@ button{font-family:var(--font-body);cursor:pointer;border:none;outline:none}
 input,select{font-family:var(--font-body);outline:none;border:none}
 a{color:inherit;text-decoration:none}
 svg{display:block}
+/* ── Ошибки полей формы ── */
+.form-input.field-error{border-color:var(--red)!important;background:rgba(239,68,68,.07)}
+.field-error-msg{font-size:11px;color:var(--red);margin-top:3px;display:none}
+.field-error-msg.visible{display:block}
+
+/* ── VPN badge ── */
+#vpn-badge{
+  position:fixed;bottom:72px;right:14px;
+  background:rgba(13,15,16,.92);border:1px solid rgba(245,158,11,.4);
+  color:var(--amber);font-size:11px;font-weight:600;
+  padding:5px 10px;border-radius:20px;z-index:9999;
+  display:none;align-items:center;gap:5px;backdrop-filter:blur(8px);
+  letter-spacing:.03em;cursor:default;
+}
+#vpn-badge svg{flex-shrink:0}
+
 
 /* ── PAGES ────────────────────────────────────────────────────────────── */
 .page{display:none}
@@ -2962,14 +2978,29 @@ footer{
       </div>
       <div class="vin-examples">
         <span style="font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase">Примеры:</span>
-        <span class="vin-example" onclick="vinSetExample('XTA210990Y5000001')">LADA</span>
-        <span class="vin-example" onclick="vinSetExample('WBA3A9100MG123456')">BMW</span>
-        <span class="vin-example" onclick="vinSetExample('JTDBL40E289123456')">Toyota</span>
-        <span class="vin-example" onclick="vinSetExample('VF1BM1B0H34567890')">Renault</span>
-        <span class="vin-example" onclick="vinSetExample('KMH4H41BPBU012345')">Hyundai</span>
-        <span class="vin-example" onclick="vinSetExample('WVW1234BPBU567890')">VW</span>
-        <span class="vin-example" onclick="vinSetExample('JN1BANT31A0000001')">Nissan</span>
-        <span class="vin-example" onclick="vinSetExample('SAL0000ABCD000001')">Land Rover</span>
+        <span class="vin-example" onclick="vinSetExample('X1P5XX00005E00001')">КАМАЗ</span>
+        <span class="vin-example" onclick="vinSetExample('Y3M5312BXKA000001')">МАЗ</span>
+        <span class="vin-example" onclick="vinSetExample('YS2R4X20001234567')">Scania</span>
+        <span class="vin-example" onclick="vinSetExample('WMA06XZZ4NP000001')">MAN</span>
+        <span class="vin-example" onclick="vinSetExample('YV2RT40A5YB000001')">Volvo</span>
+        <span class="vin-example" onclick="vinSetExample('WDB9636441L000001')">Mercedes</span>
+        <span class="vin-example" onclick="vinSetExample('XLRAE47MS0E000001')">DAF</span>
+        <span class="vin-example" onclick="vinSetExample('ZCFC35A0007000001')">IVECO</span>
+      </div>
+      <!-- Поиск без VIN -->
+      <div style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px">
+        <div style="font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;text-align:center;margin-bottom:10px">Не знаете VIN? Найдите по марке и году</div>
+        <div style="display:flex;gap:8px;max-width:480px;margin:0 auto;position:relative">
+          <div style="flex:1;position:relative">
+            <input id="vinBrandInput" class="vin-main-input" placeholder="Марка: Scania, КАМАЗ, MAN…"
+              style="font-size:14px" autocomplete="off"
+              oninput="vinBrandSuggest(this.value)"
+              onkeydown="if(event.key==='Enter')vinSearchByBrand()">
+            <div id="vinBrandSuggest" style="position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);z-index:99;display:none;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <input id="vinYearInput" class="vin-main-input" placeholder="Год" style="width:90px;font-size:14px" type="number" min="1980" max="2026">
+          <button class="vin-main-btn" onclick="vinSearchByBrand()" style="white-space:nowrap">Найти →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -5203,7 +5234,23 @@ function placeOrder(){
   const lastname=document.getElementById('co-lastname').value.trim();
   const phone=document.getElementById('co-phone').value.trim();
   const email=document.getElementById('co-email').value.trim();
-  if(!name||!phone){showToast('Заполните имя и телефон','red');return;}
+  // Валидация имени
+  if(!name||name.length<2||!/^[А-ЯЁа-яёA-Za-z\-\s]+$/.test(name)){
+    markFieldError('co-name','Введите настоящее имя (только буквы, мин. 2 символа)');
+    showToast('Проверьте имя','red');return;
+  }
+  // Валидация телефона
+  const phoneClean=phone.replace(/[\s\-\(\)]/g,'');
+  if(!/^(\+7|7|8)[0-9]{10}$/.test(phoneClean)||/^(\+7|7|8)(1234567|0000000|1111111|9999999)/.test(phoneClean)){
+    markFieldError('co-phone','Введите настоящий номер телефона');
+    showToast('Проверьте телефон','red');return;
+  }
+  // Валидация email
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+    markFieldError('co-email','Неверный формат email');
+    showToast('Проверьте email','red');return;
+  }
+  clearFieldErrors();
 
   // ИП validation
   if(coClientType==='ip'){
@@ -8552,6 +8599,97 @@ function vinAddToCart(prod){
 }
 
 init();
+
+
+// ═══ ВАЛИДАЦИЯ ПОЛЕЙ ═══
+function markFieldError(id, msg){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.add('field-error');
+  let em=el.parentNode.querySelector('.field-error-msg');
+  if(!em){em=document.createElement('div');em.className='field-error-msg';el.parentNode.appendChild(em);}
+  em.textContent=msg;em.classList.add('visible');
+  el.addEventListener('input',()=>{el.classList.remove('field-error');em.classList.remove('visible');},{once:true});
+}
+function clearFieldErrors(){
+  document.querySelectorAll('.form-input.field-error').forEach(el=>{
+    el.classList.remove('field-error');
+    const em=el.parentNode.querySelector('.field-error-msg');
+    if(em) em.classList.remove('visible');
+  });
+}
+
+// ═══ ГЕОЛОКАЦИЯ ДЛЯ СДЭК ═══
+function detectCityByGeo(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const {latitude:lat,longitude:lon}=pos.coords;
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ru`)
+      .then(r=>r.json())
+      .then(d=>{
+        const city=d.address?.city||d.address?.town||d.address?.village||'';
+        if(!city) return;
+        const inp=document.getElementById('cdek-city-input');
+        if(inp&&!inp.value){
+          inp.value=city;
+          inp.dispatchEvent(new Event('input'));
+          showToast('Город определён: '+city,'green');
+        }
+      }).catch(()=>{});
+  },()=>{},{timeout:8000});
+}
+
+// ═══ VIN: поиск без VIN по марке/году ═══
+const TRUCK_BRANDS_SUGGEST=[
+  'КАМАЗ','МАЗ','Scania','MAN','Volvo','Mercedes-Benz','DAF','IVECO','Renault T',
+  'КРАЗ','УРАЛ','ГАЗель NEXT','ЗИЛ','ISUZU','Hino','Mitsubishi Fuso','Ford Cargo'
+];
+function vinBrandSuggest(val){
+  const box=document.getElementById('vinBrandSuggest');
+  if(!val||val.length<1){box.style.display='none';return;}
+  const q=val.toLowerCase();
+  const matches=TRUCK_BRANDS_SUGGEST.filter(b=>b.toLowerCase().includes(q)).slice(0,8);
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML=matches.map(b=>`<div style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line)" onmousedown="document.getElementById('vinBrandInput').value='${b}';document.getElementById('vinBrandSuggest').style.display='none'">${b}</div>`).join('');
+  box.style.display='block';
+  document.addEventListener('click',()=>{box.style.display='none';},{once:true});
+}
+function vinSearchByBrand(){
+  const brand=document.getElementById('vinBrandInput').value.trim();
+  const year=document.getElementById('vinYearInput').value.trim();
+  if(!brand){showToast('Введите марку автомобиля','red');return;}
+  const q=brand+(year?' '+year:'');
+  document.getElementById('searchInput').value=q;
+  showPage('search');
+  setTimeout(()=>runSearch(),100);
+}
+
+// ═══ VPN DETECTOR ═══
+(function detectVPN(){
+  fetch('https://ip-api.com/json/?fields=proxy,hosting,query')
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.proxy||d.hosting){
+        const badge=document.getElementById('vpn-badge');
+        if(badge) badge.style.display='flex';
+      }
+    }).catch(()=>{});
+})();
+
+// ═══ ГЕОЛОКАЦИЯ — авто при открытии СДЭК ═══
+const _origSetDelivery=typeof setDelivery==='function'?setDelivery:null;
+if(_origSetDelivery){
+  window.setDelivery=function(type){
+    _origSetDelivery(type);
+    if(type==='cdek_pvz'||type==='cdek_courier') detectCityByGeo();
+  };
+}
 </script>
+
+<!-- VPN badge -->
+<div id="vpn-badge" title="Обнаружен VPN/прокси">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  VPN
+</div>
 </body>
 </html>
