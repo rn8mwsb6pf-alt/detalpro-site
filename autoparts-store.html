@@ -2583,7 +2583,12 @@ footer{
         <div id="delivery-cdek_pvz" style="display:none">
           <div class="form-group full" style="margin-bottom:12px">
             <label class="form-label">Город</label>
-            <input class="form-input" id="cdek-city" placeholder="Москва" value="Москва" oninput="filterPvz(this.value)">
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="cdek-city" placeholder="Начните вводить город..." style="flex:1" oninput="filterPvz(this.value)">
+              <button onclick="cdekAutoDetect()" title="Определить по геолокации"
+                style="padding:0 14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:18px;cursor:pointer;transition:.15s;flex-shrink:0"
+                onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--line2)'">📍</button>
+            </div>
           </div>
           <div class="pvz-list" id="pvz-list"></div>
         </div>
@@ -3919,14 +3924,98 @@ const STORES = [
   {id:'store1',name:'Героев Пионеров, 95',address:'Каменск-Шахтинский, ул. Героев Пионеров, д. 95 (932 км М4)',tag:'Главный склад'},
 ];
 
-const PVZ_LIST = [
-  {code:'MSK001',name:'ПВЗ Тверская',address:'Москва, ул. Тверская, 12',cost:299,days:'1-2 дня'},
-  {code:'MSK002',name:'ПВЗ Арбат',address:'Москва, Арбат, 24',cost:299,days:'1-2 дня'},
-  {code:'MSK003',name:'ПВЗ ВДНХ',address:'Москва, пр. Мира, 119',cost:349,days:'1-2 дня'},
-  {code:'MSK004',name:'ПВЗ Преображенская',address:'Москва, ул. Преображенская пл., 2',cost:349,days:'2-3 дня'},
-  {code:'SPB001',name:'ПВЗ Невский',address:'Санкт-Петербург, Невский пр., 48',cost:399,days:'2-3 дня'},
-  {code:'SPB002',name:'ПВЗ Московский',address:'Санкт-Петербург, Московский пр., 77',cost:399,days:'2-3 дня'},
-];
+let PVZ_LIST = []; // Заполняется из CDEK API по геолокации
+let CDEK_TOKEN = null;
+let CDEK_TOKEN_EXP = 0;
+
+// Получаем OAuth токен СДЭК
+async function cdekGetToken(){
+  if(CDEK_TOKEN && Date.now() < CDEK_TOKEN_EXP) return CDEK_TOKEN;
+  try {
+    const r = await fetch('https://api.cdek.ru/v2/oauth/token', {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: 'grant_type=client_credentials&client_id=EMscd6r9JnFiQ3bLoyjJY6eM&client_secret=PjLZkKBHEiLK3YsjtNrt3TGNG0ahs3kG'
+    });
+    const d = await r.json();
+    CDEK_TOKEN = d.access_token;
+    CDEK_TOKEN_EXP = Date.now() + (d.expires_in - 60) * 1000;
+    return CDEK_TOKEN;
+  } catch(e){ return null; }
+}
+
+// Загружаем ПВЗ по координатам (ближайшие)
+async function cdekLoadPvzByCoords(lat, lng){
+  showPvzLoading('📍 Ищем ближайшие ПВЗ СДЭК...');
+  try {
+    const token = await cdekGetToken();
+    if(!token){ cdekLoadPvzByCity(''); return; }
+    const r = await fetch(`https://api.cdek.ru/v2/deliverypoints?lat=${lat}&lng=${lng}&weight_max=30&type=PVZ&take=10`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await r.json();
+    const points = (Array.isArray(data) ? data : (data.entity||[])).slice(0,10);
+    if(!points.length){ cdekLoadPvzByCity(''); return; }
+    PVZ_LIST = points.map(p => ({
+      code: p.code,
+      name: p.name || p.code,
+      address: (p.location?.address_full) || (p.location?.city+', '+p.location?.address) || '—',
+      city: p.location?.city || '',
+      cost: 299,
+      days: '1-5 дней',
+      lat: p.location?.latitude,
+      lng: p.location?.longitude,
+      work_time: p.work_time || '',
+      phones: p.phones?.map(ph=>ph.number).join(', ') || ''
+    }));
+    renderPvzList();
+    // Обновляем поле города
+    if(PVZ_LIST[0]?.city){
+      const cityInp = document.getElementById('cdek-city');
+      if(cityInp) cityInp.value = PVZ_LIST[0].city;
+    }
+    showToast('Найдено ' + PVZ_LIST.length + ' ПВЗ рядом с вами','green');
+  } catch(e){ cdekLoadPvzByCity(''); }
+}
+
+// Загружаем ПВЗ по городу
+async function cdekLoadPvzByCity(city){
+  if(!city){ showPvzLoading('Введите город для поиска ПВЗ'); return; }
+  showPvzLoading('🔍 Ищем ПВЗ в городе ' + city + '...');
+  try {
+    const token = await cdekGetToken();
+    if(!token){ showPvzLoading('Ошибка подключения к СДЭК'); return; }
+    // Сначала получаем код города
+    const cityR = await fetch(`https://api.cdek.ru/v2/location/cities?country_codes=RU&size=5&q=${encodeURIComponent(city)}`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const cities = await cityR.json();
+    const cityCode = (Array.isArray(cities) ? cities[0] : cities.entity?.[0])?.code;
+    if(!cityCode){ showPvzLoading('Город не найден'); return; }
+    
+    const r = await fetch(`https://api.cdek.ru/v2/deliverypoints?city_code=${cityCode}&weight_max=30&type=PVZ&take=10`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await r.json();
+    const points = (Array.isArray(data) ? data : (data.entity||[])).slice(0,10);
+    PVZ_LIST = points.map(p => ({
+      code: p.code,
+      name: p.name || p.code,
+      address: (p.location?.address_full) || (p.location?.address) || '—',
+      city: city,
+      cost: 299,
+      days: '1-5 дней',
+      work_time: p.work_time || ''
+    }));
+    if(!PVZ_LIST.length) showPvzLoading('ПВЗ не найдены в этом городе');
+    else renderPvzList();
+  } catch(e){ showPvzLoading('Ошибка загрузки ПВЗ'); }
+}
+
+function showPvzLoading(msg){
+  const el=document.getElementById('pvz-list');
+  if(el) el.innerHTML=`<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px">${msg}</div>`;
+}
 
 // Мок-результаты поиска по разным артикулам
 // ── Каталог товаров (1С / QWEP — только реальные данные) ──────────────────
@@ -4759,20 +4848,24 @@ function selectStore(id){
 }
 
 function filterPvz(city){
-  const lcity=city.toLowerCase();
-  renderPvzList(PVZ_LIST.filter(p=>p.address.toLowerCase().includes(lcity)));
+  // При вводе города — дебаунс запрос к CDEK
+  clearTimeout(window._pvzDebounce);
+  window._pvzDebounce = setTimeout(()=>{ if(city.length>=2) cdekLoadPvzByCity(city); }, 700);
 }
 
 function renderPvzList(list){
   const el=document.getElementById('pvz-list');
   if(!el) return;
-  el.innerHTML=(list||PVZ_LIST).map(p=>`
+  const items = list || PVZ_LIST;
+  if(!items.length){ showPvzLoading('ПВЗ не найдены'); return; }
+  el.innerHTML = items.map(p=>`
     <div class="pvz-item ${state.selectedPvz?.code===p.code?'active':''}" onclick="selectPvz('${p.code}')">
       <div class="pvz-name">${p.name}</div>
       <div class="pvz-addr">${p.address}</div>
-      <div style="display:flex;gap:12px;margin-top:4px">
+      <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap">
         <div class="pvz-cost">${p.cost} ₽</div>
         <div class="pvz-time">${p.days}</div>
+        ${p.work_time?`<div style="font-size:11px;color:var(--text3)">🕐 ${p.work_time}</div>`:''}
       </div>
     </div>`).join('');
 }
@@ -8718,24 +8811,21 @@ function clearFieldErrors(){
   });
 }
 
-// ═══ ГЕОЛОКАЦИЯ ДЛЯ СДЭК ═══
+// ═══ СДЭК ГЕОЛОКАЦИЯ ═══
+function cdekAutoDetect(){
+  if(!navigator.geolocation){ showToast('Геолокация недоступна','red'); return; }
+  showPvzLoading('📍 Определяем ваше местоположение...');
+  showToast('Определяем местоположение...','amber');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ cdekLoadPvzByCoords(pos.coords.latitude, pos.coords.longitude); },
+    ()=>{ showToast('Разрешите доступ к геолокации в браузере','red'); showPvzLoading('Введите город вручную'); },
+    {timeout:8000, enableHighAccuracy:false}
+  );
+}
+
+// Старая функция - редиректим
 function detectCityByGeo(){
-  if(!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const {latitude:lat,longitude:lon}=pos.coords;
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ru`)
-      .then(r=>r.json())
-      .then(d=>{
-        const city=d.address?.city||d.address?.town||d.address?.village||'';
-        if(!city) return;
-        const inp=document.getElementById('cdek-city-input');
-        if(inp&&!inp.value){
-          inp.value=city;
-          inp.dispatchEvent(new Event('input'));
-          showToast('Город определён: '+city,'green');
-        }
-      }).catch(()=>{});
-  },()=>{},{timeout:8000});
+  cdekAutoDetect();
 }
 
 // ═══ VIN: поиск без VIN по марке/году ═══
@@ -8941,7 +9031,18 @@ const _origSetDelivery=typeof setDelivery==='function'?setDelivery:null;
 if(_origSetDelivery){
   window.setDelivery=function(type){
     _origSetDelivery(type);
-    if(type==='cdek_pvz'||type==='cdek_courier') detectCityByGeo();
+    if(type==='cdek_pvz'||type==='cdek_courier'){
+    // Сначала пробуем геолокацию, потом fallback на IP
+    if(navigator.geolocation){
+      cdekAutoDetect();
+    } else {
+      // Fallback по IP
+      fetch('https://ipapi.co/json/')
+        .then(r=>r.json())
+        .then(d=>{ if(d.city){ document.getElementById('cdek-city').value=d.city; cdekLoadPvzByCity(d.city); }})
+        .catch(()=>{ showPvzLoading('Введите название города'); });
+    }
+  }
   };
 }
 
