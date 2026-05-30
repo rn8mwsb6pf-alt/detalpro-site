@@ -1,0 +1,106 @@
+/* globals.css */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0d0f10;
+  --bg2:     #131618;
+  --bg3:     #1a1d20;
+  --bg4:     #222629;
+  --line:    #2a2f33;
+  --line2:   #363c41;
+  --text:    #e8eaeb;
+  --text2:   #9da5ab;
+  --text3:   #5a6268;
+  --accent:  #e8411a;
+  --accent2: #ff6b45;
+  --accentbg:rgba(232,65,26,.12);
+  --green:   #22c55e;
+  --greenbg: rgba(34,197,94,.1);
+  --amber:   #f59e0b;
+  --amberbg: rgba(245,158,11,.1);
+  --blue:    #3b82f6;
+  --bluebg:  rgba(59,130,246,.1);
+  --r:  4px;
+  --r2: 8px;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button  { font-family: var(--font-body), sans-serif; cursor: pointer; border: none; outline: none; }
+input, select, textarea { font-family: var(--font-body), sans-serif; outline: none; border: none; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Кнопки ──────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: var(--r); font-weight: 600;
+  transition: all .15s; white-space: nowrap; cursor: pointer;
+  font-family: var(--font-body), sans-serif;
+}
+.btn-sm  { height: 32px; padding: 0 14px; font-size: 12px; }
+.btn-md  { height: 38px; padding: 0 18px; font-size: 13px; }
+.btn-lg  { height: 46px; padding: 0 24px; font-size: 14px; }
+.btn-xl  { height: 54px; padding: 0 32px; font-size: 15px; }
+.btn-primary  { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline  { background: transparent; border: 1px solid var(--line2); color: var(--text2); }
+.btn-outline:hover  { border-color: var(--text2); color: var(--text); }
+.btn-ghost    { background: transparent; color: var(--text2); }
+.btn-ghost:hover    { color: var(--text); background: var(--bg3); }
+.btn-call {
+  background: var(--greenbg); color: var(--green);
+  border: 1px solid rgba(34,197,94,.3);
+}
+.btn-call:hover { background: rgba(34,197,94,.2); }
+
+/* ── Формы ───────────────────────────────────────────────────────────── */
+.form-input {
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: var(--r); padding: 0 14px; height: 40px;
+  font-size: 14px; color: var(--text); width: 100%;
+  transition: border-color .15s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+textarea.form-input { height: auto; padding-top: 10px; resize: vertical; }
+
+/* ── Бейджи ──────────────────────────────────────────────────────────── */
+.badge        { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--r); }
+.badge-green  { background: var(--greenbg); color: var(--green);  border: 1px solid rgba(34,197,94,.25); }
+.badge-amber  { background: var(--amberbg); color: var(--amber);  border: 1px solid rgba(245,158,11,.25); }
+.badge-blue   { background: var(--bluebg);  color: var(--blue);   border: 1px solid rgba(59,130,246,.25); }
+.badge-accent { background: var(--accentbg); color: var(--accent); border: 1px solid rgba(232,65,26,.25); }
+
+/* ── Контейнер ───────────────────────────────────────────────────────── */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Анимации ────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes spin  { to { transform: rotate(360deg); } }
+
+.animate-in { animation: fadeUp .4s ease both; }
+.delay-1    { animation-delay: .05s; }
+.delay-2    { animation-delay: .1s;  }
+.delay-3    { animation-delay: .15s; }
+.delay-4    { animation-delay: .2s;  }
+
+/* ── Скроллбар ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }

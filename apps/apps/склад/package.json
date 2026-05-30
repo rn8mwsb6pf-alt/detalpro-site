@@ -1,0 +1,59 @@
+{
+  "name": "garage-warehouse",
+  "version": "1.0.0",
+  "description": "Склад — Дорожный комплекс Гараж",
+  "main": "main.js",
+  "author": "Дорожный комплекс Гараж",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "create-icons": "node ../electron-app/create-icons.js"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "xlsx": "^0.18.5",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.7.1"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "ru.garage.warehouse",
+    "productName": "Гараж — Склад",
+    "copyright": "Copyright © 2025 Дорожный комплекс Гараж",
+    "files": ["main.js", "preload.js", "index.html", "assets/**/*"],
+    "win": {
+      "target": [
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.business",
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "Гараж — Склад",
+      "artifactName": "Гараж-Склад-${version}-mac.dmg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Гараж — Склад"
+    }
+  }
+}

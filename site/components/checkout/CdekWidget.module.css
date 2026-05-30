@@ -1,0 +1,66 @@
+.wrap { margin-top: 12px; }
+
+.openBtn {
+  width: 100%; justify-content: center;
+  border-style: dashed !important;
+  height: 48px !important;
+}
+
+.selected {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px; background: var(--greenbg);
+  border: 1px solid rgba(34,197,94,.25);
+  border-radius: var(--r2);
+}
+.selectedIcon   { font-size: 28px; flex-shrink: 0; }
+.selectedInfo   { flex: 1; }
+.selectedName   { font-size: 14px; font-weight: 600; color: #fff; }
+.selectedAddr   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.selectedMeta   { margin-top: 6px; display: flex; gap: 8px; }
+.metaCost       { font-family: var(--font-mono),monospace; font-size: 13px; font-weight: 600; color: var(--green); }
+.metaDays       { font-size: 12px; color: var(--text3); }
+.changeBtn      { flex-shrink: 0; }
+
+/* Оверлей с картой */
+.mapOverlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.8);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.mapContainer {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r2);
+  width: 100%; max-width: 900px; height: 85vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.mapHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.mapTitle { font-size: 16px; font-weight: 600; color: #fff; }
+.mapClose {
+  width: 32px; height: 32px; background: transparent; border: none;
+  color: var(--text3); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r);
+}
+.mapClose:hover { background: var(--bg3); color: var(--text); }
+.mapRoot { flex: 1; overflow: hidden; }
+
+/* Запасной список */
+.fallback       { margin-top: 12px; }
+.fallbackSearch { display: flex; gap: 8px; margin-bottom: 8px; }
+.pvzList {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 240px; overflow-y: auto;
+  border: 1px solid var(--line); border-radius: var(--r); padding: 4px;
+}
+.pvzItem {
+  padding: 10px 12px; border-radius: var(--r);
+  cursor: pointer; transition: .15s;
+}
+.pvzItem:hover { background: var(--bg3); }
+.pvzName { font-size: 13px; font-weight: 500; color: #fff; }
+.pvzAddr { font-size: 12px; color: var(--text3); margin-top: 2px; }
