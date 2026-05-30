@@ -1,0 +1,78 @@
+.wrap    { padding: 24px 32px; }
+.topbar  {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 16px; margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.queryInfo   { display: flex; align-items: center; gap: 12px; }
+.queryArticle {
+  font-family: var(--font-mono), monospace;
+  font-size: 20px; font-weight: 500; color: #fff;
+}
+.queryCount  { font-size: 13px; color: var(--text3); }
+.sortBox     { display: flex; align-items: center; gap: 8px; }
+.sortLabel   { font-size: 13px; color: var(--text2); }
+.sortSelect  {
+  background: var(--bg3); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 6px 10px;
+  font-size: 13px; color: var(--text); cursor: pointer;
+}
+
+.group        { margin-bottom: 28px; }
+.groupLabel   { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.groupLine    { flex: 1; height: 1px; background: var(--line); }
+
+.table {
+  width: 100%; border-collapse: collapse;
+  border: 1px solid var(--line); border-radius: var(--r2); overflow: hidden;
+}
+.table th {
+  background: var(--bg3);
+  font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text3); padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.table td {
+  padding: 11px 14px; border-bottom: 1px solid var(--line);
+  font-size: 13px; vertical-align: middle;
+}
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td      { background: var(--bg3); }
+
+.tdArticle  { font-family: var(--font-mono),monospace; font-size:12px; color:var(--accent); }
+.tdBrand    { font-weight:600; font-size:11px; text-transform:uppercase; color:var(--text2); }
+.tdName     { color:var(--text); max-width:220px; }
+.tdPrice    { font-family:var(--font-mono),monospace; font-size:14px; font-weight:500; color:#fff; white-space:nowrap; }
+.tdInput    { font-family:var(--font-mono),monospace; font-size:12px; color:var(--text3); white-space:nowrap; }
+.tdSupplier { font-size:12px; font-family:var(--font-mono),monospace; color:var(--blue); }
+.tdQty      { font-size:12px; }
+.tdDelivery { font-size:12px; color:var(--text3); }
+.qtyOk      { color:var(--green); }
+.qtyOrder   { color:var(--amber); }
+
+.ctaBlock  { display:flex; flex-direction:column; gap:3px; align-items:flex-start; }
+.ctaStatus { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--amber); }
+.ctaHint   { font-size:10px; color:var(--text3); }
+
+.loader {
+  display: flex; align-items: center; gap: 6px;
+  padding: 48px 0; justify-content: center;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse .8s ease infinite;
+}
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+.loaderText { font-size: 13px; color: var(--text3); margin-left: 8px; }
+
+.emptyState { text-align:center; padding:80px 24px; }
+.emptyIcon  { font-size:48px; margin-bottom:12px; }
+.emptyTitle { font-family:var(--font-head),sans-serif; font-size:24px; color:var(--text2); margin-bottom:6px; }
+.emptySub   { font-size:14px; color:var(--text3); }
+
+.errorMsg {
+  padding: 16px; background: var(--accentbg);
+  border: 1px solid rgba(232,65,26,.3); border-radius: var(--r);
+  color: var(--accent); font-size: 14px; margin-bottom: 16px;
+}

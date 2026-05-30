@@ -1,0 +1,111 @@
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,15,16,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.inner {
+  max-width: 1280px; margin: 0 auto;
+  display: flex; align-items: center;
+  height: 60px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 24px; height: 100%;
+  border-right: 1px solid var(--line);
+  cursor: pointer; flex-shrink: 0;
+}
+.logoSvg { flex-shrink: 0; }
+.logoText {
+  display: flex; flex-direction: column; gap: 0;
+}
+.logoSub {
+  font-family: var(--font-body), sans-serif;
+  font-size: 9px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text3);
+  line-height: 1;
+}
+.logoMain {
+  font-family: var(--font-head), sans-serif;
+  font-weight: 900; font-size: 20px;
+  letter-spacing: .05em; color: #fff;
+  line-height: 1.1;
+}
+
+.nav {
+  display: flex; align-items: center; height: 100%;
+  padding: 0 4px; border-right: 1px solid var(--line);
+}
+.navLink {
+  padding: 0 14px; height: 100%;
+  display: flex; align-items: center;
+  font-size: 12px; font-weight: 500; letter-spacing: .04em;
+  color: var(--text2); text-transform: uppercase;
+  transition: color .15s;
+}
+.navLink:hover { color: var(--text); }
+.navLinkActive  { color: var(--text); }
+
+.searchBox {
+  flex: 1; display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+}
+.searchInput {
+  flex: 1; background: var(--bg3);
+  border: 1px solid var(--line); border-radius: var(--r);
+  padding: 0 14px; height: 34px;
+  font-size: 14px; color: var(--text);
+  transition: border-color .15s;
+}
+.searchInput::placeholder { color: var(--text3); }
+.searchInput:focus { border-color: var(--line2); }
+.searchBtn {
+  background: var(--accent); color: #fff;
+  height: 34px; padding: 0 18px;
+  border-radius: var(--r); border: none;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  transition: background .15s; white-space: nowrap; cursor: pointer;
+}
+.searchBtn:hover { background: var(--accent2); }
+
+.right {
+  display: flex; align-items: center; height: 100%;
+  border-left: 1px solid var(--line);
+  padding: 0 4px; gap: 2px; flex-shrink: 0;
+}
+.hbtn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 12px; height: 100%;
+  background: transparent; border: none;
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  transition: color .15s; position: relative; cursor: pointer;
+  white-space: nowrap;
+}
+.hbtn:hover { color: var(--text); }
+.hbtnLabel { text-transform: uppercase; letter-spacing: .03em; }
+.cartBadge {
+  position: absolute; top: 8px; right: 4px;
+  background: var(--accent); color: #fff;
+  font-size: 9px; font-weight: 700;
+  min-width: 16px; height: 16px;
+  border-radius: 99px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.userMenu { display: flex; align-items: center; }
+.roleBadge {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px; border-radius: var(--r);
+  background: var(--amberbg); color: var(--amber);
+  border: 1px solid rgba(245,158,11,.3); margin-right: 8px;
+}
+.loginBtn {
+  margin: 0 8px; padding: 0 16px; height: 32px;
+  background: transparent; border: 1px solid var(--line2);
+  border-radius: var(--r); color: var(--text2);
+  font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; cursor: pointer;
+  transition: .15s;
+}
+.loginBtn:hover { border-color: var(--accent); color: var(--accent); }

@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Дорожный комплекс ГАРАЖ — Склад</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d0f10;
+  --bg2:      #131618;
+  --bg3:      #1a1d20;
+  --line:     #2a2f33;
+  --line2:    #363c41;
+  --text:     #e8eaeb;
+  --text2:    #9da5ab;
+  --text3:    #5a6268;
+  --accent:   #e8411a;
+  --accent2:  #ff6b45;
+  --green:    #22c55e;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --blue:     #3b82f6;
+  --purple:   #a855f7;
+  --r:        4px;
+  --r2:       8px;
+  --font:     'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-head:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','Consolas',monospace;
+  /* legacy aliases */
+  --border: var(--line);
+  --radius: var(--r2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── Login screen ── */
+#loginScreen{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:40px;width:400px;box-shadow:0 24px 64px rgba(0,0,0,.5);
+}
+.login-logo{font-size:1.4rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px}
+.login-sub{text-align:center;color:var(--text3);font-size:.8rem;margin-bottom:28px}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.login-field label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.login-field input{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:11px 14px;color:var(--text);font-size:.95rem;font-family:var(--font);
+  outline:none;transition:border-color .15s;
+}
+.login-field input:focus{border-color:var(--accent)}
+.login-field input::placeholder{color:var(--text3)}
+.login-error{
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
+  color:var(--red);border-radius:8px;padding:10px 14px;font-size:.82rem;
+  margin-bottom:14px;display:none;
+}
+.login-error.visible{display:block}
+.login-hints{
+  margin-bottom:18px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;font-size:.75rem;color:var(--text3);
+}
+.login-hints b{color:var(--text2)}
+.login-btn{
+  width:100%;padding:12px;background:var(--accent);color:#fff;border:none;
+  border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;
+  font-family:var(--font);transition:background .12s;
+}
+.login-btn:hover{background:var(--accent2)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Layout ── */
+.app{display:grid;grid-template-rows:56px 1fr;height:100vh}
+
+/* ── Header ── */
+header{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+  -webkit-app-region:drag;
+}
+header .logo{font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+header .sub{font-size:.72rem;color:var(--text3);margin-left:4px}
+.wh-tabs{display:flex;gap:2px;-webkit-app-region:no-drag;margin-left:8px}
+.wh-tab{
+  padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;
+  color:var(--text3);border:1px solid transparent;transition:all .12s;
+}
+.wh-tab:hover{color:var(--text);background:var(--bg3)}
+.wh-tab.active{background:rgba(232,65,26,.15);color:var(--accent);border-color:rgba(232,65,26,.3)}
+.header-spacer{flex:1}
+.role-badge{
+  -webkit-app-region:no-drag;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;font-size:.75rem;color:var(--text2);
+}
+.sync-badge{
+  -webkit-app-region:no-drag;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;font-size:.75rem;color:var(--text2);cursor:pointer;
+  transition:border-color .15s;
+}
+.sync-badge:hover{border-color:var(--accent)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.offline{background:var(--red)}
+
+/* ── Main body ── */
+.body{display:grid;grid-template-columns:220px 1fr;overflow:hidden}
+
+/* ── Sidebar ── */
+nav{
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;
+}
+.nav-section{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:12px 8px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--radius);cursor:pointer;color:var(--text2);
+  transition:background .12s,color .12s;font-size:.875rem;
+}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(232,65,26,.15);color:var(--accent)}
+.nav-item .ico{font-size:1rem;width:20px;text-align:center}
+.nav-count{
+  margin-left:auto;background:var(--bg3);color:var(--text3);
+  font-size:.65rem;padding:2px 6px;border-radius:10px;min-width:22px;text-align:center;
+}
+.wh-mini{display:flex;flex-direction:column;gap:6px;padding:0 8px;margin-top:4px}
+.wh-mini-item{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:8px 10px;font-size:.75rem;
+}
+.wh-mini-title{color:var(--text3);margin-bottom:4px;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.wh-mini-row{display:flex;justify-content:space-between;color:var(--text2)}
+.wh-mini-val{color:var(--text);font-weight:600}
+
+/* ── Content ── */
+.content{overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.view-panel{display:none;flex-direction:column;gap:16px;height:100%}
+.view-panel.active{display:flex}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-val{font-size:1.6rem;font-weight:700;color:var(--text)}
+.stat-lbl{font-size:.75rem;color:var(--text3);margin-top:2px}
+.stat.warn .stat-val{color:var(--amber)}
+.stat.danger .stat-val{color:var(--red)}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-wrap{flex:1;position:relative;min-width:200px}
+.search-wrap input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 12px 8px 36px;
+  color:var(--text);font-size:.875rem;outline:none;transition:border-color .15s;
+}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.9rem}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 14px;
+  border:none;border-radius:var(--radius);cursor:pointer;font-size:.875rem;
+  font-family:var(--font);font-weight:600;transition:background .12s,opacity .12s;
+}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--accent2)}
+.btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,.25)}
+.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-green:hover:not(:disabled){background:rgba(34,197,94,.25)}
+.btn-blue{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.btn-blue:hover:not(:disabled){background:rgba(59,130,246,.25)}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+
+/* ── Table ── */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:auto;flex:1}
+table{width:100%;border-collapse:collapse}
+th{
+  background:var(--bg3);padding:10px 12px;text-align:left;
+  font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;
+}
+th:hover{color:var(--text2)}
+th.no-sort{cursor:default}
+th.no-sort:hover{color:var(--text3)}
+td{padding:10px 12px;border-bottom:1px solid rgba(42,47,51,.6);color:var(--text2);font-size:.875rem}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--text)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.badge-red  {background:rgba(239,68,68,.15); color:var(--red)}
+.badge-blue {background:rgba(59,130,246,.15);color:var(--blue)}
+.badge-purple{background:rgba(168,85,247,.15);color:var(--purple)}
+.badge-wh1{background:rgba(232,65,26,.15);color:#e8411a}
+.badge-wh2{background:rgba(59,130,246,.15);color:#3b82f6}
+.badge-wh3{background:rgba(34,197,94,.15);color:#22c55e}
+.actions{display:flex;gap:4px}
+.icon-btn{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;color:var(--text3);font-size:.95rem;transition:background .1s,color .1s}
+.icon-btn:hover{background:var(--bg3);color:var(--text)}
+.icon-btn.del:hover{color:var(--red)}
+.icon-btn.move-btn:hover{color:var(--blue)}
+.empty{padding:48px;text-align:center;color:var(--text3)}
+.empty .ico{font-size:2.5rem;margin-bottom:12px}
+
+/* ── Audit view ── */
+.audit-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.audit-filter{
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;color:var(--text);font-size:.8rem;outline:none;font-family:var(--font);
+}
+.audit-filter:focus{border-color:var(--accent)}
+.act-add   {background:rgba(34,197,94,.15);color:var(--green);border-radius:8px;padding:2px 8px;font-size:.7rem;font-weight:600}
+.act-update{background:rgba(59,130,246,.15);color:var(--blue);border-radius:8px;padding:2px 8px;font-size:.7rem;font-weight:600}
+.act-delete{background:rgba(239,68,68,.15);color:var(--red);border-radius:8px;padding:2px 8px;font-size:.7rem;font-weight:600}
+.act-move  {background:rgba(245,158,11,.15);color:var(--amber);border-radius:8px;padding:2px 8px;font-size:.7rem;font-weight:600}
+.act-import{background:rgba(168,85,247,.15);color:var(--purple);border-radius:8px;padding:2px 8px;font-size:.7rem;font-weight:600}
+
+/* ══════════════════════════════════════════════
+   TRANSFER VIEW
+══════════════════════════════════════════════ */
+.transfer-mode-bar{
+  display:flex;gap:8px;padding:16px 20px 0;
+  border-bottom:1px solid var(--border);
+  background:var(--bg2);
+  -webkit-app-region:no-drag;
+}
+.mode-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:8px 8px 0 0;
+  cursor:pointer;font-size:.9rem;font-weight:600;
+  color:var(--text3);border:1px solid transparent;border-bottom:none;
+  transition:all .15s;position:relative;bottom:-1px;
+}
+.mode-tab:hover{color:var(--text);background:var(--bg3)}
+.mode-tab.active{
+  color:var(--text);background:var(--bg);
+  border-color:var(--border);border-bottom-color:var(--bg);
+}
+.mode-tab .tab-ico{font-size:1.1rem}
+
+/* Document mode */
+.doc-container{
+  display:flex;flex-direction:column;gap:0;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;
+}
+.doc-header-card{
+  background:var(--bg3);border-bottom:1px solid var(--border);
+  padding:16px 20px;display:flex;flex-direction:column;gap:12px;
+}
+.doc-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.doc-number{font-size:1.1rem;font-weight:700;color:var(--text)}
+.doc-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;
+}
+.doc-status.draft  {background:rgba(245,158,11,.15);color:var(--amber)}
+.doc-status.posted {background:rgba(34,197,94,.15);color:var(--green)}
+.doc-route-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.doc-route-label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.doc-select{
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:7px 11px;color:var(--text);font-size:.875rem;font-family:var(--font);outline:none;
+  transition:border-color .15s;min-width:130px;
+}
+.doc-select:focus{border-color:var(--accent)}
+.doc-select:disabled{opacity:.6;cursor:not-allowed}
+.doc-arrow{font-size:1.2rem;color:var(--text3)}
+.doc-comment{
+  width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:7px 11px;color:var(--text);font-size:.875rem;font-family:var(--font);outline:none;
+  transition:border-color .15s;resize:none;height:38px;
+}
+.doc-comment:focus{border-color:var(--accent)}
+.doc-comment:disabled{opacity:.6;cursor:not-allowed}
+
+/* Items table inside doc */
+.doc-items-area{padding:0}
+.doc-items-table{width:100%;border-collapse:collapse}
+.doc-items-table th{
+  background:var(--bg3);padding:9px 12px;text-align:left;
+  font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);
+}
+.doc-items-table td{
+  padding:8px 12px;border-bottom:1px solid rgba(42,47,51,.5);
+  color:var(--text2);font-size:.85rem;
+}
+.doc-items-table tr:last-child td{border-bottom:none}
+.doc-qty-input,.doc-shelf-input{
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:5px 8px;color:var(--text);font-size:.85rem;font-family:var(--font);
+  outline:none;transition:border-color .12s;
+}
+.doc-qty-input{width:70px;text-align:center}
+.doc-shelf-input{width:120px}
+.doc-qty-input:focus,.doc-shelf-input:focus{border-color:var(--accent)}
+.doc-qty-input:disabled,.doc-shelf-input:disabled{opacity:.5;cursor:not-allowed}
+
+.doc-footer{
+  display:flex;align-items:center;gap:10px;padding:14px 20px;
+  border-top:1px solid var(--border);background:var(--bg3);flex-wrap:wrap;
+}
+
+/* Quick mode */
+.quick-layout{
+  display:grid;grid-template-columns:1fr 380px;gap:16px;
+  flex:1;overflow:hidden;
+}
+.quick-panel{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.quick-panel-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  background:var(--bg3);display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.quick-panel-title{font-weight:700;color:var(--text);font-size:.9rem}
+.quick-panel-body{overflow-y:auto;flex:1}
+.quick-product-row{
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  border-bottom:1px solid rgba(42,47,51,.5);cursor:pointer;
+  transition:background .1s;
+}
+.quick-product-row:hover{background:var(--bg3)}
+.quick-product-row.selected{background:rgba(59,130,246,.08)}
+.quick-checkbox{
+  width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;
+}
+.quick-product-info{flex:1;min-width:0}
+.quick-product-name{font-size:.85rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick-product-meta{font-size:.75rem;color:var(--text3);margin-top:1px}
+.quick-product-stock{font-size:.85rem;font-weight:600;color:var(--text2);flex-shrink:0}
+.quick-selected-row{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  border-bottom:1px solid rgba(42,47,51,.5);
+}
+.quick-selected-info{flex:1;min-width:0}
+.quick-selected-name{font-size:.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick-selected-art{font-size:.72rem;color:var(--text3)}
+.quick-qty-input{
+  width:64px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:4px 6px;color:var(--text);font-size:.85rem;font-family:var(--font);
+  outline:none;text-align:center;
+}
+.quick-qty-input:focus{border-color:var(--blue)}
+.quick-footer{
+  padding:14px 16px;border-top:1px solid var(--border);background:var(--bg3);
+  display:flex;flex-direction:column;gap:10px;
+}
+.quick-dest-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.quick-dest-label{font-size:.75rem;color:var(--text3);white-space:nowrap}
+.quick-select{
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;color:var(--text);font-size:.82rem;font-family:var(--font);outline:none;
+}
+.quick-select:focus{border-color:var(--blue)}
+.quick-shelf-inp{
+  flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;color:var(--text);font-size:.82rem;font-family:var(--font);outline:none;
+  min-width:80px;
+}
+.quick-shelf-inp:focus{border-color:var(--blue)}
+
+/* History */
+.history-toggle{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  color:var(--text3);font-size:.82rem;padding:8px 0;
+  transition:color .12s;user-select:none;
+}
+.history-toggle:hover{color:var(--text2)}
+.history-arrow{transition:transform .2s}
+.history-arrow.open{transform:rotate(90deg)}
+.history-section{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;
+}
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{
+  background:var(--bg3);padding:9px 12px;text-align:left;
+  font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);
+}
+.history-table td{
+  padding:9px 12px;border-bottom:1px solid rgba(42,47,51,.5);
+  color:var(--text2);font-size:.84rem;
+}
+.history-table tr:last-child td{border-bottom:none}
+.history-table tr:hover td{background:var(--bg3);cursor:pointer}
+.doc-status-badge{
+  display:inline-block;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:600;
+}
+.doc-status-badge.draft {background:rgba(245,158,11,.15);color:var(--amber)}
+.doc-status-badge.posted{background:rgba(34,197,94,.15);color:var(--green)}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.hidden{display:none}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:28px;width:560px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal h2{font-size:1.1rem;margin-bottom:20px;color:var(--text)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.field input,.field select,.field textarea{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:9px 11px;color:var(--text);font-size:.875rem;font-family:var(--font);outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text3)}
+.field textarea{resize:vertical;min-height:60px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* Move modal */
+.move-info{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:.85rem;color:var(--text2)}
+.move-info b{color:var(--text)}
+
+/* Product search modal */
+.search-modal{width:600px;padding:20px}
+.search-modal h2{margin-bottom:14px}
+.search-modal-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;color:var(--text);font-size:.9rem;font-family:var(--font);outline:none;
+  transition:border-color .15s;margin-bottom:12px;
+}
+.search-modal-input:focus{border-color:var(--accent)}
+.search-modal-list{max-height:360px;overflow-y:auto;border:1px solid var(--border);border-radius:8px}
+.search-result-row{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-bottom:1px solid rgba(42,47,51,.5);cursor:pointer;transition:background .1s;
+}
+.search-result-row:hover{background:var(--bg3)}
+.search-result-row:last-child{border-bottom:none}
+.sr-article{font-weight:700;color:var(--text);font-size:.85rem;min-width:100px}
+.sr-name{flex:1;color:var(--text2);font-size:.85rem}
+.sr-wh{font-size:.75rem}
+.sr-stock{font-size:.85rem;font-weight:600;color:var(--text);text-align:right;min-width:50px}
+
+/* ── Toast ── */
+.toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200}
+.toast{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 16px;font-size:.875rem;color:var(--text);min-width:240px;
+  animation:slideIn .2s ease;box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error  {border-color:var(--red);  color:var(--red)}
+.toast.info   {border-color:var(--accent);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+
+/* Mobile burger button */
+.hdr-burger{
+  display:none;-webkit-app-region:no-drag;
+  align-items:center;justify-content:center;
+  width:34px;height:34px;border:none;background:var(--bg3);
+  border-radius:6px;cursor:pointer;font-size:1rem;flex-shrink:0;
+}
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;
+}
+.sidebar-overlay.open{display:block}
+
+/* App switches from overflow:hidden grid to flex so mobile scroll works */
+@media(max-width:900px){
+  html,body{overflow:auto}
+  .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+  /* Show burger */
+  .hdr-burger{display:flex}
+
+  /* Sidebar becomes a slide-in drawer */
+  nav{
+    position:fixed;top:0;left:0;bottom:0;
+    width:240px;z-index:41;
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+    padding-top:64px;
+  }
+  nav.open{transform:translateX(0)}
+
+  /* Body no longer needs to allocate sidebar column */
+  .body{display:block;flex:1;overflow:hidden;position:relative}
+
+  /* Content takes full width */
+  .content{height:100%;overflow-y:auto;padding:12px;gap:12px}
+
+  /* Stats: 2 columns on tablet */
+  .stats{grid-template-columns:repeat(2,1fr)}
+
+  /* Transfer layout stacks */
+  .quick-layout{grid-template-columns:1fr}
+
+  /* Toast */
+  .toast-container{left:12px;right:12px;bottom:12px}
+  .toast{min-width:unset}
+
+  /* Header chips shrink */
+  .sync-badge span{display:none}
+  header .sub{display:none}
+}
+
+@media(max-width:600px){
+  .stats{grid-template-columns:1fr 1fr;gap:8px}
+  .stat-val{font-size:1.3rem}
+  .toolbar{gap:6px}
+  .btn{padding:7px 10px;font-size:.82rem}
+  th{padding:8px 9px;font-size:.62rem}
+  td{padding:8px 9px;font-size:.82rem}
+  .login-box{padding:24px 18px;width:100%;max-width:360px}
+
+  /* Collapse role badge text */
+  .role-badge span:not(:first-child){display:none}
+
+  /* Doc header stacks */
+  .doc-route-row{flex-direction:column;align-items:flex-start}
+  .doc-title-row{flex-wrap:wrap}
+}
+
+@media(max-width:400px){
+  .kpi-grid,.stats{grid-template-columns:1fr 1fr}
+  header{padding:0 10px;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo" style="display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:center">
+      <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="36" stroke="#e8411a" stroke-width="1"/>
+        <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
+        <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+        <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="8" r="3" fill="#e8411a"/>
+        <circle cx="50" cy="92" r="3" fill="#e8411a"/>
+        <circle cx="8" cy="50" r="3" fill="#e8411a"/>
+        <circle cx="92" cy="50" r="3" fill="#e8411a"/>
+      </svg>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-head);font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)">Дорожный комплекс</div>
+        <div style="font-family:var(--font-head);font-size:1.8rem;font-weight:900;letter-spacing:.05em;color:#fff;line-height:1">ГАРАЖ</div>
+      </div>
+    </div>
+    <div class="login-sub">Склад / Управление товарами</div>
+    <div id="siteStatusBar" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:var(--r);font-size:.78rem;border:1px solid"></div>
+    <div class="login-field">
+      <label>Email / Логин</label>
+      <input type="email" id="loginEmail" placeholder="timmon или sklad" autocomplete="email"
+             onkeydown="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
+    </div>
+    <div class="login-field">
+      <label>Пароль</label>
+      <input type="password" id="loginPassword" placeholder="Введите пароль" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hints" id="loginHints">
+      Подключение к сайту…
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти →</button>
+    <div style="margin-top:14px;text-align:center">
+      <span style="font-size:.75rem;color:var(--text3);cursor:pointer" onclick="toggleSiteSettings()">⚙ Адрес сайта</span>
+    </div>
+    <div id="siteSettingsPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
+      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">URL сайта Гараж</div>
+      <input type="text" id="siteUrlInput" placeholder="http://localhost:3000"
+        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:.85rem;font-family:var(--font-mono);outline:none;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')saveSiteUrl()">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="saveSiteUrl()" style="flex:1;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.8rem;font-weight:600;cursor:pointer">Сохранить</button>
+        <button onclick="pingSite()" style="padding:7px 12px;background:var(--bg2);border:1px solid var(--line);color:var(--text2);border-radius:var(--r);font-size:.8rem;cursor:pointer">Проверить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div class="app" id="mainApp" style="display:none">
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<header>
+  <button class="hdr-burger" onclick="toggleSidebar()">☰</button>
+  <div class="logo" style="display:flex;align-items:center;gap:8px">
+    <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+      <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
+      <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
+      <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+      <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+      <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+      <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <div style="line-height:1.1">
+      <div style="font-family:var(--font-head);font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)">Дорожный комплекс</div>
+      <div style="font-family:var(--font-head);font-weight:900;font-size:1rem;letter-spacing:.05em;color:#fff;line-height:1">ГАРАЖ <span style="font-size:.6rem;font-weight:600;color:var(--text3)">/ Склад</span></div>
+    </div>
+  </div>
+  <div class="wh-tabs">
+    <div class="wh-tab active" data-wh="all" onclick="setWarehouse('all',this)">Все</div>
+    <div class="wh-tab"       data-wh="wh1" onclick="setWarehouse('wh1',this)">Склад 1</div>
+    <div class="wh-tab"       data-wh="wh2" onclick="setWarehouse('wh2',this)">Склад 2</div>
+    <div class="wh-tab"       data-wh="wh3" onclick="setWarehouse('wh3',this)">Склад 3</div>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="role-badge" id="roleBadge">👤 —</div>
+  <div class="sync-badge" id="syncBadge" onclick="openSettingsModal()" style="margin-left:8px">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncLabel">Синхронизация…</span>
+  </div>
+  <button class="btn btn-ghost" style="-webkit-app-region:no-drag;margin-left:8px;font-size:.8rem" onclick="pushNow()" id="syncBtn">↑ Синхр.</button>
+</header>
+
+<div class="body">
+
+<!-- ── Sidebar ── -->
+<nav>
+  <div class="nav-section">Разделы</div>
+  <div class="nav-item active" id="navProducts" onclick="setView('products',this)">
+    <span class="ico">📦</span> Товары
+    <span class="nav-count" id="navCountProducts">0</span>
+  </div>
+  <div class="nav-item" id="navLow" onclick="setView('lowstock',this)">
+    <span class="ico">⚠️</span> Мало на складе
+    <span class="nav-count" id="navCountLow" style="background:rgba(245,158,11,.2);color:#f59e0b">0</span>
+  </div>
+  <div class="nav-item" id="navTransfer" onclick="setView('transfer',this)">
+    <span class="ico">🔄</span> Перемещение
+    <span class="nav-count" id="navCountTransfer" style="background:rgba(59,130,246,.2);color:#3b82f6">0</span>
+  </div>
+  <div class="nav-item" id="navAudit" onclick="setView('audit',this)" style="display:none">
+    <span class="ico">📋</span> Аудит
+    <span class="nav-count" id="navCountAudit">0</span>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px">Склады</div>
+  <div class="wh-mini">
+    <div class="wh-mini-item">
+      <div class="wh-mini-title" style="color:#e8411a">📦 Склад 1</div>
+      <div class="wh-mini-row"><span>Позиций:</span><span class="wh-mini-val" id="wh1Count">0</span></div>
+      <div class="wh-mini-row"><span>В наличии:</span><span class="wh-mini-val" id="wh1Stock">0</span></div>
+    </div>
+    <div class="wh-mini-item">
+      <div class="wh-mini-title" style="color:#3b82f6">📦 Склад 2</div>
+      <div class="wh-mini-row"><span>Позиций:</span><span class="wh-mini-val" id="wh2Count">0</span></div>
+      <div class="wh-mini-row"><span>В наличии:</span><span class="wh-mini-val" id="wh2Stock">0</span></div>
+    </div>
+    <div class="wh-mini-item">
+      <div class="wh-mini-title" style="color:#22c55e">📦 Склад 3</div>
+      <div class="wh-mini-row"><span>Позиций:</span><span class="wh-mini-val" id="wh3Count">0</span></div>
+      <div class="wh-mini-row"><span>В наличии:</span><span class="wh-mini-val" id="wh3Stock">0</span></div>
+    </div>
+  </div>
+
+  <div class="nav-section" style="margin-top:auto">Действия</div>
+  <div class="nav-item" id="navAdd" onclick="openAddModal()">
+    <span class="ico">➕</span> Добавить товар
+  </div>
+  <div class="nav-item" id="navImport" onclick="importFile()">
+    <span class="ico">📥</span> Загрузить файл
+  </div>
+  <div class="nav-item" onclick="openSharedDir()">
+    <span class="ico">📁</span> Открыть данные
+  </div>
+  <div class="nav-item" onclick="logout()">
+    <span class="ico">🚪</span> Выйти
+  </div>
+</nav>
+
+<!-- ── Content ── -->
+<div class="content" id="content">
+
+  <!-- ═══ VIEW: Products ═══ -->
+  <div class="view-panel active" id="view-products">
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Всего товаров</div></div>
+      <div class="stat"><div class="stat-val" id="statInStock">0</div><div class="stat-lbl">В наличии</div></div>
+      <div class="stat warn"><div class="stat-val" id="statLow">0</div><div class="stat-lbl">Мало (&lt; 5 шт.)</div></div>
+      <div class="stat danger"><div class="stat-val" id="statZero">0</div><div class="stat-lbl">Нет в наличии</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="ico">🔍</span>
+        <input type="text" id="searchInput" placeholder="Поиск по артикулу, названию, бренду…" oninput="renderTable()">
+      </div>
+      <button class="btn btn-ghost" onclick="renderTable()">Обновить</button>
+      <button class="btn btn-primary" id="btnAdd" onclick="openAddModal()">+ Добавить</button>
+      <button class="btn btn-ghost" id="btnImport" onclick="importFile()">📥 Файл</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortBy('article')">Артикул ↕</th>
+          <th onclick="sortBy('brand')">Бренд ↕</th>
+          <th onclick="sortBy('name')">Наименование ↕</th>
+          <th onclick="sortBy('warehouse')">Склад</th>
+          <th onclick="sortBy('shelf')">Полка ↕</th>
+          <th onclick="sortBy('price_retail')" style="text-align:right">Цена розн. ↕</th>
+          <th onclick="sortBy('stock')" style="text-align:right">Кол-во ↕</th>
+          <th>Статус</th>
+          <th>Обновлено</th>
+          <th class="no-sort" style="width:90px"></th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ VIEW: Low stock ═══ -->
+  <div class="view-panel" id="view-lowstock">
+    <div class="toolbar">
+      <span style="color:var(--amber);font-weight:600">⚠️ Товары с малым остатком (менее 5 шт.)</span>
+      <div class="header-spacer"></div>
+      <button class="btn btn-ghost" onclick="renderLowStock()">Обновить</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Артикул</th><th>Наименование</th><th>Склад</th><th>Полка</th>
+          <th style="text-align:right">Остаток</th><th>Статус</th>
+        </tr></thead>
+        <tbody id="lowStockBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ VIEW: Transfer ═══ -->
+  <div class="view-panel" id="view-transfer" style="gap:0;padding:0;overflow:hidden">
+
+    <!-- Mode tabs bar -->
+    <div class="transfer-mode-bar">
+      <div class="mode-tab active" id="tabDoc" onclick="setTransferMode('doc')">
+        <span class="tab-ico">📄</span> Документ <span style="font-size:.75rem;color:var(--text3);font-weight:400;margin-left:4px">(как в 1С)</span>
+      </div>
+      <div class="mode-tab" id="tabQuick" onclick="setTransferMode('quick')">
+        <span class="tab-ico">⚡</span> Быстрое перемещение
+      </div>
+      <div style="flex:1"></div>
+      <div class="history-toggle" id="historyToggle" onclick="toggleHistory()" style="padding:8px 0;margin-right:4px">
+        <span class="history-arrow" id="historyArrow">▶</span>
+        <span>История документов</span>
+        <span class="nav-count" id="navCountHistory">0</span>
+      </div>
+    </div>
+
+    <!-- Scrollable area under tabs -->
+    <div style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+
+      <!-- History (hidden by default) -->
+      <div id="historySection" style="display:none">
+        <div class="history-section">
+          <table class="history-table">
+            <thead><tr>
+              <th>№</th><th>Дата</th><th>Откуда</th><th>Куда</th>
+              <th style="text-align:center">Позиций</th><th>Статус</th><th>Ответственный</th><th class="no-sort"></th>
+            </tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── DOC MODE ── -->
+      <div id="modePanelDoc" style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Document card -->
+        <div class="doc-container" id="docCard">
+
+          <!-- Header -->
+          <div class="doc-header-card">
+            <div class="doc-title-row">
+              <span class="doc-number" id="docNumberLabel">📄 Новый документ</span>
+              <span class="doc-status draft" id="docStatusBadge">● Черновик</span>
+              <div style="flex:1"></div>
+              <button class="btn btn-ghost btn-sm" onclick="newDocForm()" title="Создать новый документ">+ Новый</button>
+            </div>
+            <div class="doc-route-row">
+              <span class="doc-route-label">Откуда:</span>
+              <select class="doc-select" id="docFrom">
+                <option value="wh1">Склад 1</option>
+                <option value="wh2">Склад 2</option>
+                <option value="wh3">Склад 3</option>
+              </select>
+              <span class="doc-arrow">→</span>
+              <span class="doc-route-label">Куда:</span>
+              <select class="doc-select" id="docTo">
+                <option value="wh1">Склад 1</option>
+                <option value="wh2" selected>Склад 2</option>
+                <option value="wh3">Склад 3</option>
+              </select>
+              <span style="flex:1"></span>
+              <span style="font-size:.78rem;color:var(--text3)" id="docDateLabel"></span>
+            </div>
+            <input class="doc-comment" id="docComment" placeholder="Комментарий / причина перемещения…">
+          </div>
+
+          <!-- Items table -->
+          <div class="doc-items-area">
+            <table class="doc-items-table" style="width:100%">
+              <thead><tr>
+                <th style="width:36px;text-align:center">№</th>
+                <th>Артикул</th>
+                <th>Наименование</th>
+                <th>Текущая полка</th>
+                <th style="text-align:center">Кол-во</th>
+                <th>Полка назначения</th>
+                <th style="width:36px"></th>
+              </tr></thead>
+              <tbody id="docItemsBody"></tbody>
+            </table>
+            <div id="docEmptyHint" style="padding:24px;text-align:center;color:var(--text3);font-size:.85rem">
+              Нажмите «+ Добавить товар» чтобы добавить позиции в документ
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="doc-footer">
+            <button class="btn btn-ghost" id="docBtnAdd" onclick="openProductSearch()">+ Добавить товар</button>
+            <div style="flex:1"></div>
+            <span id="docItemCount" style="font-size:.8rem;color:var(--text3)">0 позиций</span>
+            <button class="btn btn-ghost" id="docBtnSave" onclick="saveDocDraft()">💾 Сохранить черновик</button>
+            <button class="btn btn-green" id="docBtnPost" onclick="postDoc()">✓ Провести</button>
+          </div>
+        </div>
+
+      </div><!-- /modePanelDoc -->
+
+      <!-- ── QUICK MODE ── -->
+      <div id="modePanelQuick" style="display:none;flex:1;overflow:hidden">
+        <div class="quick-layout" style="height:100%;min-height:400px">
+
+          <!-- Left: Source -->
+          <div class="quick-panel">
+            <div class="quick-panel-header">
+              <span class="quick-panel-title">📦 Откуда</span>
+              <select class="quick-select" id="quickFrom" onchange="renderQuickSource()">
+                <option value="wh1">Склад 1</option>
+                <option value="wh2">Склад 2</option>
+                <option value="wh3">Склад 3</option>
+              </select>
+              <div class="search-wrap" style="flex:1;min-width:120px">
+                <span class="ico">🔍</span>
+                <input type="text" id="quickSearch" placeholder="Поиск…" oninput="renderQuickSource()" style="padding-left:30px;font-size:.8rem;padding-top:6px;padding-bottom:6px">
+              </div>
+            </div>
+            <div class="quick-panel-body" id="quickSourceList"></div>
+          </div>
+
+          <!-- Right: Destination -->
+          <div class="quick-panel">
+            <div class="quick-panel-header">
+              <span class="quick-panel-title">🎯 Выбранные товары</span>
+              <span id="quickSelectedCount" style="font-size:.8rem;color:var(--text3)">0 позиций</span>
+            </div>
+            <div class="quick-panel-body" id="quickDestList"></div>
+            <div class="quick-footer">
+              <div class="quick-dest-row">
+                <span class="quick-dest-label">Куда:</span>
+                <select class="quick-select" id="quickTo">
+                  <option value="wh1">Склад 1</option>
+                  <option value="wh2" selected>Склад 2</option>
+                  <option value="wh3">Склад 3</option>
+                </select>
+                <span class="quick-dest-label" style="margin-left:6px">Полка:</span>
+                <input class="quick-shelf-inp" id="quickToShelf" placeholder="необязательно">
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="executeQuickTransfer()">✓ Переместить выбранные</button>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /modePanelQuick -->
+
+    </div><!-- /scroll area -->
+  </div><!-- /view-transfer -->
+
+  <!-- ═══ VIEW: Audit ═══ -->
+  <div class="view-panel" id="view-audit">
+    <div class="audit-toolbar">
+      <b style="color:var(--text)">📋 Складской аудит</b>
+      <select class="audit-filter" id="auditFilterType" onchange="renderAudit()">
+        <option value="">Все действия</option>
+        <option value="add">Добавление</option>
+        <option value="update">Изменение</option>
+        <option value="delete">Удаление</option>
+        <option value="move">Перемещение</option>
+        <option value="import">Импорт</option>
+      </select>
+      <select class="audit-filter" id="auditFilterWh" onchange="renderAudit()">
+        <option value="">Все склады</option>
+        <option value="wh1">Склад 1</option>
+        <option value="wh2">Склад 2</option>
+        <option value="wh3">Склад 3</option>
+      </select>
+      <div class="header-spacer"></div>
+      <button class="btn btn-ghost" onclick="loadAudit()">🔄 Обновить</button>
+      <button class="btn btn-danger" onclick="clearAudit()">🗑 Очистить лог</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Время</th><th>Действие</th><th>Роль</th><th>Товар</th>
+          <th>Склад</th><th>Полка</th><th style="text-align:right">Кол-во</th><th>Детали</th>
+        </tr></thead>
+        <tbody id="auditBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /body -->
+</div><!-- /app -->
+
+<!-- ══ Add/Edit Modal ══ -->
+<div class="overlay hidden" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="modalTitle">Добавить товар</h2>
+    <div class="form-grid">
+      <div class="field"><label>Артикул *</label><input id="fArticle" placeholder="04E115561B"></div>
+      <div class="field"><label>Бренд</label><input id="fBrand" placeholder="VAG, Bosch, NGK"></div>
+      <div class="field full"><label>Наименование *</label><input id="fName" placeholder="Масляный фильтр…"></div>
+      <div class="field"><label>Цена розничная (₽)</label><input id="fPriceR" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Цена оптовая (₽)</label><input id="fPriceW" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Количество (шт.)</label><input id="fStock" type="number" min="0" step="1" placeholder="0"></div>
+      <div class="field"><label>Категория</label><input id="fCategory" placeholder="Фильтры, Тормоза…"></div>
+      <div class="field"><label>Склад</label><select id="fWarehouse"><option value="wh1">Склад 1</option><option value="wh2">Склад 2</option><option value="wh3">Склад 3</option></select></div>
+      <div class="field full"><label>Полка / Место хранения</label><input id="fShelf" placeholder="А-12, Стеллаж 3 ряд 2"></div>
+    </div>
+    <div class="modal-footer" id="editModalFooter">
+      <button class="btn btn-ghost" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Move Modal ══ -->
+<div class="overlay hidden" id="moveOverlay" onclick="closeMoveOutside(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:480px">
+    <h2>🔄 Переместить товар</h2>
+    <div class="move-info" id="moveInfo">—</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div class="field"><label>Целевой склад</label><select id="mWarehouse"><option value="wh1">Склад 1</option><option value="wh2">Склад 2</option><option value="wh3">Склад 3</option></select></div>
+      <div class="field"><label>Полка / Место</label><input id="mShelf" placeholder="А-12…"></div>
+      <div class="field"><label>Количество (0 = всё)</label><input id="mQty" type="number" min="0" step="1" placeholder="0"></div>
+      <div class="field"><label>Причина</label><input id="mReason" placeholder="Необязательно"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeMoveModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="confirmMove()">✓ Переместить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Product Search Modal (for doc) ══ -->
+<div class="overlay hidden" id="searchOverlay" onclick="closeSearchOutside(event)">
+  <div class="modal search-modal" onclick="event.stopPropagation()">
+    <h2>🔍 Выберите товар</h2>
+    <input class="search-modal-input" id="searchModalInput" placeholder="Поиск по артикулу или названию…" oninput="renderSearchResults()">
+    <div class="search-modal-list" id="searchResultsList"></div>
+    <div class="modal-footer" style="margin-top:12px">
+      <button class="btn btn-ghost" onclick="closeSearchModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Settings Modal ══ -->
+<div class="overlay hidden" id="settingsOverlay" onclick="closeSettingsOutside(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <h2>⚙️ Настройки облачной синхронизации</h2>
+    <p style="color:var(--text3);font-size:.8rem;margin-bottom:16px;line-height:1.6">
+      Используется <b style="color:var(--text)">JSONBin.io</b> — бесплатное облачное хранилище.<br>
+      1. Зарегистрируйтесь на <span style="color:var(--accent);cursor:pointer">jsonbin.io</span><br>
+      2. Скопируйте Master Key из раздела API Keys<br>
+      3. Нажмите «Создать хранилище»
+    </p>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="field"><label>Master Key (API Key)</label><input id="sCfgKey" type="password" placeholder="$2b$10$…" autocomplete="off"></div>
+      <div class="field"><label>Bin ID <span style="color:var(--text3)">(заполняется автоматически)</span></label><input id="sCfgBin" placeholder="64abc123..." autocomplete="off"></div>
+    </div>
+    <div id="settingsStatus" style="margin-top:12px;font-size:.8rem;color:var(--text3);min-height:20px"></div>
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px">
+      <button class="btn btn-ghost" onclick="closeSettingsModal()">Закрыть</button>
+      <button class="btn btn-ghost" onclick="createBin()" id="btnCreateBin">📦 Создать хранилище</button>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// ROLES
+// ══════════════════════════════════════════════════
+const ROLES = {
+  // Site roles
+  admin:     { name: 'Администратор', icon: '⚡', audit: true,  canEdit: true  },
+  manager:   { name: 'Менеджер',      icon: '👔', audit: true,  canEdit: true  },
+  customer:  { name: 'Покупатель',    icon: '👤', audit: false, canEdit: false },
+  // Legacy local roles
+  warehouse: { name: 'Кладовщик',     icon: '📦', audit: true,  canEdit: true  },
+  boss:      { name: 'Босс',          icon: '🎯', audit: true,  canEdit: true  },
+  creator:   { name: 'Создатель',     icon: '⚡', audit: true,  canEdit: true  },
+};
+const WH_LABELS = { wh1: 'Склад 1', wh2: 'Склад 2', wh3: 'Склад 3', all: 'Все' };
+
+let currentUser = null;
+
+async function doLogin() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
+
+  if (!email || !password) {
+    errEl.textContent = 'Введите email и пароль';
+    errEl.classList.add('visible');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Проверка…';
+  errEl.classList.remove('visible');
+
+  let res = await warehouseAPI.validateWithSite(email, password);
+
+  if (!res.ok && res.source === 'offline') {
+    res = await warehouseAPI.validateUser(email, password);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Войти →';
+
+  if (!res.ok) {
+    errEl.textContent = res.error || 'Неверный email или пароль';
+    errEl.classList.add('visible');
+    document.getElementById('loginPassword').value = '';
+    return;
+  }
+
+  const roleDefaults = ROLES[res.user.role] || ROLES.manager;
+  currentUser = {
+    ...roleDefaults,
+    ...res.user,
+    canEdit: res.user.canEdit !== undefined ? res.user.canEdit : roleDefaults.canEdit,
+    audit:   res.user.audit   !== undefined ? res.user.audit   : roleDefaults.audit,
+    icon:    roleDefaults.icon,
+  };
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = '';
+  applyRole();
+  init();
+}
+
+async function initSiteSettings() {
+  const url = await warehouseAPI.getSiteUrl().catch(() => 'http://localhost:3000');
+  const inp = document.getElementById('siteUrlInput');
+  if (inp) inp.value = url || 'http://localhost:3000';
+  const res = await warehouseAPI.pingSite().catch(() => ({ ok: false }));
+  const bar = document.getElementById('siteStatusBar');
+  const hints = document.getElementById('loginHints');
+  if (bar) {
+    bar.style.display = 'block';
+    bar.style.background = res.ok ? 'rgba(34,197,94,.1)' : 'rgba(239,68,68,.08)';
+    bar.style.borderColor = res.ok ? 'rgba(34,197,94,.3)' : 'rgba(239,68,68,.25)';
+    bar.style.color = res.ok ? '#4ade80' : '#f87171';
+    bar.textContent = res.ok ? '● Сайт подключён' : '● Сайт недоступен — только локальный вход';
+  }
+  if (hints) hints.textContent = res.ok ? 'Войдите: <b>timmon / l050525L</b> (создатель) · <b>sklad / 1234</b>' : 'Сайт недоступен. Локальный: <b>sklad / 1234</b> · <b>timmon / l050525L</b>';
+}
+function toggleSiteSettings() {
+  const panel = document.getElementById('siteSettingsPanel');
+  if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+async function saveSiteUrl() {
+  const inp = document.getElementById('siteUrlInput');
+  if (!inp) return;
+  const url = inp.value.trim().replace(/\/$/, '');
+  await warehouseAPI.setSiteUrl(url);
+  await initSiteSettings();
+}
+async function pingSite() {
+  const res = await warehouseAPI.pingSite().catch(() => ({ ok: false }));
+  const bar = document.getElementById('siteStatusBar');
+  const hints = document.getElementById('loginHints');
+  if (bar) {
+    bar.style.display = 'block';
+    bar.style.background = res.ok ? 'rgba(34,197,94,.1)' : 'rgba(239,68,68,.08)';
+    bar.style.borderColor = res.ok ? 'rgba(34,197,94,.3)' : 'rgba(239,68,68,.25)';
+    bar.style.color = res.ok ? '#4ade80' : '#f87171';
+    bar.textContent = res.ok ? '● Сайт подключён' : '● Сайт недоступен — только локальный вход';
+  }
+  if (hints) hints.textContent = res.ok ? 'Войдите: <b>timmon / l050525L</b> (создатель) · <b>sklad / 1234</b>' : 'Сайт недоступен. Локальный: <b>sklad / 1234</b> · <b>timmon / l050525L</b>';
+}
+
+function toggleSidebar() {
+  document.querySelector('nav').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('nav').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+initSiteSettings();
+
+function logout() {
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').classList.remove('visible');
+  currentUser = null;
+}
+function applyRole() {
+  document.getElementById('roleBadge').textContent = `${currentUser.icon} ${currentUser.name}`;
+  document.getElementById('navAudit').style.display = currentUser.audit ? 'flex' : 'none';
+  ['navAdd','navImport','btnAdd','btnImport'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = currentUser.canEdit ? '' : 'none';
+  });
+  // Transfer buttons visibility
+  const canEdit = currentUser.canEdit;
+  ['docBtnAdd','docBtnSave','docBtnPost'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = canEdit ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let products    = [];
+let movements   = [];
+let currentView = 'products';
+let currentWh   = 'all';
+let sortField   = 'article';
+let sortAsc     = true;
+let editingId   = null;
+let movingId    = null;
+
+// ── Init ──────────────────────────────────────────
+async function init() {
+  products = await warehouseAPI.getProducts();
+  renderAll();
+  updateSyncStatus();
+  await loadTransferHistory();
+  warehouseAPI.onProductsChanged(items => { products = items; renderAll(); updateSyncStatus(); });
+  warehouseAPI.onSyncOk(d => {
+    document.getElementById('syncDot').className = 'sync-dot';
+    document.getElementById('syncLabel').textContent = `✓ Синхр. ${new Date(d.at).toLocaleTimeString('ru')} • ${d.count} тов.`;
+  });
+  warehouseAPI.onSyncError(e => {
+    document.getElementById('syncDot').className = 'sync-dot offline';
+    toast(`Ошибка синхронизации: ${e}`, 'error');
+  });
+  newDocForm(); // init empty doc
+}
+
+// ══════════════════════════════════════════════════
+// WAREHOUSE FILTER
+// ══════════════════════════════════════════════════
+function setWarehouse(wh, el) {
+  currentWh = wh;
+  document.querySelectorAll('.wh-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+function filteredByWh(list) {
+  if (currentWh === 'all') return list;
+  return list.filter(p => (p.warehouse || 'wh1') === currentWh);
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function renderAll() {
+  updateStats();
+  updateNavCounts();
+  updateWhMiniStats();
+  if (currentView === 'products') renderTable();
+  if (currentView === 'lowstock') renderLowStock();
+  if (currentView === 'transfer' && transferMode === 'quick') renderQuickSource();
+}
+function updateStats() {
+  const items = filteredByWh(products);
+  document.getElementById('statTotal').textContent   = items.length;
+  document.getElementById('statInStock').textContent = items.filter(p => p.stock > 0).length;
+  document.getElementById('statLow').textContent     = items.filter(p => p.stock > 0 && p.stock < 5).length;
+  document.getElementById('statZero').textContent    = items.filter(p => !p.stock || p.stock <= 0).length;
+}
+function updateNavCounts() {
+  const items = filteredByWh(products);
+  document.getElementById('navCountProducts').textContent = items.length;
+  document.getElementById('navCountLow').textContent = items.filter(p => p.stock > 0 && p.stock < 5).length;
+}
+function updateWhMiniStats() {
+  ['wh1','wh2','wh3'].forEach(wh => {
+    const it = products.filter(p => (p.warehouse || 'wh1') === wh);
+    document.getElementById(wh+'Count').textContent = it.length;
+    document.getElementById(wh+'Stock').textContent = it.filter(p => p.stock > 0).length;
+  });
+}
+function setView(v, el) {
+  closeSidebar();
+  currentView = v;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if (v === 'audit')    loadAudit();
+  if (v === 'products') renderTable();
+  if (v === 'lowstock') renderLowStock();
+  if (v === 'transfer') { renderQuickSource(); renderQuickDest(); }
+}
+
+// ── Products table ─────────────────────────────────
+function renderTable() {
+  const q = document.getElementById('searchInput').value.trim().toUpperCase();
+  let items = filteredByWh(products);
+  if (q) items = items.filter(p =>
+    (p.article||'').toUpperCase().includes(q) ||
+    (p.name||'').toUpperCase().includes(q) ||
+    (p.brand||'').toUpperCase().includes(q)
+  );
+  items = [...items].sort((a,b) => {
+    const va = a[sortField]??'', vb = b[sortField]??'';
+    const r = typeof va === 'number' ? va-vb : String(va).localeCompare(String(vb),'ru');
+    return sortAsc ? r : -r;
+  });
+  const tbody = document.getElementById('tableBody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="ico">📦</div>Товаров нет. Добавьте или импортируйте файл.</div></td></tr>`;
+    return;
+  }
+  const canEdit = currentUser?.canEdit;
+  tbody.innerHTML = items.map(p => {
+    const stock = parseInt(p.stock)||0;
+    const badge = stock<=0 ? '<span class="badge badge-red">Нет</span>'
+                : stock<5  ? '<span class="badge badge-amber">Мало</span>'
+                :             '<span class="badge badge-green">В наличии</span>';
+    const wh = p.warehouse||'wh1';
+    const whCls = wh==='wh1'?'badge-wh1':wh==='wh2'?'badge-wh2':'badge-wh3';
+    const editBtns = canEdit
+      ? `<button class="icon-btn" onclick="openEditModal('${p.id}')" title="Редактировать">✏️</button>
+         <button class="icon-btn move-btn" onclick="openMoveModal('${p.id}')" title="Переместить">🔄</button>
+         <button class="icon-btn del" onclick="deleteProduct('${p.id}')" title="Удалить">🗑️</button>`
+      : `<button class="icon-btn" onclick="openEditModal('${p.id}')" title="Просмотр">👁</button>`;
+    return `<tr>
+      <td><b style="color:var(--text)">${esc(p.article||'—')}</b></td>
+      <td>${esc(p.brand||'—')}</td>
+      <td>${esc(p.name||'—')}</td>
+      <td><span class="badge ${whCls}">${WH_LABELS[wh]||wh}</span></td>
+      <td style="font-size:.8rem;color:var(--text3)">${esc(p.shelf||'—')}</td>
+      <td style="text-align:right">${p.price_retail ? numFmt(p.price_retail)+' ₽' : '—'}</td>
+      <td style="text-align:right"><b style="color:${stock<=0?'var(--red)':stock<5?'var(--amber)':'var(--text)'}">${stock}</b></td>
+      <td>${badge}</td>
+      <td style="font-size:.8rem">${p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('ru') : '—'}</td>
+      <td><div class="actions">${editBtns}</div></td>
+    </tr>`;
+  }).join('');
+}
+function sortBy(field) {
+  if (sortField===field) sortAsc=!sortAsc; else { sortField=field; sortAsc=true; }
+  renderTable();
+}
+
+// ── Low stock ─────────────────────────────────────
+function renderLowStock() {
+  const items = filteredByWh(products).filter(p => p.stock > 0 && p.stock < 5);
+  const tbody = document.getElementById('lowStockBody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="ico">✅</div>Все товары в норме!</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(p => {
+    const wh = p.warehouse||'wh1';
+    const whCls = wh==='wh1'?'badge-wh1':wh==='wh2'?'badge-wh2':'badge-wh3';
+    return `<tr>
+      <td><b style="color:var(--text)">${esc(p.article||'—')}</b></td>
+      <td>${esc(p.name||'—')}</td>
+      <td><span class="badge ${whCls}">${WH_LABELS[wh]||wh}</span></td>
+      <td style="font-size:.8rem;color:var(--text3)">${esc(p.shelf||'—')}</td>
+      <td style="text-align:right"><b style="color:var(--amber)">${parseInt(p.stock)||0}</b></td>
+      <td><span class="badge badge-amber">Мало</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// TRANSFER — shared state
+// ══════════════════════════════════════════════════
+let transferMode    = 'doc';
+let transferHistory = [];
+let historyVisible  = false;
+
+// ── doc state ─────────────────────────────────────
+let currentDoc = null; // { id, number, fromWarehouse, toWarehouse, reason, items[], status }
+
+// ── quick state ───────────────────────────────────
+let quickSelected = new Map(); // productId -> { product, qty }
+
+// ── Mode switch ───────────────────────────────────
+function setTransferMode(mode) {
+  transferMode = mode;
+  document.getElementById('tabDoc').classList.toggle('active', mode==='doc');
+  document.getElementById('tabQuick').classList.toggle('active', mode==='quick');
+  document.getElementById('modePanelDoc').style.display   = mode==='doc'   ? 'flex' : 'none';
+  document.getElementById('modePanelQuick').style.display = mode==='quick' ? 'flex' : 'none';
+  if (mode==='quick') { quickSelected.clear(); renderQuickSource(); renderQuickDest(); }
+}
+
+// ══════════════════════════════════════════════════
+// DOC MODE — 1С style
+// ══════════════════════════════════════════════════
+function newDocForm() {
+  currentDoc = {
+    id:            null,
+    number:        null,
+    fromWarehouse: 'wh1',
+    toWarehouse:   'wh2',
+    reason:        '',
+    items:         [],
+    status:        'draft',
+  };
+  document.getElementById('docFrom').value    = 'wh1';
+  document.getElementById('docTo').value      = 'wh2';
+  document.getElementById('docComment').value = '';
+  document.getElementById('docNumberLabel').textContent = '📄 Новый документ';
+  document.getElementById('docStatusBadge').textContent = '● Черновик';
+  document.getElementById('docStatusBadge').className   = 'doc-status draft';
+  document.getElementById('docDateLabel').textContent   = new Date().toLocaleDateString('ru');
+  renderDocItems();
+  setDocReadOnly(false);
+}
+
+function loadDocFromHistory(doc) {
+  currentDoc = JSON.parse(JSON.stringify(doc)); // deep copy
+  document.getElementById('docFrom').value    = doc.fromWarehouse || 'wh1';
+  document.getElementById('docTo').value      = doc.toWarehouse   || 'wh2';
+  document.getElementById('docComment').value = doc.reason        || '';
+  document.getElementById('docNumberLabel').textContent = `📄 Документ № ${doc.number || '—'}`;
+  const isPosted = doc.status === 'posted';
+  document.getElementById('docStatusBadge').textContent = isPosted ? '✓ Проведён' : '● Черновик';
+  document.getElementById('docStatusBadge').className   = `doc-status ${doc.status||'draft'}`;
+  document.getElementById('docDateLabel').textContent   = new Date(doc.createdAt||Date.now()).toLocaleDateString('ru');
+  renderDocItems();
+  setDocReadOnly(isPosted);
+  setTransferMode('doc');
+  // scroll to top
+  document.getElementById('modePanelDoc').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setDocReadOnly(ro) {
+  ['docFrom','docTo','docComment'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = ro;
+  });
+  ['docBtnAdd','docBtnSave','docBtnPost'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.disabled = ro; el.style.opacity = ro ? '.4' : ''; }
+  });
+}
+
+function renderDocItems() {
+  const tbody = document.getElementById('docItemsBody');
+  const hint  = document.getElementById('docEmptyHint');
+  const items = currentDoc?.items || [];
+  const isPosted = currentDoc?.status === 'posted';
+
+  document.getElementById('docItemCount').textContent = `${items.length} позиц${items.length===1?'ия':items.length>1&&items.length<5?'ии':'ий'}`;
+  hint.style.display = items.length ? 'none' : '';
+
+  if (!items.length) { tbody.innerHTML = ''; return; }
+
+  tbody.innerHTML = items.map((item, idx) => {
+    const disabled = isPosted ? 'disabled' : '';
+    const rmBtn = !isPosted
+      ? `<button class="icon-btn del" onclick="removeDocItem(${idx})" title="Удалить">✕</button>`
+      : '';
+    return `<tr>
+      <td style="text-align:center;color:var(--text3)">${idx+1}</td>
+      <td><b style="color:var(--text)">${esc(item.article||'—')}</b></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.name||'—')}</td>
+      <td style="font-size:.8rem;color:var(--text3)">${esc(item.fromShelf||'—')}</td>
+      <td style="text-align:center">
+        <input class="doc-qty-input" type="number" min="1" value="${item.qty||1}"
+          onchange="updateDocItem(${idx},'qty',this.value)" ${disabled}>
+      </td>
+      <td>
+        <input class="doc-shelf-input" type="text" value="${esc(item.toShelf||'')}"
+          placeholder="куда…" onchange="updateDocItem(${idx},'toShelf',this.value)" ${disabled}>
+      </td>
+      <td>${rmBtn}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateDocItem(idx, field, value) {
+  if (!currentDoc) return;
+  if (field === 'qty') currentDoc.items[idx].qty = parseInt(value)||1;
+  if (field === 'toShelf') currentDoc.items[idx].toShelf = value;
+}
+
+function removeDocItem(idx) {
+  if (!currentDoc) return;
+  currentDoc.items.splice(idx, 1);
+  renderDocItems();
+}
+
+// Product search modal for doc
+function openProductSearch() {
+  if (!currentUser?.canEdit) return;
+  document.getElementById('searchModalInput').value = '';
+  document.getElementById('searchOverlay').classList.remove('hidden');
+  renderSearchResults();
+  setTimeout(() => document.getElementById('searchModalInput').focus(), 50);
+}
+function closeSearchModal() {
+  document.getElementById('searchOverlay').classList.add('hidden');
+}
+function closeSearchOutside(e) {
+  if (e.target === document.getElementById('searchOverlay')) closeSearchModal();
+}
+
+function renderSearchResults() {
+  const q = document.getElementById('searchModalInput').value.trim().toUpperCase();
+  const fromWh = document.getElementById('docFrom').value;
+  // Show products from the source warehouse
+  let items = products.filter(p => (p.warehouse||'wh1') === fromWh);
+  if (q) items = items.filter(p =>
+    (p.article||'').toUpperCase().includes(q) ||
+    (p.name||'').toUpperCase().includes(q) ||
+    (p.brand||'').toUpperCase().includes(q)
+  );
+  items = items.slice(0, 60);
+  const list = document.getElementById('searchResultsList');
+  if (!items.length) {
+    list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text3)">Товары не найдены на ${WH_LABELS[fromWh]}</div>`;
+    return;
+  }
+  const wh = fromWh;
+  const whCls = wh==='wh1'?'badge-wh1':wh==='wh2'?'badge-wh2':'badge-wh3';
+  list.innerHTML = items.map(p => {
+    const stock = parseInt(p.stock)||0;
+    const already = currentDoc?.items?.some(i => String(i.productId)===String(p.id));
+    return `<div class="search-result-row" onclick="selectProductForDoc('${p.id}')" style="${already?'opacity:.5;pointer-events:none':''}">
+      <div class="sr-article">${esc(p.article||'—')}</div>
+      <div class="sr-name">${esc(p.name||'—')}<br><span style="font-size:.72rem;color:var(--text3)">${esc(p.brand||'')}${p.shelf?' · '+esc(p.shelf):''}</span></div>
+      <div class="sr-wh"><span class="badge ${whCls}">${WH_LABELS[wh]}</span></div>
+      <div class="sr-stock" style="color:${stock<=0?'var(--red)':stock<5?'var(--amber)':'var(--green)'}">${stock} шт.</div>
+      ${already ? '<span style="font-size:.72rem;color:var(--text3)">уже добавлен</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectProductForDoc(productId) {
+  const p = products.find(x => String(x.id)===String(productId));
+  if (!p || !currentDoc) return;
+  const alreadyIdx = currentDoc.items.findIndex(i => String(i.productId)===String(p.id));
+  if (alreadyIdx >= 0) return; // already in doc
+  currentDoc.items.push({
+    productId: p.id,
+    article:   p.article || '',
+    name:      p.name    || '',
+    fromShelf: p.shelf   || '',
+    toShelf:   '',
+    qty:       1,
+  });
+  renderDocItems();
+  renderSearchResults(); // grey out the added one
+  toast(`Добавлен: ${p.article||p.name}`, 'info');
+}
+
+async function saveDocDraft() {
+  if (!currentDoc) return;
+  if (!currentDoc.items.length) { toast('Добавьте хотя бы один товар', 'error'); return; }
+  // Sync fields from UI
+  currentDoc.fromWarehouse = document.getElementById('docFrom').value;
+  currentDoc.toWarehouse   = document.getElementById('docTo').value;
+  currentDoc.reason        = document.getElementById('docComment').value.trim();
+  if (currentDoc.fromWarehouse === currentDoc.toWarehouse) {
+    toast('Склад-источник и склад-назначение должны отличаться', 'error'); return;
+  }
+  currentDoc.status = 'draft';
+  const res = await warehouseAPI.saveTransfer(currentDoc);
+  if (res.ok) {
+    currentDoc = res.doc;
+    document.getElementById('docNumberLabel').textContent = `📄 Документ № ${res.doc.number}`;
+    toast(`✓ Черновик № ${res.doc.number} сохранён`, 'success');
+    await loadTransferHistory();
+  } else {
+    toast(res.error || 'Ошибка сохранения', 'error');
+  }
+}
+
+async function postDoc() {
+  if (!currentUser?.canEdit) return;
+  if (!currentDoc) return;
+  if (!currentDoc.items.length) { toast('Добавьте хотя бы один товар', 'error'); return; }
+  currentDoc.fromWarehouse = document.getElementById('docFrom').value;
+  currentDoc.toWarehouse   = document.getElementById('docTo').value;
+  currentDoc.reason        = document.getElementById('docComment').value.trim();
+  if (currentDoc.fromWarehouse === currentDoc.toWarehouse) {
+    toast('Откуда и куда не должны совпадать', 'error'); return;
+  }
+  // Save first if new
+  if (!currentDoc.id) {
+    const sr = await warehouseAPI.saveTransfer(currentDoc);
+    if (!sr.ok) { toast(sr.error || 'Ошибка сохранения', 'error'); return; }
+    currentDoc = sr.doc;
+  }
+  if (!confirm(`Провести документ № ${currentDoc.number}?\nТовары будут перемещены на ${WH_LABELS[currentDoc.toWarehouse]}.`)) return;
+
+  const user = { role: currentUser.role, name: currentUser.name };
+  const res  = await warehouseAPI.postTransfer(currentDoc.id, user);
+  if (res.ok || res.postedCount > 0) {
+    toast(`✓ Документ № ${currentDoc.number} проведён. Перемещено: ${res.postedCount} поз.`, 'success');
+    if (res.errors && res.errors.length) toast(`⚠ Не найдено: ${res.errors.join(', ')}`, 'error');
+    await loadTransferHistory();
+    // Reload products
+    products = await warehouseAPI.getProducts();
+    renderAll();
+    // Reload doc from history (now posted)
+    const updated = transferHistory.find(d => d.id === currentDoc.id);
+    if (updated) loadDocFromHistory(updated);
+  } else {
+    toast(res.error || 'Ошибка проведения', 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// QUICK MODE
+// ══════════════════════════════════════════════════
+function renderQuickSource() {
+  const fromWh = document.getElementById('quickFrom')?.value || 'wh1';
+  const q      = (document.getElementById('quickSearch')?.value || '').trim().toUpperCase();
+  let items    = products.filter(p => (p.warehouse||'wh1') === fromWh);
+  if (q) items = items.filter(p =>
+    (p.article||'').toUpperCase().includes(q)||
+    (p.name||'').toUpperCase().includes(q)||
+    (p.brand||'').toUpperCase().includes(q)
+  );
+
+  const list = document.getElementById('quickSourceList');
+  if (!items.length) {
+    list.innerHTML = `<div class="empty" style="padding:32px"><div class="ico">📦</div>Нет товаров на этом складе</div>`;
+    return;
+  }
+  list.innerHTML = items.map(p => {
+    const sel = quickSelected.has(String(p.id));
+    const stock = parseInt(p.stock)||0;
+    return `<div class="quick-product-row${sel?' selected':''}" onclick="toggleQuickItem('${p.id}')">
+      <input type="checkbox" class="quick-checkbox" ${sel?'checked':''} onclick="event.stopPropagation();toggleQuickItem('${p.id}')">
+      <div class="quick-product-info">
+        <div class="quick-product-name" title="${esc(p.name||'')}"><b>${esc(p.article||'?')}</b> — ${esc(p.name||'—')}</div>
+        <div class="quick-product-meta">${esc(p.brand||'')}${p.shelf?' · Полка: '+esc(p.shelf):''}</div>
+      </div>
+      <div class="quick-product-stock" style="color:${stock<=0?'var(--red)':stock<5?'var(--amber)':'var(--text2)'}">${stock} шт.</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleQuickItem(productId) {
+  const pid = String(productId);
+  const p   = products.find(x => String(x.id)===pid);
+  if (!p) return;
+  if (quickSelected.has(pid)) {
+    quickSelected.delete(pid);
+  } else {
+    quickSelected.set(pid, { product: p, qty: parseInt(p.stock)||1 });
+  }
+  renderQuickSource();
+  renderQuickDest();
+}
+
+function renderQuickDest() {
+  const list     = document.getElementById('quickDestList');
+  const count    = document.getElementById('quickSelectedCount');
+  const selected = [...quickSelected.values()];
+  count.textContent = `${selected.length} позиц${selected.length===1?'ия':selected.length>1&&selected.length<5?'ии':'ий'}`;
+  if (!selected.length) {
+    list.innerHTML = `<div class="empty" style="padding:32px;font-size:.85rem"><div class="ico" style="font-size:1.8rem">☑</div>Отметьте товары слева</div>`;
+    return;
+  }
+  list.innerHTML = selected.map(({ product: p, qty }) => `
+    <div class="quick-selected-row">
+      <div class="quick-selected-info">
+        <div class="quick-selected-name">${esc(p.name||'—')}</div>
+        <div class="quick-selected-art">${esc(p.article||'—')}${p.shelf?' · '+esc(p.shelf):''}</div>
+      </div>
+      <input class="quick-qty-input" type="number" min="1" value="${qty}"
+        onchange="updateQuickQty('${p.id}',this.value)" title="Количество">
+      <button class="icon-btn del" onclick="toggleQuickItem('${p.id}')" title="Убрать">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateQuickQty(productId, val) {
+  const entry = quickSelected.get(String(productId));
+  if (entry) entry.qty = parseInt(val)||1;
+}
+
+async function executeQuickTransfer() {
+  if (!currentUser?.canEdit) return;
+  const toWh    = document.getElementById('quickTo').value;
+  const toShelf = document.getElementById('quickToShelf').value.trim();
+  const fromWh  = document.getElementById('quickFrom').value;
+  const selected = [...quickSelected.values()];
+
+  if (!selected.length) { toast('Выберите товары для перемещения', 'error'); return; }
+  if (fromWh === toWh) { toast('Склад-источник и склад-назначение должны отличаться', 'error'); return; }
+
+  const user = { role: currentUser.role, name: currentUser.name };
+  let ok = 0, fail = 0;
+
+  for (const { product: p, qty } of selected) {
+    const res = await warehouseAPI.moveProduct({
+      productId:   p.id,
+      toWarehouse: toWh,
+      toShelf:     toShelf || p.shelf || '',
+      qty,
+      reason:      `Быстрое перемещение`,
+      user,
+    });
+    if (res && res.ok) ok++; else fail++;
+  }
+
+  toast(`✓ Перемещено: ${ok} поз.${fail?` | Ошибок: ${fail}`:''}`, ok ? 'success' : 'error');
+  quickSelected.clear();
+  products = await warehouseAPI.getProducts();
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════════════
+async function loadTransferHistory() {
+  transferHistory = await warehouseAPI.getTransfers();
+  document.getElementById('navCountTransfer').textContent = transferHistory.length;
+  document.getElementById('navCountHistory').textContent  = transferHistory.length;
+  if (historyVisible) renderHistory();
+}
+
+function toggleHistory() {
+  historyVisible = !historyVisible;
+  document.getElementById('historySection').style.display = historyVisible ? '' : 'none';
+  document.getElementById('historyArrow').classList.toggle('open', historyVisible);
+  if (historyVisible) renderHistory();
+}
+
+function renderHistory() {
+  const tbody = document.getElementById('historyBody');
+  if (!transferHistory.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty" style="padding:24px">История документов пуста</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = transferHistory.map(doc => {
+    const date   = doc.createdAt ? new Date(doc.createdAt).toLocaleString('ru') : '—';
+    const from   = WH_LABELS[doc.fromWarehouse] || doc.fromWarehouse || '—';
+    const to     = WH_LABELS[doc.toWarehouse]   || doc.toWarehouse   || '—';
+    const count  = (doc.items||[]).length;
+    const isDraft = doc.status !== 'posted';
+    const statusBadge = isDraft
+      ? '<span class="doc-status-badge draft">● Черновик</span>'
+      : '<span class="doc-status-badge posted">✓ Проведён</span>';
+    const user = doc.postedBy?.name || doc.createdBy?.name || '—';
+    const delBtn = isDraft
+      ? `<button class="icon-btn del" onclick="event.stopPropagation();deleteHistoryDoc('${doc.id}')" title="Удалить черновик">🗑️</button>`
+      : '';
+    return `<tr onclick="loadDocFromHistory(${JSON.stringify(doc).replace(/"/g,'&quot;')})">
+      <td><b style="color:var(--text)">№ ${esc(doc.number||'—')}</b></td>
+      <td style="font-size:.8rem">${esc(date)}</td>
+      <td><span class="badge badge-wh1" style="font-size:.72rem">${esc(from)}</span></td>
+      <td><span class="badge badge-wh2" style="font-size:.72rem">${esc(to)}</span></td>
+      <td style="text-align:center">${count}</td>
+      <td>${statusBadge}</td>
+      <td style="font-size:.8rem;color:var(--text3)">${esc(user)}</td>
+      <td><div class="actions">${delBtn}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function deleteHistoryDoc(id) {
+  if (!confirm('Удалить черновик документа?')) return;
+  const res = await warehouseAPI.deleteTransfer(id);
+  if (res.ok) { toast('Черновик удалён', 'info'); await loadTransferHistory(); }
+}
+
+// ══════════════════════════════════════════════════
+// AUDIT
+// ══════════════════════════════════════════════════
+async function loadAudit() {
+  movements = await warehouseAPI.getMovements(500);
+  document.getElementById('navCountAudit').textContent = movements.length;
+  renderAudit();
+}
+function renderAudit() {
+  const ft = document.getElementById('auditFilterType').value;
+  const fw = document.getElementById('auditFilterWh').value;
+  let items = movements;
+  if (ft) items = items.filter(m => m.action === ft || m.type === ft);
+  if (fw) items = items.filter(m =>
+    m.warehouse===fw||m.fromWarehouse===fw||m.toWarehouse===fw
+  );
+  const tbody = document.getElementById('auditBody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ico">📋</div>Записей нет</div></td></tr>`;
+    return;
+  }
+  const actLabels = {
+    add:    '<span class="act-add">Добавление</span>',
+    update: '<span class="act-update">Изменение</span>',
+    delete: '<span class="act-delete">Удаление</span>',
+    move:   '<span class="act-move">Перемещение</span>',
+    import: '<span class="act-import">Импорт</span>',
+  };
+  tbody.innerHTML = items.map(m => {
+    const time = m.timestamp ? new Date(m.timestamp).toLocaleString('ru') : '—';
+    const act  = actLabels[m.action||m.type] || esc(m.action||m.type||'—');
+    const role = ROLES[m.userRole]?.name || m.userRole || m.user || '—';
+    const prod = esc(m.productName||m.name||m.article||m.productId||'—');
+    let whCell = '—', shelfCell = '—';
+    if ((m.action||m.type) === 'move') {
+      const fl = WH_LABELS[m.fromWarehouse]||m.fromWarehouse||'?';
+      const tl = WH_LABELS[m.toWarehouse]  ||m.toWarehouse  ||'?';
+      whCell    = `<span style="font-size:.78rem">${esc(fl)} → ${esc(tl)}</span>`;
+      shelfCell = `<span style="font-size:.78rem">${esc(m.fromShelf||'—')} → ${esc(m.toShelf||'—')}</span>`;
+    } else {
+      const w = m.toWarehouse||m.warehouse;
+      whCell    = w ? `<span class="badge badge-blue" style="font-size:.7rem">${WH_LABELS[w]||w}</span>` : '—';
+      shelfCell = esc(m.toShelf||m.shelf||'—');
+    }
+    return `<tr>
+      <td style="font-size:.78rem;white-space:nowrap">${time}</td>
+      <td>${act}</td>
+      <td style="font-size:.8rem">${esc(role)}</td>
+      <td style="font-size:.8rem">${prod}</td>
+      <td>${whCell}</td>
+      <td style="font-size:.8rem">${shelfCell}</td>
+      <td style="text-align:right">${m.qty??'—'}</td>
+      <td style="font-size:.78rem;color:var(--text3);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(m.reason||m.changes||'')}">${esc(m.reason||m.changes||'')}</td>
+    </tr>`;
+  }).join('');
+}
+async function clearAudit() {
+  if (!confirm('Очистить весь журнал аудита?')) return;
+  await warehouseAPI.clearMovements();
+  movements = [];
+  document.getElementById('navCountAudit').textContent = 0;
+  renderAudit();
+  toast('Журнал очищен', 'info');
+}
+
+// ══════════════════════════════════════════════════
+// PRODUCT MODAL (Add / Edit)
+// ══════════════════════════════════════════════════
+function openAddModal() {
+  if (!currentUser?.canEdit) return;
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Добавить товар';
+  ['fArticle','fBrand','fName','fPriceR','fPriceW','fStock','fCategory','fShelf'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.disabled = false; }
+  });
+  const sel = document.getElementById('fWarehouse');
+  sel.value = currentWh !== 'all' ? currentWh : 'wh1';
+  sel.disabled = false;
+  document.getElementById('editModalFooter').style.display = '';
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('fArticle').focus();
+}
+function openEditModal(id) {
+  const p = products.find(x => String(x.id)===String(id));
+  if (!p) return;
+  editingId = id;
+  const ro = !currentUser?.canEdit;
+  document.getElementById('modalTitle').textContent = ro ? '👁 Просмотр товара' : 'Редактировать товар';
+  document.getElementById('fArticle').value   = p.article         || '';
+  document.getElementById('fBrand').value     = p.brand           || '';
+  document.getElementById('fName').value      = p.name            || '';
+  document.getElementById('fPriceR').value    = p.price_retail    || '';
+  document.getElementById('fPriceW').value    = p.price_wholesale || '';
+  document.getElementById('fStock').value     = p.stock           ?? '';
+  document.getElementById('fCategory').value  = p.category        || '';
+  document.getElementById('fWarehouse').value = p.warehouse       || 'wh1';
+  document.getElementById('fShelf').value     = p.shelf           || '';
+  ['fArticle','fBrand','fName','fPriceR','fPriceW','fStock','fCategory','fWarehouse','fShelf'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = ro;
+  });
+  document.getElementById('editModalFooter').style.display = ro ? 'none' : '';
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); editingId = null; }
+function closeModalOutside(e) { if (e.target===document.getElementById('modalOverlay')) closeModal(); }
+async function saveProduct() {
+  const article = document.getElementById('fArticle').value.trim();
+  const name    = document.getElementById('fName').value.trim();
+  if (!article||!name) { toast('Заполните Артикул и Наименование','error'); return; }
+  const item = {
+    article, name,
+    brand:           document.getElementById('fBrand').value.trim(),
+    price_retail:    parseFloat(document.getElementById('fPriceR').value)||0,
+    price_wholesale: parseFloat(document.getElementById('fPriceW').value)||0,
+    stock:           parseInt(document.getElementById('fStock').value)||0,
+    category:        document.getElementById('fCategory').value.trim(),
+    warehouse:       document.getElementById('fWarehouse').value||'wh1',
+    shelf:           document.getElementById('fShelf').value.trim(),
+  };
+  const user = { role: currentUser.role, name: currentUser.name };
+  let res;
+  if (editingId) {
+    res = await warehouseAPI.updateProduct({ ...item, id: editingId }, user);
+    if (res.ok) toast('Товар обновлён','success');
+  } else {
+    res = await warehouseAPI.addProduct(item, user);
+    if (res.ok) toast('Товар добавлен','success');
+  }
+  if (!res.ok) { toast(res.error||'Ошибка сохранения','error'); return; }
+  closeModal();
+}
+
+// ── Move modal ────────────────────────────────────
+function openMoveModal(id) {
+  if (!currentUser?.canEdit) return;
+  const p = products.find(x => String(x.id)===String(id));
+  if (!p) return;
+  movingId = id;
+  const wh = WH_LABELS[p.warehouse||'wh1']||p.warehouse||'Склад 1';
+  document.getElementById('moveInfo').innerHTML =
+    `<b>${esc(p.name||p.article)}</b><br>Текущее: <b>${esc(wh)}</b> / Полка: <b>${esc(p.shelf||'—')}</b> / Кол-во: <b>${p.stock??0} шт.</b>`;
+  document.getElementById('mWarehouse').value = p.warehouse||'wh1';
+  document.getElementById('mShelf').value     = p.shelf||'';
+  document.getElementById('mQty').value       = '';
+  document.getElementById('mReason').value    = '';
+  document.getElementById('moveOverlay').classList.remove('hidden');
+  document.getElementById('mShelf').focus();
+}
+function closeMoveModal() { document.getElementById('moveOverlay').classList.add('hidden'); movingId=null; }
+function closeMoveOutside(e) { if (e.target===document.getElementById('moveOverlay')) closeMoveModal(); }
+async function confirmMove() {
+  if (!movingId) return;
+  const user = { role: currentUser.role, name: currentUser.name };
+  const res  = await warehouseAPI.moveProduct({
+    productId:   movingId,
+    toWarehouse: document.getElementById('mWarehouse').value,
+    toShelf:     document.getElementById('mShelf').value.trim(),
+    qty:         parseInt(document.getElementById('mQty').value)||0,
+    reason:      document.getElementById('mReason').value.trim(),
+    user,
+  });
+  if (res?.ok) { toast(`✓ Товар перемещён`, 'success'); closeMoveModal(); }
+  else toast(res?.error||'Ошибка перемещения','error');
+}
+async function deleteProduct(id) {
+  if (!currentUser?.canEdit) return;
+  const p = products.find(x => String(x.id)===String(id));
+  if (!confirm(`Удалить "${p?.name||p?.article}"?`)) return;
+  const res = await warehouseAPI.deleteProduct(id, { role: currentUser.role, name: currentUser.name });
+  if (res.ok) toast('Товар удалён','info');
+}
+async function importFile() {
+  if (!currentUser?.canEdit) return;
+  toast('Выберите файл…','info');
+  const res = await warehouseAPI.importFile();
+  if (!res) return;
+  if (!res.ok) { toast(res.error||'Ошибка чтения файла','error'); return; }
+  toast(`✓ "${res.fileName}": +${res.added} добавлено, ${res.updated} обновлено. Всего: ${res.total}`,'success');
+}
+
+// ══════════════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════════════
+async function updateSyncStatus() {
+  const cfg = await warehouseAPI.getConfig();
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  if (!cfg.apiKey||!cfg.binId) {
+    dot.className = 'sync-dot offline';
+    lbl.textContent = 'Синхронизация не настроена';
+  } else {
+    dot.className = 'sync-dot';
+    lbl.textContent = `Синхр. активна • ${products.length} тов.`;
+  }
+}
+async function pushNow() {
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true; btn.textContent = '↑ …';
+  const res = await warehouseAPI.pushNow();
+  btn.disabled = false; btn.textContent = '↑ Синхр.';
+  if (res.ok) toast('✓ Данные отправлены на сайт','success');
+  else toast(res.error||'Ошибка синхронизации','error');
+}
+async function openSettingsModal() {
+  const cfg = await warehouseAPI.getConfig();
+  document.getElementById('sCfgKey').value = cfg.apiKey||'';
+  document.getElementById('sCfgBin').value = cfg.binId ||'';
+  document.getElementById('settingsStatus').textContent = '';
+  document.getElementById('settingsOverlay').classList.remove('hidden');
+}
+function closeSettingsModal() { document.getElementById('settingsOverlay').classList.add('hidden'); }
+function closeSettingsOutside(e) { if (e.target===document.getElementById('settingsOverlay')) closeSettingsModal(); }
+async function createBin() {
+  const apiKey = document.getElementById('sCfgKey').value.trim();
+  if (!apiKey) { document.getElementById('settingsStatus').textContent='⚠ Введите Master Key'; return; }
+  const btn = document.getElementById('btnCreateBin');
+  btn.disabled=true; btn.textContent='…создание';
+  const res = await warehouseAPI.createBin(apiKey);
+  btn.disabled=false; btn.textContent='📦 Создать хранилище';
+  if (res.ok) {
+    document.getElementById('sCfgBin').value = res.binId;
+    document.getElementById('settingsStatus').textContent = `✓ Bin ID: ${res.binId}`;
+    toast('Хранилище JSONBin создано','success');
+  } else {
+    document.getElementById('settingsStatus').textContent = `✗ ${res.error}`;
+  }
+}
+async function saveSettings() {
+  const apiKey = document.getElementById('sCfgKey').value.trim();
+  const binId  = document.getElementById('sCfgBin').value.trim();
+  await warehouseAPI.saveConfig({ apiKey, binId });
+  closeSettingsModal();
+  updateSyncStatus();
+  if (apiKey&&binId) { toast('Настройки сохранены. Синхронизация активна!','success'); pushNow(); }
+  else toast('Настройки сохранены','info');
+}
+async function openSharedDir() { await warehouseAPI.openSharedDir(); }
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function numFmt(n){ return Number(n).toLocaleString('ru-RU',{maximumFractionDigits:0}); }
+function toast(msg,type='info'){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.textContent=msg;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(),3800);
+}
+document.addEventListener('keydown',e=>{
+  if (e.key==='Escape'){
+    closeModal(); closeMoveModal(); closeSettingsModal(); closeSearchModal();
+  }
+  if (e.key==='Enter'){
+    if (!document.getElementById('modalOverlay').classList.contains('hidden'))  saveProduct();
+    if (!document.getElementById('searchOverlay').classList.contains('hidden')) return; // don't post on enter in search
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+  "name": "detalpro",
+  "version": "1.0.0",
+  "description": "Дорожный комплекс Гараж — Интернет-магазин автозапчастей",
+  "main": "main.js",
+  "author": "Дорожный комплекс Гараж",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable",
+    "create-icons": "node create-icons.js"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "ru.detalpro.app",
+    "productName": "Дорожный комплекс Гараж",
+    "copyright": "Copyright © 2025 Дорожный комплекс Гараж",
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "assets/**/*",
+      "app/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Дорожный комплекс Гараж"
+    },
+    "portable": {
+      "artifactName": "Дорожный комплекс Гараж-Portable-${version}.exe"
+    }
+  }
+}
