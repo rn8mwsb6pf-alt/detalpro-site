@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['postgres', 'ioredis', 'bcryptjs'],
-  },
+  serverExternalPackages: ['postgres', 'ioredis', 'bcryptjs'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.cdnspb.ru' },
