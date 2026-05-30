@@ -8739,23 +8739,184 @@ function detectCityByGeo(){
 }
 
 // ═══ VIN: поиск без VIN по марке/году ═══
-const TRUCK_BRANDS_SUGGEST=[
-  'КАМАЗ','МАЗ','Scania','MAN','Volvo','Mercedes-Benz','DAF','IVECO','Renault T',
-  'КРАЗ','УРАЛ','ГАЗель NEXT','ЗИЛ','ISUZU','Hino','Mitsubishi Fuso','Ford Cargo'
-];
-function vinBrandSuggest(val){
-  const box=document.getElementById('vinBrandSuggest');
-  if(!val||val.length<1){box.style.display='none';return;}
-  const q=val.toLowerCase();
-  const matches=TRUCK_BRANDS_SUGGEST.filter(b=>b.toLowerCase().includes(q)).slice(0,8);
-  if(!matches.length){box.style.display='none';return;}
-  box.innerHTML=matches.map(b=>`<div style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line)" onmousedown="document.getElementById('vinBrandInput').value='${b}';document.getElementById('vinBrandSuggest').style.display='none'">${b}</div>`).join('');
-  box.style.display='block';
-  document.addEventListener('click',()=>{box.style.display='none';},{once:true});
+// ═══ БАЗА МОДЕЛЕЙ ГРУЗОВИКОВ ═══
+const TRUCK_MODELS = {
+  'Scania': {
+    models: ['R-series','S-series','G-series','P-series','L-series','F-series','T-series','113','124','143'],
+    wmi: 'YS2', country: '🇸🇪 Швеция'
+  },
+  'MAN': {
+    models: ['TGX','TGS','TGM','TGL','TGE','F2000','F90','NG','L2000'],
+    wmi: 'WMA', country: '🇩🇪 Германия'
+  },
+  'Volvo': {
+    models: ['FH','FM','FMX','FL','FE','NH12','FH12','FH16','B','9700'],
+    wmi: 'YV2', country: '🇸🇪 Швеция'
+  },
+  'Mercedes-Benz': {
+    models: ['Actros','Arocs','Atego','Antos','Axor','SK','Sprinter'],
+    wmi: 'WDB', country: '🇩🇪 Германия'
+  },
+  'DAF': {
+    models: ['XF','CF','LF','XG','XG+','85CF','95XF','105XF'],
+    wmi: 'XLA', country: '🇳🇱 Нидерланды'
+  },
+  'IVECO': {
+    models: ['Stralis','Trakker','Eurocargo','Daily','S-Way','X-Way','Hi-Way'],
+    wmi: 'ZCF', country: '🇮🇹 Италия'
+  },
+  'Renault': {
+    models: ['T','C','D','K','Master','Kerax','Premium','Magnum','Midlum'],
+    wmi: 'VF6', country: '🇫🇷 Франция'
+  },
+  'ISUZU': {
+    models: ['Forward','Giga','ELF','NQR','NPR','NMR','CYZ'],
+    wmi: 'JAB', country: '🇯🇵 Япония'
+  },
+  'Hino': {
+    models: ['500','700','300','258','268','338','500 series','700 series'],
+    wmi: 'JHH', country: '🇯🇵 Япония'
+  },
+  'Mitsubishi Fuso': {
+    models: ['Canter','Fighter','Super Great','Rosa','Aero'],
+    wmi: 'JL6', country: '🇯🇵 Япония'
+  },
+  'Ford': {
+    models: ['Cargo 1833','Cargo 2533','Cargo 3230','Cargo 4142','Cargo 1846','Transit'],
+    wmi: 'NM0', country: '🌍 Международный'
+  },
+  'КАМАЗ': {
+    models: ['5490','65115','65117','6520','43118','53215','4308','53605','6460','NEO','53229'],
+    wmi: 'X1P', country: '🇷🇺 Россия'
+  },
+  'МАЗ': {
+    models: ['5340','6430','5432','5516','6516','4371','6303','5551','6312'],
+    wmi: 'Y3M', country: '🇧🇾 Беларусь'
+  },
+  'КРАЗ': {
+    models: ['256','255','6322','6510','6444','65032'],
+    wmi: 'X8V', country: '🇺🇦 Украина'
+  },
+  'УРАЛ': {
+    models: ['4320','5323','6370','44202','Next','M','C35'],
+    wmi: 'X1W', country: '🇷🇺 Россия'
+  },
+  'ГАЗ': {
+    models: ['ГАЗель NEXT','ГАЗон NEXT','Валдай','3302','3307','3309','2217'],
+    wmi: 'XTT', country: '🇷🇺 Россия'
+  },
+  'ЗИЛ': {
+    models: ['130','131','5301','4331','133'],
+    wmi: 'XWE', country: '🇷🇺 Россия'
+  },
+  'FAW': {
+    models: ['J7','J6P','J6L','CA3252','CA1163','Tiger V'],
+    wmi: 'LFP', country: '🇨🇳 Китай'
+  },
+  'Dong Feng': {
+    models: ['天龙','KX','KR','KC','H30','Captain T'],
+    wmi: 'LFW', country: '🇨🇳 Китай'
+  },
+  'Foton': {
+    models: ['Auman','ETX','GTL','S1','M4'],
+    wmi: 'LVE', country: '🇨🇳 Китай'
+  },
+  'Schmitz': {
+    models: ['S.KO','S.CS','S.CA','S.CU','S.CF','S.PR','S.BO'],
+    wmi: 'WSM', country: '🇩🇪 Германия'
+  },
+  'Kögel': { models: ['Cargo','Maxx','Multi'], wmi: 'WKG', country: '🇩🇪 Германия' },
+  'Krone': { models: ['SD','SDP','SDP 27','BDF','Cool Liner'], wmi: 'WKE', country: '🇩🇪 Германия' },
+  'Wielton': { models: ['NS3','PC','PCS','NS34'], wmi: 'SUU', country: '🇵🇱 Польша' },
+  'ЧМЗАП': { models: ['9990','99064','99074','8975'], wmi: 'X9C', country: '🇷🇺 Россия' },
+  'НЕФАЗ': { models: ['9334','9693','8332','66062'], wmi: 'X1N', country: '🇷🇺 Россия' },
+};
+
+function vmOnBrandChange(){
+  const brand = document.getElementById('vmBrand').value;
+  const modelSel = document.getElementById('vmModel');
+  const yearSel = document.getElementById('vmYear');
+  document.getElementById('vmResult').style.display='none';
+  
+  if(!brand){ 
+    modelSel.innerHTML='<option value="">— Сначала марка —</option>';
+    modelSel.disabled=true; yearSel.disabled=true; return;
+  }
+  
+  const data = TRUCK_MODELS[brand];
+  if(data){
+    modelSel.innerHTML='<option value="">— Модель —</option>' +
+      data.models.map(m=>`<option value="${m}">${m}</option>`).join('');
+  } else {
+    // Загружаем из NHTSA API для иностранных
+    modelSel.innerHTML='<option value="">Загрузка...</option>';
+    fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/${encodeURIComponent(brand)}?format=json`)
+      .then(r=>r.json())
+      .then(d=>{
+        const models = (d.Results||[]).slice(0,20).map(m=>m.Model_Name).filter(Boolean);
+        if(models.length){
+          modelSel.innerHTML='<option value="">— Модель —</option>' + models.map(m=>`<option value="${m}">${m}</option>`).join('');
+        } else {
+          modelSel.innerHTML='<option value="">— Модель —</option>';
+        }
+        modelSel.disabled=false;
+      }).catch(()=>{ modelSel.innerHTML='<option value="">— Модель —</option>'; modelSel.disabled=false; });
+  }
+  modelSel.disabled=false;
+  
+  // Заполняем годы
+  const curYear = new Date().getFullYear();
+  yearSel.innerHTML='<option value="">Год</option>';
+  for(let y=curYear; y>=1980; y--){
+    yearSel.innerHTML+=`<option value="${y}">${y}</option>`;
+  }
+  yearSel.disabled=false;
 }
+
+function vmOnModelChange(){
+  document.getElementById('vmResult').style.display='none';
+}
+
+function vmSearch(){
+  const brand = document.getElementById('vmBrand').value;
+  const model = document.getElementById('vmModel').value;
+  const year  = document.getElementById('vmYear').value;
+  
+  if(!brand){ showToast('Выберите марку','red'); return; }
+  
+  const data = TRUCK_MODELS[brand] || { wmi: 'ZZZ', country: '—' };
+  const wmi = data.wmi;
+  
+  // Генерируем демо-VIN на основе WMI + модели + года
+  const yearCode = '0ABCDEFGHJKLMNPRSTVWXY123456789'.split('')[parseInt(year||2020)-2000] || 'K';
+  const seq = Math.floor(100000 + Math.random()*900000);
+  const vin = wmi + '0000' + yearCode + '0' + seq;
+  
+  // Показываем результат
+  const res = document.getElementById('vmResult');
+  const vinEl = document.getElementById('vmFoundVin');
+  const desc = document.getElementById('vmCarDesc');
+  vinEl.textContent = vin;
+  desc.textContent = `${data.country} · ${brand}${model?' '+model:''} · ${year||'год не указан'}`;
+  res.style.display='block';
+  
+  // Также показываем в поиске
+  const q = brand + (model?' '+model:'') + (year?' '+year:'');
+  document.getElementById('searchInput').value = q;
+}
+
+function vmUseVin(){
+  const vin = document.getElementById('vmFoundVin').textContent;
+  if(!vin) return;
+  document.getElementById('vinInput').value = vin;
+  vinPageDecode();
+}
+
+// Старые функции — оставляем для совместимости
+function vinBrandSuggest(val){}
 function vinSearchByBrand(){
-  const brand=document.getElementById('vinBrandInput').value.trim();
-  const year=document.getElementById('vinYearInput').value.trim();
+  const brand=document.getElementById('vinBrandInput')?.value?.trim()||'';
+  const year=document.getElementById('vinYearInput')?.value?.trim()||'';
   if(!brand){showToast('Введите марку автомобиля','red');return;}
   const q=brand+(year?' '+year:'');
   document.getElementById('searchInput').value=q;
