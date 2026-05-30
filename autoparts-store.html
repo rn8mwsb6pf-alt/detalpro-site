@@ -5392,6 +5392,7 @@ function renderSuccessPayInfo(order){
 // TELEGRAM
 // ═══════════════════════════════════════════════════════════════════════════
 const TG_TOKEN='8854969760:AAH9m9IDcGD47QxjuxK_NmuRqKKCiOeqIGg';
+const OWNER_CHAT_ID=910208528; // @atimoxa — Тимоха
 
 function getTgConfig(){
   try{return JSON.parse(localStorage.getItem('dp_tg_config')||'{}');}catch{return{};}
@@ -5401,7 +5402,7 @@ function saveTgConfig(cfg){
 }
 async function notifyTelegram(text,chatId){
   const cfg=getTgConfig();
-  const id=chatId||cfg.chatId;
+  const id=chatId||cfg.chatId||OWNER_CHAT_ID;
   if(!id) return;
   try{
     await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
@@ -5409,6 +5410,54 @@ async function notifyTelegram(text,chatId){
       body:JSON.stringify({chat_id:id,text,parse_mode:'Markdown'})
     });
   }catch(e){}
+}
+
+async function notifyOwnerWithPhoto(caption, base64img){
+  try{
+    // base64 → blob → FormData
+    const res=await fetch(base64img);
+    const blob=await res.blob();
+    const fd=new FormData();
+    fd.append('chat_id', OWNER_CHAT_ID);
+    fd.append('caption', caption);
+    fd.append('parse_mode','Markdown');
+    fd.append('photo', blob, 'receipt.jpg');
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,{method:'POST',body:fd});
+  }catch(e){
+    // fallback — отправить просто текст
+    await notifyTelegram(caption, OWNER_CHAT_ID);
+  }
+}
+
+async function notifyOwnerNewOrder(order, receiptBase64){
+  const items=order.items||[];
+  const itemsList=items.slice(0,5).map(i=>`  • ${i.brand||''} ${i.article} × ${i.quantity} = ${((i.priceRetail||0)*i.quantity).toLocaleString('ru-RU')} ₽`).join('\n');
+  const more=items.length>5?`\n  ...ещё ${items.length-5} позиций`:'';
+  const delivLabel={pickup:'🏪 Самовывоз',cdek_pvz:'📦 СДЭК ПВЗ',cdek_courier:'🚚 СДЭК курьер'}[order.delivery]||order.delivery;
+  const payLabel=order.payMethod==='sbp'?'💳 СБП':'💵 Карта/наличные';
+
+  const text=
+`🆕 *Новый заказ ${order.id}*
+
+👤 *Покупатель:* ${order.contact?.name||'—'} ${order.contact?.lastname||''}
+📞 ${order.contact?.phone||'—'}
+${order.contact?.email?'✉️ '+order.contact.email:''}
+
+🛒 *Товары:*
+${itemsList}${more}
+
+💰 *Итого:* ${order.total?.toLocaleString('ru-RU')||'—'} ₽
+${order.prepayAmt>0?`💳 К оплате сейчас: *${order.prepayAmt?.toLocaleString('ru-RU')} ₽*`:'✅ Предоплата не требуется'}
+
+${delivLabel}
+${payLabel}
+${order.comment?'💬 '+order.comment:''}`;
+
+  if(receiptBase64 && order.payMethod==='sbp'){
+    await notifyOwnerWithPhoto(text+'\n\n📎 *Скриншот оплаты прикреплён*', receiptBase64);
+  } else {
+    await notifyTelegram(text, OWNER_CHAT_ID);
+  }
 }
 async function fetchTgChatId(){
   try{
