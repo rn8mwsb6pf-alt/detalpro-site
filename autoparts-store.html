@@ -2749,7 +2749,7 @@ footer{
 
           <div style="border-top:1px solid var(--line);padding-top:16px;text-align:center">
             <div style="font-size:11px;color:var(--text3);margin-bottom:6px">ИЛИ переведи вручную по номеру СБП:</div>
-            <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:.04em">+7 (960) 451-31-69</div>
+            <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:.04em">+7 (960) 464-19-55</div>
             <div style="font-size:12px;color:var(--text3);margin-top:4px">Т-Банк · Дорожный комплекс ГАРАЖ</div>
             <div id="sp-comment-hint" style="margin-top:10px;background:var(--bg3);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text2)">
               💬 В комментарии к переводу укажите: <strong id="sp-order-id-hint" style="color:var(--accent)"></strong>
@@ -5628,7 +5628,7 @@ function spGoToPayment(){
   document.getElementById('sp-comment-hint').querySelector('strong').textContent = order.id;
 
   // Генерируем QR
-  const phone = '79604513169';
+  const phone = '79604641955';
   const amt = order.prepayAmt * 100;
   const qrData = encodeURIComponent('https://qr.nspk.ru/0/?phone=%2B'+phone+'&sum='+amt+'&purpose='+encodeURIComponent(order.id+' ДК ГАРАЖ'));
   document.getElementById('sp-qr-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=22-197-94&bgcolor=22-27-31&data='+qrData;
@@ -7994,7 +7994,7 @@ function renderPayInfoPanel(){
   const prepay=delivery!=='pickup'?total:(isIp||hasInStock)?0:Math.ceil(total*0.2);
 
   if(coPayMethod==='sbp'){
-    const phone='79604513169';
+    const phone='79604641955';
     const amt=prepay>0?prepay:total;
     // QR-код через api.qrserver.com (бесплатный генератор)
     const qrData=encodeURIComponent(`https://qr.nspk.ru/0/?phone=%2B${phone}&sum=${amt*100}&purpose=Заказ+ДК+ГАРАЖ`);
