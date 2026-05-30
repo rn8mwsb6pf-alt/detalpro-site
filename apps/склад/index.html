@@ -3,37 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ДЕТАЛЬПРО — Склад</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Склад — Гараж</title>
 <style>
 :root {
   --bg:       #0d0f10;
-  --bg2:      #131618;
+  --bg2:      #141719;
   --bg3:      #1a1d20;
-  --line:     #2a2f33;
-  --line2:    #363c41;
+  --border:   #2a2f33;
   --text:     #e8eaeb;
   --text2:    #9da5ab;
   --text3:    #5a6268;
   --accent:   #e8411a;
-  --accent2:  #ff6b45;
+  --accent2:  #c73516;
   --green:    #22c55e;
   --amber:    #f59e0b;
   --red:      #ef4444;
   --blue:     #3b82f6;
   --purple:   #a855f7;
-  --r:        4px;
-  --r2:       8px;
-  --font:     'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
-  --font-head:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
-  --font-mono:'IBM Plex Mono','Consolas',monospace;
-  /* legacy aliases */
-  --border: var(--line);
-  --radius: var(--r2);
+  --radius:   8px;
+  --font:     'Segoe UI', system-ui, sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
 
 /* ── Login screen ── */
 #loginScreen{
@@ -553,15 +544,11 @@ tr:hover td{background:var(--bg3);color:var(--text)}
 <!-- ══════════════ LOGIN ══════════════ -->
 <div id="loginScreen">
   <div class="login-box">
-    <div class="login-logo" style="display:flex;align-items:center;gap:10px;justify-content:center">
-      <div style="width:28px;height:28px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
-      <span style="font-family:var(--font-head);font-size:1.4rem;font-weight:900;letter-spacing:.05em">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></span>
-    </div>
-    <div class="login-sub">Склад / Управление товарами</div>
-    <div id="siteStatusBar" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:var(--r);font-size:.78rem;border:1px solid"></div>
+    <div class="login-logo">🏪 Гараж / Склад</div>
+    <div class="login-sub">Введите логин и пароль для входа</div>
     <div class="login-field">
-      <label>Email / Логин</label>
-      <input type="email" id="loginEmail" placeholder="artem или email@detalpro.ru" autocomplete="email"
+      <label>Логин</label>
+      <input type="text" id="loginUsername" placeholder="Введите логин" autocomplete="username"
              onkeydown="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
     </div>
     <div class="login-field">
@@ -570,23 +557,10 @@ tr:hover td{background:var(--bg3);color:var(--text)}
              onkeydown="if(event.key==='Enter') doLogin()">
     </div>
     <div class="login-error" id="loginError"></div>
-    <div class="login-hints" id="loginHints">
-      Подключение к сайту…
+    <div class="login-hints">
+      По умолчанию: <b>admin / admin</b> · <b>sklad / 1234</b> · <b>manager / 1234</b> · <b>boss / boss1234</b>
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти →</button>
-    <div style="margin-top:14px;text-align:center">
-      <span style="font-size:.75rem;color:var(--text3);cursor:pointer" onclick="toggleSiteSettings()">⚙ Адрес сайта</span>
-    </div>
-    <div id="siteSettingsPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
-      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">URL сайта ДЕТАЛЬПРО</div>
-      <input type="text" id="siteUrlInput" placeholder="http://localhost:3000"
-        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:.85rem;font-family:var(--font-mono);outline:none;box-sizing:border-box"
-        onkeydown="if(event.key==='Enter')saveSiteUrl()">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="saveSiteUrl()" style="flex:1;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.8rem;font-weight:600;cursor:pointer">Сохранить</button>
-        <button onclick="pingSite()" style="padding:7px 12px;background:var(--bg2);border:1px solid var(--line);color:var(--text2);border-radius:var(--r);font-size:.8rem;cursor:pointer">Проверить</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -597,11 +571,7 @@ tr:hover td{background:var(--bg3);color:var(--text)}
 
 <header>
   <button class="hdr-burger" onclick="toggleSidebar()">☰</button>
-  <div class="logo" style="display:flex;align-items:center;gap:8px">
-    <div style="width:20px;height:20px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
-    <span style="font-family:var(--font-head);font-weight:900;font-size:1rem;letter-spacing:.05em;color:#fff">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></span>
-    <span class="sub">/ Склад</span>
-  </div>
+  <div class="logo">Гараж <span class="sub">/ Склад</span></div>
   <div class="wh-tabs">
     <div class="wh-tab active" data-wh="all" onclick="setWarehouse('all',this)">Все</div>
     <div class="wh-tab"       data-wh="wh1" onclick="setWarehouse('wh1',this)">Склад 1</div>
@@ -998,27 +968,23 @@ tr:hover td{background:var(--bg3);color:var(--text)}
 // ROLES
 // ══════════════════════════════════════════════════
 const ROLES = {
-  // Site roles
-  admin:     { name: 'Администратор', icon: '⚡', audit: true,  canEdit: true  },
-  manager:   { name: 'Менеджер',      icon: '👔', audit: true,  canEdit: true  },
-  customer:  { name: 'Покупатель',    icon: '👤', audit: false, canEdit: false },
-  // Legacy local roles
-  warehouse: { name: 'Кладовщик',     icon: '📦', audit: true,  canEdit: true  },
-  boss:      { name: 'Босс',          icon: '🎯', audit: true,  canEdit: true  },
-  creator:   { name: 'Создатель',     icon: '⚡', audit: true,  canEdit: true  },
+  warehouse: { name: 'Кладовщик', icon: '📦', audit: true,  canEdit: true  },
+  manager:   { name: 'Менеджер',  icon: '👔', audit: false, canEdit: false },
+  boss:      { name: 'Босс',      icon: '🎯', audit: true,  canEdit: true  },
+  creator:   { name: 'Создатель', icon: '⚡', audit: true,  canEdit: true  },
 };
 const WH_LABELS = { wh1: 'Склад 1', wh2: 'Склад 2', wh3: 'Склад 3', all: 'Все' };
 
 let currentUser = null;
 
 async function doLogin() {
-  const email    = document.getElementById('loginEmail').value.trim();
+  const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errEl    = document.getElementById('loginError');
   const btn      = document.getElementById('loginBtn');
 
-  if (!email || !password) {
-    errEl.textContent = 'Введите email и пароль';
+  if (!username || !password) {
+    errEl.textContent = 'Введите логин и пароль';
     errEl.classList.add('visible');
     return;
   }
@@ -1026,17 +992,12 @@ async function doLogin() {
   btn.textContent = 'Проверка…';
   errEl.classList.remove('visible');
 
-  let res = await warehouseAPI.validateWithSite(email, password);
-
-  if (!res.ok && res.source === 'offline') {
-    res = await warehouseAPI.validateUser(email, password);
-  }
-
+  const res = await warehouseAPI.validateUser(username, password);
   btn.disabled = false;
   btn.textContent = 'Войти →';
 
   if (!res.ok) {
-    errEl.textContent = res.error || 'Неверный email или пароль';
+    errEl.textContent = res.error || 'Неверный логин или пароль';
     errEl.classList.add('visible');
     document.getElementById('loginPassword').value = '';
     return;
@@ -1056,47 +1017,6 @@ async function doLogin() {
   init();
 }
 
-async function initSiteSettings() {
-  const url = await warehouseAPI.getSiteUrl().catch(() => 'http://localhost:3000');
-  const inp = document.getElementById('siteUrlInput');
-  if (inp) inp.value = url || 'http://localhost:3000';
-  const res = await warehouseAPI.pingSite().catch(() => ({ ok: false }));
-  const bar = document.getElementById('siteStatusBar');
-  const hints = document.getElementById('loginHints');
-  if (bar) {
-    bar.style.display = 'block';
-    bar.style.background = res.ok ? 'rgba(34,197,94,.1)' : 'rgba(239,68,68,.08)';
-    bar.style.borderColor = res.ok ? 'rgba(34,197,94,.3)' : 'rgba(239,68,68,.25)';
-    bar.style.color = res.ok ? '#4ade80' : '#f87171';
-    bar.textContent = res.ok ? '● Сайт подключён' : '● Сайт недоступен — только локальный вход';
-  }
-  if (hints) hints.textContent = res.ok ? 'Войдите через аккаунт сайта ДЕТАЛЬПРО' : 'Сайт недоступен. Используйте локальный логин.';
-}
-function toggleSiteSettings() {
-  const panel = document.getElementById('siteSettingsPanel');
-  if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
-async function saveSiteUrl() {
-  const inp = document.getElementById('siteUrlInput');
-  if (!inp) return;
-  const url = inp.value.trim().replace(/\/$/, '');
-  await warehouseAPI.setSiteUrl(url);
-  await initSiteSettings();
-}
-async function pingSite() {
-  const res = await warehouseAPI.pingSite().catch(() => ({ ok: false }));
-  const bar = document.getElementById('siteStatusBar');
-  const hints = document.getElementById('loginHints');
-  if (bar) {
-    bar.style.display = 'block';
-    bar.style.background = res.ok ? 'rgba(34,197,94,.1)' : 'rgba(239,68,68,.08)';
-    bar.style.borderColor = res.ok ? 'rgba(34,197,94,.3)' : 'rgba(239,68,68,.25)';
-    bar.style.color = res.ok ? '#4ade80' : '#f87171';
-    bar.textContent = res.ok ? '● Сайт подключён' : '● Сайт недоступен — только локальный вход';
-  }
-  if (hints) hints.textContent = res.ok ? 'Войдите через аккаунт сайта ДЕТАЛЬПРО' : 'Сайт недоступен. Используйте локальный логин.';
-}
-
 function toggleSidebar() {
   document.querySelector('nav').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -1106,8 +1026,6 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
-
-initSiteSettings();
 
 function logout() {
   document.getElementById('mainApp').style.display = 'none';

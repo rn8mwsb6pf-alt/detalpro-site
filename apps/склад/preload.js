@@ -32,19 +32,13 @@ contextBridge.exposeInMainWorld('warehouseAPI', {
   deleteTransfer: (id)      => ipcRenderer.invoke('transfers:delete', id),
 
   // Users / auth
-  validateWithSite: (email, password) => ipcRenderer.invoke('users:validateWithSite', { email, password }),
-  validateUser:     (username, password) => ipcRenderer.invoke('users:validate', { username, password }),
-  getUsers:         ()       => ipcRenderer.invoke('users:get'),
-  saveUsers:        (users)  => ipcRenderer.invoke('users:save', users),
-  pushUsers:        ()       => ipcRenderer.invoke('users:push'),
-  pullUsers:        ()       => ipcRenderer.invoke('users:pull'),
-  createUsersBin:   (apiKey) => ipcRenderer.invoke('users:createBin', apiKey),
-  getUsersBinId:    ()       => ipcRenderer.invoke('users:getBinId'),
-
-  // Site URL
-  getSiteUrl: ()      => ipcRenderer.invoke('sync:getSiteUrl'),
-  setSiteUrl: (url)   => ipcRenderer.invoke('sync:setSiteUrl', url),
-  pingSite:   ()      => ipcRenderer.invoke('sync:pingsite'),
+  validateUser:   (username, password) => ipcRenderer.invoke('users:validate', { username, password }),
+  getUsers:       ()       => ipcRenderer.invoke('users:get'),
+  saveUsers:      (users)  => ipcRenderer.invoke('users:save', users),
+  pushUsers:      ()       => ipcRenderer.invoke('users:push'),
+  pullUsers:      ()       => ipcRenderer.invoke('users:pull'),
+  createUsersBin: (apiKey) => ipcRenderer.invoke('users:createBin', apiKey),
+  getUsersBinId:  ()       => ipcRenderer.invoke('users:getBinId'),
 
   // Events main → renderer
   onProductsChanged: (cb) => ipcRenderer.on('products:changed', (_e, items) => cb(items)),

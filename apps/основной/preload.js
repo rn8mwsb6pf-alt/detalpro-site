@@ -5,11 +5,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('adminAPI', {
   isElectron: true,
 
-  // Auth — основной метод через сайт ДЕТАЛЬПРО
-  validateWithSite: (email, password)  => ipcRenderer.invoke('users:validateWithSite', { email, password }),
-  // Auth — локальные пользователи (запасной)
-  validateUser:     (username, password) => ipcRenderer.invoke('users:validate', { username, password }),
-
+  // Auth
+  validateUser:   (username, password) => ipcRenderer.invoke('users:validate', { username, password }),
   getUsers:       ()       => ipcRenderer.invoke('users:get'),
   saveUsers:      (users)  => ipcRenderer.invoke('users:save', users),
   pushUsers:      ()       => ipcRenderer.invoke('users:push'),
@@ -28,12 +25,9 @@ contextBridge.exposeInMainWorld('adminAPI', {
   // Transfers
   getTransfers:  ()         => ipcRenderer.invoke('transfers:get'),
 
-  // Sync config + site URL
+  // Sync config
   getConfig:     ()         => ipcRenderer.invoke('sync:getConfig'),
   pushNow:       ()         => ipcRenderer.invoke('sync:pushNow'),
-  getSiteUrl:    ()         => ipcRenderer.invoke('sync:getSiteUrl'),
-  setSiteUrl:    (url)      => ipcRenderer.invoke('sync:setSiteUrl', url),
-  pingSite:      ()         => ipcRenderer.invoke('sync:pingsite'),
 
   // App
   getVersion:    ()         => ipcRenderer.invoke('app:version'),

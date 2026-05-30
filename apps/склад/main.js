@@ -6,7 +6,6 @@ const {
 const path  = require('path');
 const fs    = require('fs');
 const os    = require('os');
-const http  = require('http');
 const https = require('https');
 const Store = require('electron-store');
 
@@ -52,49 +51,6 @@ function writeSyncConfigFull(cfg) {
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
 }
 
-// ── HTTP(S) helper (supports both http and https) ─────────────────────────────
-function httpRequest(options, body) {
-  return new Promise((resolve, reject) => {
-    const mod = (options.protocol === 'http:') ? http : https;
-    const req = mod.request(options, res => {
-      let data = '';
-      res.on('data', c => { data += c; });
-      res.on('end', () => {
-        try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
-        catch { resolve({ status: res.statusCode, data }); }
-      });
-    });
-    req.setTimeout(5000, () => { req.destroy(); reject(new Error('timeout')); });
-    req.on('error', reject);
-    if (body) req.write(body);
-    req.end();
-  });
-}
-
-// ── Validate credentials against the website ─────────────────────────────────
-async function validateWithSite(email, password) {
-  const cfg     = readSyncConfigFull();
-  const siteUrl = cfg.siteUrl || 'http://localhost:3000';
-  try {
-    const url  = new URL('/api/auth/app-validate', siteUrl);
-    const body = JSON.stringify({ email, password });
-    const res  = await httpRequest({
-      protocol: url.protocol,
-      hostname: url.hostname,
-      port:     url.port || (url.protocol === 'https:' ? 443 : 80),
-      path:     url.pathname,
-      method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-    }, body);
-    if (res.status === 200 && res.data?.ok) {
-      return { ok: true, user: res.data.user, source: 'site' };
-    }
-    return { ok: false, error: res.data?.error || 'Неверные данные', source: 'site' };
-  } catch {
-    return { ok: false, error: 'Сайт недоступен', source: 'offline' };
-  }
-}
-
 async function pushUsersToCloud(users) {
   const cfg = readSyncConfigFull();
   if (!cfg.apiKey || !cfg.usersBinId) return { ok: false, error: 'Нет хранилища пользователей' };
@@ -133,39 +89,6 @@ ipcMain.handle('users:validate', (_e, { username, password }) => {
   if (!user) return { ok: false, error: 'Неверный логин или пароль' };
   const { password: _pw, ...safe } = user;
   return { ok: true, user: safe };
-});
-
-// Авторизация через сайт ДЕТАЛЬПРО (основной метод)
-ipcMain.handle('users:validateWithSite', async (_e, { email, password }) => {
-  return validateWithSite(email, password);
-});
-
-// Настройки URL сайта
-ipcMain.handle('sync:getSiteUrl', () => {
-  const cfg = readSyncConfigFull();
-  return { siteUrl: cfg.siteUrl || 'http://localhost:3000' };
-});
-ipcMain.handle('sync:setSiteUrl', (_e, siteUrl) => {
-  writeSyncConfigFull({ ...readSyncConfigFull(), siteUrl });
-  return { ok: true };
-});
-ipcMain.handle('sync:pingsite', async () => {
-  const cfg = readSyncConfigFull();
-  const siteUrl = cfg.siteUrl || 'http://localhost:3000';
-  try {
-    const url = new URL('/api/auth/app-validate', siteUrl);
-    const res = await httpRequest({
-      protocol: url.protocol,
-      hostname: url.hostname,
-      port:     url.port || (url.protocol === 'https:' ? 443 : 80),
-      path:     url.pathname,
-      method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': 2 },
-    }, '{}');
-    return { ok: true, status: res.status };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
 });
 
 ipcMain.handle('users:get', () => readUsers().map(({ password: _pw, ...u }) => u));
@@ -368,6 +291,22 @@ function writeSyncConfig(cfg) {
 
 // ── Cloud sync (JSONBin.io) ───────────────────────────────────────────────────
 let syncTimer = null;
+
+function httpRequest(options, body) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, res => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
+        catch { resolve({ status: res.statusCode, data }); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
 
 async function pushToCloud(items) {
   const { apiKey, binId } = readSyncConfig();

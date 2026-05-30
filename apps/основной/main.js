@@ -4,15 +4,13 @@ const {
   app, BrowserWindow, Menu, Tray, shell,
   ipcMain, nativeImage, screen, dialog
 } = require('electron');
-const path  = require('path');
-const fs    = require('fs');
-const http  = require('http');
-const https = require('https');
+const path = require('path');
+const fs   = require('fs');
 const Store = require('electron-store');
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const APP_FILE   = path.join(__dirname, 'app', 'index.html');
-const APP_REMOTE = 'http://localhost:3000'; // адрес сайта ДЕТАЛЬПРО
+const APP_REMOTE = 'https://detalpro.netlify.app'; // только для "Открыть в браузере"
 const APP_TITLE  = 'Дорожный комплекс Гараж';
 const IS_DEV      = process.argv.includes('--dev');
 
@@ -60,50 +58,6 @@ function readConfig() {
   try { return fs.existsSync(CONFIG_FILE) ? JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) : { apiKey: '', binId: '' }; }
   catch { return { apiKey: '', binId: '' }; }
 }
-function writeConfig(cfg) { fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8'); }
-
-// ── HTTP(S) helper ────────────────────────────────────────────────────────────
-function httpRequest(options, body) {
-  return new Promise((resolve, reject) => {
-    const mod = (options.protocol === 'http:') ? http : https;
-    const req = mod.request(options, res => {
-      let data = '';
-      res.on('data', c => { data += c; });
-      res.on('end', () => {
-        try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
-        catch { resolve({ status: res.statusCode, data }); }
-      });
-    });
-    req.setTimeout(5000, () => { req.destroy(); reject(new Error('timeout')); });
-    req.on('error', reject);
-    if (body) req.write(body);
-    req.end();
-  });
-}
-
-// ── Validate credentials against the website ─────────────────────────────────
-async function validateWithSite(email, password) {
-  const cfg     = readConfig();
-  const siteUrl = cfg.siteUrl || 'http://localhost:3000';
-  try {
-    const url  = new URL('/api/auth/app-validate', siteUrl);
-    const body = JSON.stringify({ email, password });
-    const res  = await httpRequest({
-      protocol: url.protocol,
-      hostname: url.hostname,
-      port:     url.port || (url.protocol === 'https:' ? 443 : 80),
-      path:     url.pathname,
-      method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-    }, body);
-    if (res.status === 200 && res.data?.ok) {
-      return { ok: true, user: res.data.user, source: 'site' };
-    }
-    return { ok: false, error: res.data?.error || 'Неверные данные', source: 'site' };
-  } catch (e) {
-    return { ok: false, error: 'Сайт недоступен', source: 'offline' };
-  }
-}
 
 // ── IPC handlers ──────────────────────────────────────────────────────────────
 ipcMain.handle('users:validate', (_e, { username, password }) => {
@@ -111,40 +65,6 @@ ipcMain.handle('users:validate', (_e, { username, password }) => {
   if (!user) return { ok: false, error: 'Неверный логин или пароль' };
   const { password: _pw, ...safe } = user;
   return { ok: true, user: safe };
-});
-
-// Авторизация через сайт (основной метод)
-ipcMain.handle('users:validateWithSite', async (_e, { email, password }) => {
-  return validateWithSite(email, password);
-});
-
-// Настройки URL сайта
-ipcMain.handle('sync:getSiteUrl', () => {
-  const cfg = readConfig();
-  return { siteUrl: cfg.siteUrl || 'http://localhost:3000' };
-});
-ipcMain.handle('sync:setSiteUrl', (_e, siteUrl) => {
-  const cfg = readConfig();
-  writeConfig({ ...cfg, siteUrl });
-  return { ok: true };
-});
-ipcMain.handle('sync:pingsite', async () => {
-  const cfg = readConfig();
-  const siteUrl = cfg.siteUrl || 'http://localhost:3000';
-  try {
-    const url = new URL('/api/auth/app-validate', siteUrl);
-    const res = await httpRequest({
-      protocol: url.protocol,
-      hostname: url.hostname,
-      port:     url.port || (url.protocol === 'https:' ? 443 : 80),
-      path:     url.pathname,
-      method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': 2 },
-    }, '{}');
-    return { ok: true, status: res.status };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
 });
 ipcMain.handle('users:get',  () => readUsers().map(({ password: _pw, ...u }) => u));
 ipcMain.handle('users:save', async (_e, users) => {
@@ -198,6 +118,22 @@ ipcMain.handle('app:version', () => app.getVersion());
 ipcMain.handle('app:openSharedDir', () => { shell.openPath(SHARED_DIR); return true; });
 
 // Cloud push / pull
+const https = require('https');
+function httpRequest(options, body) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, res => {
+      let data = '';
+      res.on('data', c => { data += c; });
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
+        catch { resolve({ status: res.statusCode, data }); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
 async function pushUsersToCloud(users) {
   const cfg = readConfig();
   if (!cfg.apiKey || !cfg.usersBinId) return { ok: false, error: 'Нет хранилища пользователей' };

@@ -3,26 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>ДЕТАЛЬПРО — Управление</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Управление — Дорожный комплекс Гараж</title>
 <style>
 :root{
-  --bg:#0d0f10;--bg2:#131618;--bg3:#1a1d20;
-  --line:#2a2f33;--line2:#363c41;
-  --text:#e8eaeb;--text2:#9da5ab;--text3:#5a6268;
-  --accent:#e8411a;--accent2:#ff6b45;
+  --bg:#0d0f10;--bg2:#141719;--bg3:#1a1d20;
+  --border:#2a2f33;--text:#e8eaeb;--text2:#9da5ab;--text3:#5a6268;
+  --accent:#e8411a;--accent2:#c73516;
   --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
-  --r:4px;--r2:8px;
-  --font:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
-  --font-head:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
-  --font-mono:'IBM Plex Mono','Consolas',monospace;
-  --sidebar-w:220px;--hdr-h:56px;
-  /* legacy aliases */
-  --border:var(--line);--radius:var(--r2);--accent2:#c73516;
+  --radius:8px;--font:'Segoe UI',system-ui,sans-serif;
+  --sidebar-w:220px;--hdr-h:52px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px}
 
 /* ── Login ── */
 #loginScreen{
@@ -330,15 +322,14 @@ tr:hover td{background:var(--bg3)}
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-brand">
-      <div class="login-brand-icon" style="width:32px;height:32px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
-      <div class="login-brand-name" style="font-family:var(--font-head);font-size:1.5rem;font-weight:900;letter-spacing:.05em">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></div>
+      <div class="login-brand-icon">🏢</div>
+      <div class="login-brand-name">Гараж</div>
     </div>
-    <div class="login-sub">Панель управления</div>
-    <div id="siteStatusBar" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:var(--r);font-size:.78rem;border:1px solid"></div>
+    <div class="login-sub">Панель управления • Дорожный комплекс</div>
     <div class="login-field">
-      <label>Email / Логин</label>
-      <input type="email" id="loginEmail" placeholder="artem@detalpro.ru или artem"
-             autocomplete="email" inputmode="email"
+      <label>Логин</label>
+      <input type="text" id="loginUsername" placeholder="Введите логин"
+             autocomplete="username" inputmode="text"
              onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
     </div>
     <div class="login-field">
@@ -348,23 +339,11 @@ tr:hover td{background:var(--bg3)}
              onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="login-error" id="loginError"></div>
-    <div class="login-hints" id="loginHints">
-      Подключение к сайту…
+    <div class="login-hints">
+      <b>boss / boss1234</b> — Директор &nbsp;·&nbsp; <b>manager / 1234</b> — Менеджер<br>
+      <b>buhgalter / 1234</b> — Бухгалтер &nbsp;·&nbsp; <b>admin / admin</b> — Создатель
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти →</button>
-    <div style="margin-top:14px;text-align:center">
-      <span style="font-size:.75rem;color:var(--text3);cursor:pointer" onclick="toggleSiteSettings()">⚙ Адрес сайта</span>
-    </div>
-    <div id="siteSettingsPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
-      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">URL сайта ДЕТАЛЬПРО</div>
-      <input type="text" id="siteUrlInput" placeholder="http://localhost:3000"
-        style="width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:.85rem;font-family:var(--font-mono);outline:none;box-sizing:border-box"
-        onkeydown="if(event.key==='Enter')saveSiteUrl()">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="saveSiteUrl()" style="flex:1;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.8rem;font-weight:600;cursor:pointer">Сохранить</button>
-        <button onclick="pingSite()" style="padding:7px 12px;background:var(--bg2);border:1px solid var(--line2);color:var(--text2);border-radius:var(--r);font-size:.8rem;cursor:pointer">Проверить</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -373,11 +352,7 @@ tr:hover td{background:var(--bg3)}
 
   <header>
     <button class="hdr-burger" id="burgerBtn" onclick="toggleSidebar()">☰</button>
-    <div class="logo" style="display:flex;align-items:center;gap:8px">
-      <div style="width:22px;height:22px;background:var(--accent);clip-path:polygon(0 20%,60% 0,100% 40%,100% 100%,40% 100%,0 60%);flex-shrink:0"></div>
-      <span style="font-family:var(--font-head);font-weight:900;font-size:1.1rem;letter-spacing:.05em;color:#fff">ДЕТАЛЬ<span style="color:var(--accent)">ПРО</span></span>
-      <span class="logo-sub">/ Управление</span>
-    </div>
+    <div class="logo">Гараж <span class="logo-sub">/ Управление</span></div>
     <div class="hdr-spacer"></div>
     <div class="hdr-chip" id="roleBadge">👤 —</div>
     <div class="hdr-chip clickable" id="syncBadge" onclick="pushNow()" title="Синхронизировать">
@@ -621,19 +596,13 @@ tr:hover td{background:var(--bg3)}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// ══════════ ROLES (синхронизированы с сайтом ДЕТАЛЬПРО) ══════════
-// Сайт использует: admin, manager, customer
-// Маппинг на права приложения:
+// ══════════ ROLES ══════════
 const ROLES = {
-  // Роли сайта
-  admin:     {name:'Администратор', icon:'⚡', reports:true, admin:true,  audit:true  },
-  manager:   {name:'Менеджер',      icon:'👔', reports:true, admin:false, audit:true  },
-  customer:  {name:'Клиент',        icon:'👤', reports:false,admin:false, audit:false },
-  // Локальные роли (запасные)
-  creator:   {name:'Создатель',     icon:'⚡', reports:true, admin:true,  audit:true  },
-  boss:      {name:'Директор',      icon:'🎯', reports:true, admin:false, audit:true  },
-  accountant:{name:'Бухгалтер',     icon:'📊', reports:true, admin:false, audit:true  },
-  warehouse: {name:'Кладовщик',     icon:'📦', reports:false,admin:false, audit:true  },
+  creator:   {name:'Создатель', icon:'⚡', reports:true, admin:true,  audit:true },
+  boss:      {name:'Директор',  icon:'🎯', reports:true, admin:false, audit:true },
+  accountant:{name:'Бухгалтер',icon:'📊', reports:true, admin:false, audit:true },
+  manager:   {name:'Менеджер', icon:'👔', reports:false,admin:false, audit:false},
+  warehouse: {name:'Кладовщик',icon:'📦', reports:false,admin:false, audit:true },
 };
 const WHL = {wh1:'Склад 1',wh2:'Склад 2',wh3:'Склад 3',all:'Все'};
 
@@ -652,58 +621,15 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
-// ══════════ SITE SETTINGS ══════════
-async function initSiteSettings(){
-  const r=await adminAPI.getSiteUrl();
-  const url=r.siteUrl||'http://localhost:3000';
-  document.getElementById('siteUrlInput').value=url;
-  const ping=await adminAPI.pingSite();
-  const bar=document.getElementById('siteStatusBar');
-  const hints=document.getElementById('loginHints');
-  if(ping.ok){
-    bar.style.display='block';
-    bar.style.background='rgba(34,197,94,.1)';bar.style.borderColor='rgba(34,197,94,.3)';bar.style.color='#22c55e';
-    bar.textContent=`✓ Сайт доступен: ${url}`;
-    hints.innerHTML='Используйте email и пароль от сайта ДЕТАЛЬПРО.<br><b>artem</b> / <b>a050525A</b> — Администратор';
-  } else {
-    bar.style.display='block';
-    bar.style.background='rgba(245,158,11,.1)';bar.style.borderColor='rgba(245,158,11,.3)';bar.style.color='var(--amber)';
-    bar.textContent='⚡ Сайт недоступен — используется локальный вход';
-    hints.innerHTML='Локальный: <b>admin / admin</b> · <b>boss / boss1234</b> · <b>manager / 1234</b>';
-  }
-}
-function toggleSiteSettings(){
-  const p=document.getElementById('siteSettingsPanel');
-  p.style.display=p.style.display==='none'?'block':'none';
-}
-async function saveSiteUrl(){
-  const url=document.getElementById('siteUrlInput').value.trim()||'http://localhost:3000';
-  await adminAPI.setSiteUrl(url);
-  toast('Адрес сохранён','green');
-  initSiteSettings();
-}
-async function pingSite(){
-  const r=await adminAPI.pingSite();
-  toast(r.ok?`Сайт доступен (${r.status})`:`Недоступен: ${r.error}`,'white');
-}
-
 // ══════════ LOGIN ══════════
 async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
+  const u=document.getElementById('loginUsername').value.trim();
   const p=document.getElementById('loginPassword').value;
   const err=document.getElementById('loginError');
   const btn=document.getElementById('loginBtn');
-  if(!email||!p){err.textContent='Введите email и пароль';err.classList.add('visible');return;}
+  if(!u||!p){err.textContent='Введите логин и пароль';err.classList.add('visible');return;}
   btn.disabled=true;btn.textContent='Проверка…';err.classList.remove('visible');
-
-  // Сначала пробуем авторизацию через сайт
-  let res=await adminAPI.validateWithSite(email,p);
-
-  // Если сайт недоступен — пробуем локальных пользователей
-  if(!res.ok && res.source==='offline'){
-    res=await adminAPI.validateUser(email,p);
-  }
-
+  const res=await adminAPI.validateUser(u,p);
   btn.disabled=false;btn.textContent='Войти →';
   if(!res.ok){
     err.textContent=res.error||'Неверный логин или пароль';
@@ -717,7 +643,7 @@ async function doLogin(){
   document.getElementById('mainApp').style.display='';
   applyRole();
   await loadAll();
-  if(currentUser?.admin) checkUsersBinStatus();
+  if(currentUser?.role==='creator') checkUsersBinStatus();
 }
 function logout(){
   document.getElementById('mainApp').style.display='none';
@@ -727,10 +653,7 @@ function logout(){
   currentUser=null;
 }
 function applyRole(){
-  const badge=document.getElementById('roleBadge');
-  badge.textContent=`${currentUser.icon} ${currentUser.name}`;
-  // Показываем источник авторизации
-  if(currentUser.source==='site') badge.title='Авторизован через сайт ДЕТАЛЬПРО';
+  document.getElementById('roleBadge').textContent=`${currentUser.icon} ${currentUser.name}`;
   const show=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'':'none'};
   const flex=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'flex':'none'};
   flex('navAudit',   currentUser.audit);
@@ -1100,11 +1023,6 @@ if(typeof adminAPI!=='undefined'){
 
 // Close sidebar on escape key
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSidebar();});
-
-// Инициализация настроек сайта при загрузке
-if(typeof adminAPI!=='undefined'){
-  initSiteSettings();
-}
 </script>
 </body>
 </html>
