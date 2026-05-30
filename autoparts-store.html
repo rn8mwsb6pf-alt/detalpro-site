@@ -2677,45 +2677,158 @@ footer{
 
 <!-- ═══ SUCCESS PAGE ══════════════════════════════════════════════════════ -->
 <div class="page" id="page-success">
-  <div class="success-wrap animate-in">
-    <div class="success-icon">✅</div>
-    <div class="success-title">Заказ принят!</div>
-    <p class="success-sub">Ваш заказ успешно оформлен и передан в обработку. Менеджер свяжется с вами в течение 15 минут для подтверждения.</p>
-    <div class="order-num" id="success-order-num">ЗКл-001337</div>
+  <div style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg)">
 
-    <!-- Payment info -->
-    <div id="success-pay-info"></div>
-
-    <!-- Контакты менеджеров -->
-    <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2);padding:20px;margin:20px 0;text-align:left">
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:14px">📞 Наши менеджеры</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <div>
-            <div style="font-size:14px;font-weight:600;color:var(--text)">Артём</div>
-            <a href="tel:+79286074547" style="font-size:15px;color:var(--green);font-weight:700;text-decoration:none">+7 (928) 607-45-47</a>
-          </div>
-          <div style="display:flex;gap:8px">
-            <a href="tel:+79286074547" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);border-radius:var(--r);color:#fff;text-decoration:none;font-size:13px;font-weight:600">📞 Позвонить</a>
-            <button onclick="downloadVcf('ДК ГАРАЖ','79286074547')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer">💾 В контакты</button>
-          </div>
+    <!-- Шаги оплаты (как Додо) -->
+    <div style="background:var(--bg2);border-bottom:1px solid var(--line);padding:0;overflow-x:auto">
+      <div style="display:flex;max-width:600px;margin:0 auto">
+        <div id="sp-step1" style="flex:1;padding:14px 12px;text-align:center;font-size:12px;font-weight:700;border-bottom:3px solid var(--accent);color:var(--accent)">
+          <div style="font-size:18px;margin-bottom:2px">1</div>ЗАКАЗ
         </div>
-        <div style="border-top:1px solid var(--line2);padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <div>
-            <div style="font-size:14px;font-weight:600;color:var(--text)">Александр</div>
-            <a href="tel:+79604513169" style="font-size:15px;color:var(--green);font-weight:700;text-decoration:none">+7 (960) 451-31-69</a>
-          </div>
-          <div style="display:flex;gap:8px">
-            <a href="tel:+79604513169" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);border-radius:var(--r);color:#fff;text-decoration:none;font-size:13px;font-weight:600">📞 Позвонить</a>
-            <button onclick="downloadVcf('Александр','79381548030')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer">💾 В контакты</button>
-          </div>
+        <div id="sp-step2" style="flex:1;padding:14px 12px;text-align:center;font-size:12px;font-weight:700;border-bottom:3px solid var(--line);color:var(--text3)">
+          <div style="font-size:18px;margin-bottom:2px">2</div>ОПЛАТА
+        </div>
+        <div id="sp-step3" style="flex:1;padding:14px 12px;text-align:center;font-size:12px;font-weight:700;border-bottom:3px solid var(--line);color:var(--text3)">
+          <div style="font-size:18px;margin-bottom:2px">3</div>ПОДТВЕРЖДЕНИЕ
         </div>
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn btn-primary btn-md" style="width:100%;justify-content:center" onclick="showPage('home')">На главную</button>
-      <button class="btn btn-outline btn-md" style="width:100%;justify-content:center" onclick="showPage('search')">Продолжить покупки</button>
+    <!-- Контент шагов -->
+    <div style="flex:1;max-width:600px;margin:0 auto;width:100%;padding:24px 16px">
+
+      <!-- ШАГ 1: Заказ принят -->
+      <div id="sp-content1" class="animate-in">
+        <div style="text-align:center;padding:24px 0 16px">
+          <div style="font-size:56px;margin-bottom:12px">✅</div>
+          <div style="font-family:var(--font-head);font-size:28px;font-weight:900;color:var(--text)">Заказ оформлен!</div>
+          <div style="font-size:14px;color:var(--text3);margin-top:6px">Менеджер позвонит в течение 15 минут</div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Номер заказа</div>
+              <div id="success-order-num" style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--accent);margin-top:2px">ЗКл-001337</div>
+            </div>
+            <div id="sp-status-badge" style="background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700">
+              ⏳ Ожидает оплаты
+            </div>
+          </div>
+        </div>
+
+        <div id="success-pay-info"></div>
+
+        <!-- Кнопка перехода к оплате -->
+        <div id="sp-pay-btn-wrap">
+          <button onclick="spGoToPayment()" class="btn btn-primary btn-xl" style="width:100%;font-size:16px;margin-bottom:12px">
+            💳 Перейти к оплате →
+          </button>
+          <button onclick="spSkipPayment()" style="width:100%;padding:12px;background:transparent;border:1px solid var(--line2);border-radius:var(--r);color:var(--text3);font-size:13px;cursor:pointer">
+            Оплачу позже / картой при получении
+          </button>
+        </div>
+      </div>
+
+      <!-- ШАГ 2: Оплата СБП -->
+      <div id="sp-content2" style="display:none" class="animate-in">
+        <div style="text-align:center;padding:16px 0 20px">
+          <div style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">К оплате</div>
+          <div id="sp-pay-amount" style="font-family:var(--font-head);font-size:42px;font-weight:900;color:var(--text)">0 ₽</div>
+          <div id="sp-pay-note" style="font-size:12px;color:var(--text3);margin-top:4px"></div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;text-align:center">Оплата через СБП</div>
+
+          <!-- QR код -->
+          <div style="text-align:center;margin-bottom:20px">
+            <img id="sp-qr-img" src="" alt="QR СБП" style="width:200px;height:200px;border-radius:12px;border:2px solid var(--line2)">
+            <div style="font-size:11px;color:var(--text3);margin-top:8px">Сканируй камерой телефона<br>или приложением банка</div>
+          </div>
+
+          <div style="border-top:1px solid var(--line);padding-top:16px;text-align:center">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">ИЛИ переведи вручную по номеру СБП:</div>
+            <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:.04em">+7 (960) 451-31-69</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px">Т-Банк · Дорожный комплекс ГАРАЖ</div>
+            <div id="sp-comment-hint" style="margin-top:10px;background:var(--bg3);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text2)">
+              💬 В комментарии к переводу укажите: <strong id="sp-order-id-hint" style="color:var(--accent)"></strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Загрузка скриншота — главная кнопка -->
+        <div style="margin-bottom:12px">
+          <label id="sp-upload-label" style="display:flex;align-items:center;gap:14px;padding:18px 20px;
+            background:var(--accent);border-radius:12px;cursor:pointer;transition:.15s;color:#fff"
+            onmouseover="this.style.background='var(--accent2)'" onmouseout="this.style.background='var(--accent)'">
+            <input type="file" id="sp-receipt-file" accept="image/*" style="display:none" onchange="spHandleReceipt(this)">
+            <span style="font-size:32px">📸</span>
+            <div>
+              <div id="sp-upload-title" style="font-size:16px;font-weight:700">Загрузить скриншот оплаты</div>
+              <div style="font-size:12px;opacity:.8">Фото чека из приложения банка</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Превью скриншота -->
+        <div id="sp-receipt-preview" style="display:none;margin-bottom:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px">
+          <div style="display:flex;gap:12px;align-items:center">
+            <img id="sp-receipt-img" style="width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--line2)" src="">
+            <div>
+              <div id="sp-receipt-name" style="font-size:13px;font-weight:600;color:var(--text)">receipt.jpg</div>
+              <div style="font-size:12px;color:var(--green)">✅ Скриншот прикреплён</div>
+            </div>
+            <button onclick="spRemoveReceipt()" style="margin-left:auto;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px">✕</button>
+          </div>
+        </div>
+
+        <button id="sp-confirm-btn" onclick="spConfirmPayment()" disabled
+          style="width:100%;padding:16px;background:var(--line2);color:var(--text3);border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:not-allowed;transition:.2s">
+          Подтвердить оплату
+        </button>
+        <div style="text-align:center;margin-top:10px">
+          <span onclick="spSkipPayment()" style="font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline">Оплачу позже</span>
+        </div>
+      </div>
+
+      <!-- ШАГ 3: Подтверждение -->
+      <div id="sp-content3" style="display:none" class="animate-in">
+        <div style="text-align:center;padding:32px 0 24px">
+          <div style="font-size:64px;margin-bottom:16px" id="sp-final-icon">🎉</div>
+          <div style="font-family:var(--font-head);font-size:32px;font-weight:900;color:var(--text)" id="sp-final-title">Оплата получена!</div>
+          <div style="font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6" id="sp-final-sub">
+            Менеджер проверит оплату и подтвердит заказ<br>в течение 15 минут
+          </div>
+        </div>
+
+        <div style="background:var(--greenbg);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:20px;margin-bottom:20px;text-align:center">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Заказ</div>
+          <div id="sp-final-order" style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--green)"></div>
+          <div style="font-size:13px;color:var(--text2);margin-top:8px">
+            📞 Менеджер позвонит на ваш номер для подтверждения
+          </div>
+        </div>
+
+        <!-- Контакты -->
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Есть вопросы?</div>
+          <a href="tel:+79286074547" style="display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:8px 0;border-bottom:1px solid var(--line)">
+            <span style="font-size:24px">📞</span>
+            <div><div style="font-size:14px;font-weight:600">+7 (928) 607-45-47</div><div style="font-size:12px;color:var(--text3)">Основной</div></div>
+          </a>
+          <a href="tel:+79604513169" style="display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:8px 0">
+            <span style="font-size:24px">📞</span>
+            <div><div style="font-size:14px;font-weight:600">+7 (960) 451-31-69</div><div style="font-size:12px;color:var(--text3)">Второй</div></div>
+          </a>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary btn-xl" style="width:100%" onclick="showPage('home')">На главную →</button>
+          <button style="width:100%;padding:14px;background:transparent;border:1px solid var(--line2);border-radius:var(--r);color:var(--text2);font-size:14px;cursor:pointer" onclick="showPage('search')">Продолжить покупки</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -5357,12 +5470,7 @@ function placeOrder(){
   }
   clearFieldErrors();
 
-  // Проверка скриншота для СБП
-  if(coPayMethod==='sbp'&&!sbpReceiptBase64){
-    showToast('Прикрепите скриншот оплаты СБП','red');
-    document.getElementById('sbp-receipt-section').scrollIntoView({behavior:'smooth'});
-    return;
-  }
+  // Скриншот теперь загружается ПОСЛЕ оформления заказа (на странице оплаты)
   // ИП validation
   if(coClientType==='ip'){
     const inn=(document.getElementById('co-inn')?.value||'').trim();
@@ -5471,26 +5579,144 @@ function placeOrder(){
   },1500);
 }
 
+let _spCurrentOrder = null;
+let _spReceiptBase64 = null;
+
 function renderSuccessPayInfo(order){
+  _spCurrentOrder = order;
   const el=document.getElementById('success-pay-info');
-  if(!el)return;
-  const isFullPay=order.prepayAmt>=order.total;
-  const isNoPrepay=order.prepayAmt===0;
+  if(!el) return;
+  const isNoPrepay = order.prepayAmt === 0;
+
   if(isNoPrepay){
-    el.innerHTML=`<div style="background:var(--greenbg);border:1px solid rgba(34,197,94,.3);border-radius:var(--r2);padding:16px;margin:16px 0;text-align:left">
+    el.innerHTML=`<div style="background:var(--greenbg);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin-bottom:16px">
       <div style="font-weight:700;color:var(--green);margin-bottom:4px">✅ Предоплата не требуется</div>
-      <div style="font-size:13px;color:var(--text2)">${order.prepayNote}${order.reserveDays?` · резерв ${order.reserveDays} дней`:''}</div>
+      <div style="font-size:13px;color:var(--text2)">${order.prepayNote}${order.reserveDays?' · резерв '+order.reserveDays+' дней':''}</div>
     </div>`;
+    // Скрываем кнопку оплаты, показываем только пропустить
+    document.getElementById('sp-pay-btn-wrap').innerHTML=`
+      <button onclick="spSkipPayment()" class="btn btn-primary btn-xl" style="width:100%">Готово →</button>`;
   } else {
-    const payHtml=order.payMethod==='sbp'
-      ? `<div class="sbp-phone" style="font-size:20px;color:var(--green)">+7 (960) 451-31-69</div><div class="sbp-bank">СБП · Т-Банк · ДК ГАРАЖ</div><div style="font-size:12px;color:var(--text3);margin-top:6px">Комментарий к переводу: ${order.id}</div>`
-      : `<div style="font-size:13px;color:var(--text2)">Оплата картой при получении или в нашем офисе.</div>`;
-    el.innerHTML=`<div style="background:var(--amberbg);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:16px;margin:16px 0;text-align:left">
-      <div style="font-weight:700;color:var(--amber);margin-bottom:8px">💳 ${isFullPay?'Полная оплата':'Предоплата'}: ${order.prepayAmt.toLocaleString('ru-RU')} ₽</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${order.prepayNote}</div>
-      ${payHtml}
+    el.innerHTML=`<div style="background:var(--amberbg);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-weight:700;color:var(--amber);font-size:18px;margin-bottom:4px">💳 К оплате: ${order.prepayAmt.toLocaleString('ru-RU')} ₽</div>
+      <div style="font-size:13px;color:var(--text2)">${order.prepayNote}</div>
     </div>`;
+    if(order.payMethod!=='sbp'){
+      document.getElementById('sp-pay-btn-wrap').innerHTML=`
+        <button onclick="spSkipPayment()" class="btn btn-primary btn-xl" style="width:100%">Готово →</button>
+        <div style="font-size:13px;color:var(--text3);text-align:center;margin-top:10px">Оплата картой при получении или в нашем офисе</div>`;
+    }
   }
+}
+
+function spGoToPayment(){
+  const order = _spCurrentOrder;
+  if(!order) return;
+
+  // Активируем шаг 2
+  document.getElementById('sp-content1').style.display='none';
+  document.getElementById('sp-content2').style.display='block';
+  document.getElementById('sp-step1').style.borderBottomColor='var(--green)';
+  document.getElementById('sp-step1').style.color='var(--green)';
+  document.getElementById('sp-step2').style.borderBottomColor='var(--accent)';
+  document.getElementById('sp-step2').style.color='var(--accent)';
+
+  // Сумма и QR
+  document.getElementById('sp-pay-amount').textContent = order.prepayAmt.toLocaleString('ru-RU') + ' ₽';
+  document.getElementById('sp-pay-note').textContent = order.prepayNote;
+  document.getElementById('sp-order-id-hint').textContent = order.id;
+  document.getElementById('sp-comment-hint').querySelector('strong').textContent = order.id;
+
+  // Генерируем QR
+  const phone = '79604513169';
+  const amt = order.prepayAmt * 100;
+  const qrData = encodeURIComponent('https://qr.nspk.ru/0/?phone=%2B'+phone+'&sum='+amt+'&purpose='+encodeURIComponent(order.id+' ДК ГАРАЖ'));
+  document.getElementById('sp-qr-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=22-197-94&bgcolor=22-27-31&data='+qrData;
+  window.scrollTo(0,0);
+}
+
+function spHandleReceipt(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _spReceiptBase64 = e.target.result;
+    // Показываем превью
+    document.getElementById('sp-receipt-img').src = _spReceiptBase64;
+    document.getElementById('sp-receipt-name').textContent = file.name;
+    document.getElementById('sp-receipt-preview').style.display = 'block';
+    // Меняем лейбл загрузки
+    document.getElementById('sp-upload-title').textContent = 'Скриншот загружен ✅';
+    document.getElementById('sp-upload-label').style.background = 'var(--greenbg)';
+    document.getElementById('sp-upload-label').style.border = '1px solid rgba(34,197,94,.4)';
+    document.getElementById('sp-upload-label').querySelector('div > div:first-child').style.color = 'var(--green)';
+    // Активируем кнопку подтверждения
+    const btn = document.getElementById('sp-confirm-btn');
+    btn.disabled = false;
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    btn.style.cursor = 'pointer';
+  };
+  reader.readAsDataURL(file);
+}
+
+function spRemoveReceipt(){
+  _spReceiptBase64 = null;
+  document.getElementById('sp-receipt-preview').style.display = 'none';
+  document.getElementById('sp-receipt-file').value = '';
+  document.getElementById('sp-upload-title').textContent = 'Загрузить скриншот оплаты';
+  document.getElementById('sp-upload-label').style.background = 'var(--accent)';
+  document.getElementById('sp-upload-label').style.border = 'none';
+  const btn = document.getElementById('sp-confirm-btn');
+  btn.disabled = true;
+  btn.style.background = 'var(--line2)';
+  btn.style.color = 'var(--text3)';
+  btn.style.cursor = 'not-allowed';
+}
+
+async function spConfirmPayment(){
+  if(!_spReceiptBase64 || !_spCurrentOrder) return;
+  const btn = document.getElementById('sp-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Отправляем...';
+
+  // Отправляем скриншот менеджеру
+  try {
+    await notifyOwnerWithPhoto(
+      '💳 *Скриншот оплаты* для заказа `'+_spCurrentOrder.id+'`\n'+
+      '👤 '+_spCurrentOrder.contact?.name+' · '+_spCurrentOrder.contact?.phone+'\n'+
+      '💰 '+_spCurrentOrder.prepayAmt?.toLocaleString('ru-RU')+' ₽',
+      _spReceiptBase64
+    );
+  } catch(e){}
+
+  spGoToConfirmed();
+}
+
+function spSkipPayment(){
+  spGoToConfirmed(true);
+}
+
+function spGoToConfirmed(skipped){
+  document.getElementById('sp-content1').style.display='none';
+  document.getElementById('sp-content2').style.display='none';
+  document.getElementById('sp-content3').style.display='block';
+  ['sp-step1','sp-step2','sp-step3'].forEach((id,i)=>{
+    document.getElementById(id).style.borderBottomColor = i<2||!skipped ? 'var(--green)':'var(--accent)';
+    document.getElementById(id).style.color = i<2||!skipped ? 'var(--green)':'var(--accent)';
+  });
+  const orderId = _spCurrentOrder?.id || document.getElementById('success-order-num').textContent;
+  document.getElementById('sp-final-order').textContent = orderId;
+  if(skipped){
+    document.getElementById('sp-final-icon').textContent = '📋';
+    document.getElementById('sp-final-title').textContent = 'Заказ принят!';
+    document.getElementById('sp-final-sub').textContent = 'Менеджер свяжется с вами для уточнения оплаты';
+    document.getElementById('sp-step3').style.borderBottomColor = 'var(--accent)';
+    document.getElementById('sp-step3').style.color = 'var(--accent)';
+  } else {
+    document.getElementById('sp-status-badge') && (document.getElementById('sp-status-badge').textContent = '✅ Оплачен');
+  }
+  window.scrollTo(0,0);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
