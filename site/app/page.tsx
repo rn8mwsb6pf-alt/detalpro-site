@@ -5,7 +5,7 @@ import { Header } from '@/components/Header';
 import styles from './home.module.css';
 
 export const metadata: Metadata = {
-  title: 'ДЕТАЛЬПРО — Автозапчасти с доставкой по России',
+  title: 'Дорожный комплекс ГАРАЖ — Автозапчасти с доставкой по России',
   description:
     'Поиск запчастей по артикулу. Более 2 000 000 позиций в наличии и под заказ. ' +
     'Доставка СДЭК по всей России. Гарантия качества.',
@@ -29,19 +29,25 @@ async function getStats() {
 }
 
 const CATEGORIES = [
-  { icon: '🔧', label: 'Двигатель', count: '128 000+', color: '#e8411a' },
-  { icon: '🛞', label: 'Подвеска', count: '95 000+', color: '#3b82f6' },
-  { icon: '🔩', label: 'Тормоза', count: '64 000+', color: '#f59e0b' },
-  { icon: '⚙️', label: 'КПП и трансмиссия', count: '52 000+', color: '#22c55e' },
-  { icon: '🔋', label: 'Электрика', count: '78 000+', color: '#a78bfa' },
-  { icon: '❄️', label: 'Охлаждение', count: '31 000+', color: '#38bdf8' },
-  { icon: '💨', label: 'Выхлопная система', count: '22 000+', color: '#fb923c' },
-  { icon: '🛢️', label: 'Масла и фильтры', count: '18 000+', color: '#facc15' },
+  { icon: '🔧', label: 'Двигатель',  count: '48 200',  color: '#e8411a' },
+  { icon: '🛞', label: 'Подвеска',   count: '62 100',  color: '#3b82f6' },
+  { icon: '🔋', label: 'Электрика',  count: '31 500',  color: '#a78bfa' },
+  { icon: '🛢', label: 'Фильтры',    count: '18 900',  color: '#facc15' },
+  { icon: '🏎', label: 'Тормоза',    count: '24 300',  color: '#f59e0b' },
+  { icon: '❄️', label: 'Охлаждение', count: '12 700',  color: '#38bdf8' },
+  { icon: '🔩', label: 'Кузов',      count: '55 800',  color: '#22c55e' },
+  { icon: '⚙️', label: 'КПП',        count: '9 400',   color: '#fb923c' },
 ];
 
+// Грузовые марки + бренды запчастей — как в оригинале autoparts-store.html
 const BRANDS = [
-  'TOYOTA', 'BMW', 'MERCEDES', 'VOLKSWAGEN', 'FORD', 'HYUNDAI',
-  'KIA', 'NISSAN', 'MAZDA', 'VOLVO', 'SCANIA', 'MAN', 'DAF', 'IVECO',
+  // Грузовые
+  'КАМАЗ', 'МАЗ', 'DAF', 'MAN', 'Volvo', 'Scania',
+  'Mercedes', 'Renault T', 'IVECO', 'ISUZU', 'ГАЗель', 'КРАЗ',
+  // Бренды запчастей
+  'Mann-Filter', 'Knorr-Bremse', 'Wabco', 'ZF', 'Sachs', 'Textar',
+  'Febi Bilstein', 'SKF', 'Bosch', 'NGK', 'Gates', 'Mahle',
+  'Corteco', 'Donaldson', 'SAF Holland', 'Continental', 'Hella', 'Valeo',
 ];
 
 export default async function HomePage() {
@@ -165,13 +171,22 @@ export default async function HomePage() {
           <div className={styles.footerInner}>
             <div className={styles.footerBrand}>
               <div className={styles.footerLogo}>
-                <div className={styles.footerLogoMark} />
-                <span className={styles.footerLogoText}>
-                  ДЕТАЛЬ<span className={styles.footerLogoAccent}>ПРО</span>
-                </span>
+                <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="47" stroke="#e8411a" strokeWidth="1.5" strokeDasharray="4 3"/>
+                  <circle cx="50" cy="50" r="42" stroke="#e8411a" strokeWidth="3"/>
+                  <circle cx="50" cy="50" r="22" stroke="#e8411a" strokeWidth="4"/>
+                  <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+                  <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+                  <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+                  <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+                </svg>
+                <div style={{ marginLeft: 8 }}>
+                  <span className={styles.footerLogoSub}>Дорожный комплекс</span>
+                  <span className={styles.footerLogoText}>ГАРАЖ</span>
+                </div>
               </div>
               <p className={styles.footerDesc}>
-                Профессиональный магазин автозапчастей. Работаем с 2007 года. Доставка по всей России через СДЭК.
+                Профессиональный магазин запчастей для грузовой техники и легковых авто. Работаем с 2007 года. На 932 км трассы М4 «Дон».
               </p>
               <div className={styles.footerContacts}>
                 <a href="tel:+79281552224" className={styles.footerContactBtn} style={{ background: 'var(--accent)' }}>
@@ -210,14 +225,14 @@ export default async function HomePage() {
                 <a href="tel:+79281552224" style={{ fontWeight: 600, color: 'var(--green)' }}>📞 +7 (928) 155-22-24 — Артём</a>
                 <a href="tel:+79381548030" style={{ fontWeight: 600, color: 'var(--green)' }}>📞 +7 (938) 154-80-30 — Александр</a>
                 <a href="mailto:info@detalpro.ru">✉️ info@detalpro.ru</a>
-                <span>📍 ул. Героев Пионеров, 95<br />Каменск-Шахтинский</span>
+                <span>📍 ул. Героев Пионеров, 95<br />Каменск-Шахтинский · 932 км М4</span>
                 <span style={{ color: 'var(--text3)', fontSize: 12 }}>🕐 Пн–Пт 8:00–19:00 · Сб 9:00–17:00</span>
               </div>
             </div>
           </div>
           <div className={styles.footerBottom}>
-            <span>© 2007–2026 ДЕТАЛЬПРО. Все права защищены.</span>
-            <span style={{ color: 'var(--text3)' }}>Магазин автозапчастей · Доставка СДЭК по России</span>
+            <span>© 2007–2026 Дорожный комплекс ГАРАЖ. Все права защищены.</span>
+            <span style={{ color: 'var(--text3)' }}>Магазин грузовых запчастей · 932 км трассы М4 «Дон»</span>
           </div>
         </footer>
       </main>

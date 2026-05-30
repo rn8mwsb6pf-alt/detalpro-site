@@ -2,7 +2,7 @@
 
 const {
   app, BrowserWindow, Menu, Tray, shell,
-  ipcMain, nativeImage, screen, dialog
+  ipcMain, nativeImage, screen, dialog, Notification
 } = require('electron');
 const path = require('path');
 const fs   = require('fs');
@@ -280,11 +280,18 @@ function createMainWindow() {
       event.preventDefault();
       mainWindow.hide();
       if (tray && !store.get('trayNoticeSeen')) {
-        tray.displayBalloon({
-          title:    APP_TITLE,
-          content:  'Приложение свёрнуто в трей. Дважды щёлкните по иконке, чтобы открыть.',
-          iconType: 'info',
-        });
+        if (process.platform === 'win32') {
+          tray.displayBalloon({
+            title:    APP_TITLE,
+            content:  'Приложение свёрнуто в трей. Дважды щёлкните по иконке, чтобы открыть.',
+            iconType: 'info',
+          });
+        } else if (Notification.isSupported()) {
+          new Notification({
+            title: APP_TITLE,
+            body: 'Приложение скрыто. Нажмите иконку в строке меню, чтобы открыть.',
+          }).show();
+        }
         store.set('trayNoticeSeen', true);
       }
     }
@@ -327,7 +334,7 @@ function buildMenu() {
       submenu: [
         {
           label:       'Выход',
-          accelerator: 'Alt+F4',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Alt+F4',
           click:       () => { isQuitting = true; app.quit(); }
         }
       ]
@@ -391,9 +398,13 @@ app.on('second-instance', () => {
   }
 });
 
-// Keep alive while tray is active
+// Keep alive while tray is active (or on macOS where apps stay open)
 app.on('window-all-closed', (event) => {
-  if (!isQuitting) event.preventDefault();
+  if (process.platform === 'darwin' || !isQuitting) event.preventDefault();
+});
+
+app.on('activate', () => {
+  if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
 });
 
 app.on('before-quit', () => {

@@ -659,7 +659,7 @@ function createWindow() {
 }
 
 Menu.setApplicationMenu(Menu.buildFromTemplate([
-  { label: 'Файл', submenu: [{ label: 'Выход', accelerator: 'Alt+F4', click: () => app.quit() }] },
+  { label: 'Файл', submenu: [{ label: 'Выход', accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Alt+F4', click: () => app.quit() }] },
   { label: 'Вид',  submenu: [
     { role: 'reload', label: 'Обновить' },
     { type: 'separator' },
@@ -677,4 +677,5 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
 
 app.whenReady().then(createWindow);
 app.on('second-instance', () => { if(win){ if(!win.isVisible()) win.show(); win.focus(); } });
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+app.on('activate', () => { if (!win) createWindow(); else { win.show(); win.focus(); } });

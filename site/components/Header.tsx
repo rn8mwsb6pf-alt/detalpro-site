@@ -37,10 +37,28 @@ export function Header() {
         <div className={styles.inner}>
           {/* Лого */}
           <div className={styles.logo} onClick={() => router.push('/')}>
-            <div className={styles.logoMark} />
-            <span className={styles.logoText}>
-              ДЕТАЛЬ<span className={styles.logoAccent}>ПРО</span>
-            </span>
+            <svg className={styles.logoSvg} width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="47" stroke="#e8411a" strokeWidth="1.5" strokeDasharray="4 3"/>
+              <circle cx="50" cy="50" r="42" stroke="#e8411a" strokeWidth="2.5"/>
+              <circle cx="50" cy="50" r="36" stroke="#e8411a" strokeWidth="1"/>
+              <circle cx="50" cy="50" r="22" stroke="#e8411a" strokeWidth="4"/>
+              <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+              <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+              <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+              <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" strokeWidth="4" strokeLinecap="round"/>
+              <circle cx="50" cy="8"  r="3" fill="#e8411a"/>
+              <circle cx="50" cy="92" r="3" fill="#e8411a"/>
+              <circle cx="8"  cy="50" r="3" fill="#e8411a"/>
+              <circle cx="92" cy="50" r="3" fill="#e8411a"/>
+              <circle cx="21" cy="21" r="2" fill="#e8411a" opacity={0.6}/>
+              <circle cx="79" cy="21" r="2" fill="#e8411a" opacity={0.6}/>
+              <circle cx="21" cy="79" r="2" fill="#e8411a" opacity={0.6}/>
+              <circle cx="79" cy="79" r="2" fill="#e8411a" opacity={0.6}/>
+            </svg>
+            <div className={styles.logoText}>
+              <span className={styles.logoSub}>Дорожный комплекс</span>
+              <span className={styles.logoMain}>ГАРАЖ</span>
+            </div>
           </div>
 
           {/* Навигация */}

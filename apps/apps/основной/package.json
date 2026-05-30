@@ -10,6 +10,7 @@
     "dev": "electron . --dev",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
     "dist:portable": "electron-builder --win portable",
     "create-icons": "node create-icons.js"
   },
@@ -33,21 +34,24 @@
     ],
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
       ],
       "icon": "assets/icon.ico",
       "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.business",
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "Дорожный комплекс Гараж",
+      "artifactName": "Дорожный комплекс Гараж-${version}-mac.dmg"
     },
     "nsis": {
       "oneClick": false,

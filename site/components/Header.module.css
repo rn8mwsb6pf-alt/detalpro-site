@@ -15,17 +15,22 @@
   border-right: 1px solid var(--line);
   cursor: pointer; flex-shrink: 0;
 }
-.logoMark {
-  width: 28px; height: 28px;
-  background: var(--accent);
-  clip-path: polygon(0 20%, 60% 0, 100% 40%, 100% 100%, 40% 100%, 0 60%);
-}
+.logoSvg { flex-shrink: 0; }
 .logoText {
+  display: flex; flex-direction: column; gap: 0;
+}
+.logoSub {
+  font-family: var(--font-body), sans-serif;
+  font-size: 9px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text3);
+  line-height: 1;
+}
+.logoMain {
   font-family: var(--font-head), sans-serif;
   font-weight: 900; font-size: 20px;
   letter-spacing: .05em; color: #fff;
+  line-height: 1.1;
 }
-.logoAccent { color: var(--accent); }
 
 .nav {
   display: flex; align-items: center; height: 100%;
