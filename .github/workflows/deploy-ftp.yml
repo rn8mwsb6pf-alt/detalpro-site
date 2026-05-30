@@ -1,0 +1,36 @@
+name: Deploy to reg.ru hosting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'autoparts-store.html'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: server244.hosting.reg.ru
+          username: u3531936
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /www/garazh-m4.ru/
+          include: |
+            autoparts-store.html
+          exclude: |
+            **/*
+            !autoparts-store.html
+
+      - name: Rename to index.html via FTP
+        uses: appleboy/ssh-action@v1.0.0
+        continue-on-error: true
+        with:
+          host: server244.hosting.reg.ru
+          username: u3531936
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: cp /www/garazh-m4.ru/autoparts-store.html /www/garazh-m4.ru/index.html
