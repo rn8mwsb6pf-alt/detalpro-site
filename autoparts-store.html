@@ -5252,6 +5252,12 @@ function placeOrder(){
   }
   clearFieldErrors();
 
+  // Проверка скриншота для СБП
+  if(coPayMethod==='sbp'&&!sbpReceiptBase64){
+    showToast('Прикрепите скриншот оплаты СБП','red');
+    document.getElementById('sbp-receipt-section').scrollIntoView({behavior:'smooth'});
+    return;
+  }
   // ИП validation
   if(coClientType==='ip'){
     const inn=(document.getElementById('co-inn')?.value||'').trim();
@@ -5299,6 +5305,7 @@ function placeOrder(){
     }
 
     const inn=document.getElementById('co-inn')?.value.trim()||null;
+    const sbpReceipt=sbpReceiptBase64||null;
     const org=document.getElementById('co-org')?.value.trim()||null;
 
     const order={
@@ -5310,7 +5317,7 @@ function placeOrder(){
       inn, org,
       delivery: state.delivery,
       payMethod: coPayMethod,
-      prepayAmt, prepayNote, reserveDays,
+      prepayAmt, prepayNote, reserveDays, sbpReceipt,
       items: state.cart.map(i=>({
         article:i.article, brand:i.brand, name:i.name, source:i.source,
         price_retail:i.price_retail, price_wholesale:i.price_wholesale||null,
@@ -5371,7 +5378,7 @@ function renderSuccessPayInfo(order){
     </div>`;
   } else {
     const payHtml=order.payMethod==='sbp'
-      ? `<div class="sbp-phone" style="font-size:20px;color:var(--green)">+7 (928) 155-22-24</div><div class="sbp-bank">СБП · Т-Банк · Артём · ДК ГАРАЖ</div><div style="font-size:12px;color:var(--text3);margin-top:6px">Комментарий к переводу: ${order.id}</div>`
+      ? `<div class="sbp-phone" style="font-size:20px;color:var(--green)">+7 (960) 464-19-55</div><div class="sbp-bank">СБП · Т-Банк · ДК ГАРАЖ</div><div style="font-size:12px;color:var(--text3);margin-top:6px">Комментарий к переводу: ${order.id}</div>`
       : `<div style="font-size:13px;color:var(--text2)">Оплата картой при получении или в нашем офисе.</div>`;
     el.innerHTML=`<div style="background:var(--amberbg);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:16px;margin:16px 0;text-align:left">
       <div style="font-weight:700;color:var(--amber);margin-bottom:8px">💳 ${isFullPay?'Полная оплата':'Предоплата'}: ${order.prepayAmt.toLocaleString('ru-RU')} ₽</div>
@@ -7598,13 +7605,44 @@ function setPayMethod(m){
 function renderPayInfoPanel(){
   const el=document.getElementById('pay-info-panel');
   if(!el)return;
+  const subtotal=getCartSubtotal();
+  const delivery=state.delivery||'pickup';
+  const delivCost=delivery==='cdek_pvz'?(state.selectedPvz?.cost||299):delivery==='cdek_courier'?499:0;
+  const total=subtotal+delivCost;
+  const hasInStock=state.cart&&state.cart.some(i=>i.source==='1c'||i.inStock);
+  const isIp=coClientType==='ip';
+  const prepay=delivery!=='pickup'?total:(isIp||hasInStock)?0:Math.ceil(total*0.2);
+
   if(coPayMethod==='sbp'){
-    el.innerHTML=`<div class="pay-detail-box">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Перевод по номеру телефона (СБП)</div>
-      <div class="sbp-phone">+7 (928) 155-22-24</div>
-      <div class="sbp-bank">Банк: Т-Банк · Артём · ДК ГАРАЖ</div>
-      <div style="margin-top:8px;font-size:12px;color:var(--text2)">Укажите в комментарии к переводу номер заказа</div>
-    </div>`;
+    const phone='79604641955';
+    const amt=prepay>0?prepay:total;
+    // QR-код через api.qrserver.com (бесплатный генератор)
+    const qrData=encodeURIComponent(`https://qr.nspk.ru/0/?phone=%2B${phone}&sum=${amt*100}&purpose=Заказ+ДК+ГАРАЖ`);
+    const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=22-197-94&bgcolor=13-15-16&data=${qrData}`;
+    el.innerHTML=`
+      <div class="pay-detail-box" style="text-align:center">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Оплата через СБП</div>
+        <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap">
+          <div>
+            <img src="${qrUrl}" width="160" height="160" style="border-radius:8px;border:2px solid var(--line2)" alt="QR СБП">
+            <div style="font-size:10px;color:var(--text3);margin-top:4px">Сканируй камерой или<br>приложением банка</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">ИЛИ переведи вручную:</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Номер телефона СБП:</div>
+            <div class="sbp-phone" style="font-size:22px;margin:4px 0">+7 (960) 464-19-55</div>
+            <div class="sbp-bank">Т-Банк · Дорожный комплекс ГАРАЖ</div>
+            ${amt>0?`<div style="margin-top:8px;padding:8px 12px;background:var(--greenbg);border-radius:var(--r);border:1px solid rgba(34,197,94,.3)">
+              <div style="font-size:11px;color:var(--text3)">Сумма к оплате:</div>
+              <div style="font-size:20px;font-weight:700;color:var(--green)">${amt.toLocaleString('ru-RU')} ₽</div>
+            </div>`:''}
+            <div style="margin-top:8px;font-size:11px;color:var(--text3)">💬 В комментарии укажите номер заказа</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text3)">
+          После оплаты нажмите «Оформить заказ» и прикрепите скриншот чека
+        </div>
+      </div>`;
   } else {
     el.innerHTML=`<div class="pay-detail-box">
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Оплата банковской картой</div>
@@ -8682,6 +8720,44 @@ if(_origSetDelivery){
   window.setDelivery=function(type){
     _origSetDelivery(type);
     if(type==='cdek_pvz'||type==='cdek_courier') detectCityByGeo();
+  };
+}
+
+// ═══ СБП — загрузка скриншота ═══
+let sbpReceiptBase64 = null;
+
+function handleReceiptUpload(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    sbpReceiptBase64=e.target.result;
+    document.getElementById('receipt-filename').textContent=file.name;
+    document.getElementById('receipt-icon').textContent='✅';
+    const prev=document.getElementById('receipt-preview');
+    const img=document.getElementById('receipt-img');
+    img.src=sbpReceiptBase64;
+    prev.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Показываем секцию скриншота только для СБП
+const _origSetPayMethod=typeof setPayMethod==='function'?setPayMethod:null;
+if(_origSetPayMethod){
+  window.setPayMethod=function(m){
+    _origSetPayMethod(m);
+    const sec=document.getElementById('sbp-receipt-section');
+    if(sec) sec.style.display=(m==='sbp')?'block':'none';
+  };
+}
+
+// ═══ Обновляем QR при изменении суммы ═══
+const _origUpdatePrepay=typeof updatePrepayPanel==='function'?updatePrepayPanel:null;
+if(_origUpdatePrepay){
+  window.updatePrepayPanel=function(){
+    _origUpdatePrepay();
+    if(typeof coPayMethod!=='undefined'&&coPayMethod==='sbp') renderPayInfoPanel();
   };
 }
 </script>
