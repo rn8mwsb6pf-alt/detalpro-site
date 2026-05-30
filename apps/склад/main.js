@@ -15,9 +15,119 @@ const PRODUCTS_FILE   = path.join(SHARED_DIR, 'products.json');
 const MOVEMENTS_FILE  = path.join(SHARED_DIR, 'movements.json');
 const CONFIG_FILE     = path.join(SHARED_DIR, 'sync-config.json');
 const TRANSFERS_FILE  = path.join(SHARED_DIR, 'transfers.json');
+const USERS_FILE      = path.join(SHARED_DIR, 'users.json');
 const IS_DEV          = process.argv.includes('--dev');
 
 if (!fs.existsSync(SHARED_DIR)) fs.mkdirSync(SHARED_DIR, { recursive: true });
+
+// ── Default users ─────────────────────────────────────────────────────────────
+const DEFAULT_USERS = [
+  { id: 1, username: 'admin',       password: 'admin',    role: 'creator',    name: 'Администратор', canEdit: true,  audit: true  },
+  { id: 2, username: 'boss',        password: 'boss1234', role: 'boss',       name: 'Директор',      canEdit: true,  audit: true  },
+  { id: 3, username: 'sklad',       password: '1234',     role: 'warehouse',  name: 'Кладовщик',     canEdit: true,  audit: false },
+  { id: 4, username: 'manager',     password: '1234',     role: 'manager',    name: 'Менеджер',      canEdit: false, audit: false },
+  { id: 5, username: 'buhgalter',   password: '1234',     role: 'accountant', name: 'Бухгалтер',     canEdit: false, audit: true  },
+];
+
+function readUsers() {
+  try {
+    if (!fs.existsSync(USERS_FILE)) {
+      fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2), 'utf8');
+      return DEFAULT_USERS;
+    }
+    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+  } catch { return DEFAULT_USERS; }
+}
+function writeUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+}
+
+// ── Users sync helpers ─────────────────────────────────────────────────────────
+function readSyncConfigFull() {
+  try { return fs.existsSync(CONFIG_FILE) ? JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) : {}; }
+  catch { return {}; }
+}
+function writeSyncConfigFull(cfg) {
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
+}
+
+async function pushUsersToCloud(users) {
+  const cfg = readSyncConfigFull();
+  if (!cfg.apiKey || !cfg.usersBinId) return { ok: false, error: 'Нет хранилища пользователей' };
+  const payload = JSON.stringify({ users, updatedAt: new Date().toISOString() });
+  try {
+    const res = await httpRequest({
+      hostname: 'api.jsonbin.io', path: `/v3/b/${cfg.usersBinId}`, method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': cfg.apiKey, 'X-Bin-Versioning': 'false' },
+    }, payload);
+    return res.status === 200 ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
+  } catch (e) { return { ok: false, error: e.message }; }
+}
+
+async function pullUsersFromCloud() {
+  const cfg = readSyncConfigFull();
+  if (!cfg.usersBinId) return { ok: false, error: 'Нет хранилища пользователей' };
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (cfg.apiKey) headers['X-Master-Key'] = cfg.apiKey;
+    const res = await httpRequest({
+      hostname: 'api.jsonbin.io', path: `/v3/b/${cfg.usersBinId}/latest`, method: 'GET', headers,
+    });
+    if (res.status === 200 && res.data?.record?.users) {
+      const cloudUsers = res.data.record.users;
+      writeUsers(cloudUsers);
+      win?.webContents.send('users:changed', cloudUsers.map(({ password: _p, ...u }) => u));
+      return { ok: true, count: cloudUsers.length };
+    }
+    return { ok: false, error: `HTTP ${res.status}` };
+  } catch (e) { return { ok: false, error: e.message }; }
+}
+
+ipcMain.handle('users:validate', (_e, { username, password }) => {
+  const users = readUsers();
+  const user  = users.find(u => u.username === username && u.password === password);
+  if (!user) return { ok: false, error: 'Неверный логин или пароль' };
+  const { password: _pw, ...safe } = user;
+  return { ok: true, user: safe };
+});
+
+ipcMain.handle('users:get', () => readUsers().map(({ password: _pw, ...u }) => u));
+
+ipcMain.handle('users:save', async (_e, users) => {
+  writeUsers(users);
+  const pushResult = await pushUsersToCloud(users);
+  return { ok: true, synced: pushResult.ok };
+});
+
+ipcMain.handle('users:push',   async () => pushUsersToCloud(readUsers()));
+ipcMain.handle('users:pull',   async () => pullUsersFromCloud());
+
+ipcMain.handle('users:createBin', async (_e, apiKey) => {
+  const initial = { users: readUsers(), updatedAt: new Date().toISOString() };
+  try {
+    const res = await httpRequest({
+      hostname: 'api.jsonbin.io', path: '/v3/b', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 'X-Master-Key': apiKey,
+        'X-Bin-Name': 'garage-users', 'X-Bin-Private': 'false',
+      },
+    }, JSON.stringify(initial));
+    if (res.status === 200 || res.status === 201) {
+      const usersBinId = res.data?.metadata?.id;
+      if (usersBinId) {
+        const cfg = readSyncConfigFull();
+        writeSyncConfigFull({ ...cfg, apiKey, usersBinId });
+        return { ok: true, usersBinId };
+      }
+    }
+    return { ok: false, error: `HTTP ${res.status}` };
+  } catch (e) { return { ok: false, error: e.message }; }
+});
+
+ipcMain.handle('users:getBinId', () => {
+  const cfg = readSyncConfigFull();
+  return { usersBinId: cfg.usersBinId || null };
+});
 
 // ── Movements (audit log) ─────────────────────────────────────────────────────
 function readMovements() {

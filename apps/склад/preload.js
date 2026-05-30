@@ -31,8 +31,18 @@ contextBridge.exposeInMainWorld('warehouseAPI', {
   postTransfer:   (id, user)=> ipcRenderer.invoke('transfers:post', { id, user }),
   deleteTransfer: (id)      => ipcRenderer.invoke('transfers:delete', id),
 
+  // Users / auth
+  validateUser:   (username, password) => ipcRenderer.invoke('users:validate', { username, password }),
+  getUsers:       ()       => ipcRenderer.invoke('users:get'),
+  saveUsers:      (users)  => ipcRenderer.invoke('users:save', users),
+  pushUsers:      ()       => ipcRenderer.invoke('users:push'),
+  pullUsers:      ()       => ipcRenderer.invoke('users:pull'),
+  createUsersBin: (apiKey) => ipcRenderer.invoke('users:createBin', apiKey),
+  getUsersBinId:  ()       => ipcRenderer.invoke('users:getBinId'),
+
   // Events main → renderer
   onProductsChanged: (cb) => ipcRenderer.on('products:changed', (_e, items) => cb(items)),
+  onUsersChanged:    (cb) => ipcRenderer.on('users:changed',    (_e, u)     => cb(u)),
   onSyncOk:    (cb) => ipcRenderer.on('sync:ok',    (_e, d) => cb(d)),
   onSyncError: (cb) => ipcRenderer.on('sync:error', (_e, e) => cb(e)),
 });
