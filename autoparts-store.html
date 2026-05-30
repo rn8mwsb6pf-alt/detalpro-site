@@ -3117,19 +3117,65 @@ footer{
         <span class="vin-example" onclick="vinSetExample('XLRAE47MS0E000001')">DAF</span>
         <span class="vin-example" onclick="vinSetExample('ZCFC35A0007000001')">IVECO</span>
       </div>
-      <!-- Поиск без VIN -->
+      <!-- Поиск без VIN: Марка → Модель → Год -->
       <div style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px">
-        <div style="font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;text-align:center;margin-bottom:10px">Не знаете VIN? Найдите по марке и году</div>
-        <div style="display:flex;gap:8px;max-width:480px;margin:0 auto;position:relative">
-          <div style="flex:1;position:relative">
-            <input id="vinBrandInput" class="vin-main-input" placeholder="Марка: Scania, КАМАЗ, MAN…"
-              style="font-size:14px" autocomplete="off"
-              oninput="vinBrandSuggest(this.value)"
-              onkeydown="if(event.key==='Enter')vinSearchByBrand()">
-            <div id="vinBrandSuggest" style="position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);z-index:99;display:none;max-height:200px;overflow-y:auto"></div>
+        <div style="font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;text-align:center;margin-bottom:12px">Не знаете VIN? Выберите марку, модель и год</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 90px auto;gap:8px;max-width:680px;margin:0 auto">
+
+          <!-- Марка -->
+          <div style="position:relative">
+            <select id="vmBrand" class="vin-main-input" style="font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px" onchange="vmOnBrandChange()">
+              <option value="">— Марка —</option>
+              <optgroup label="Грузовые иномарки">
+                <option>Scania</option><option>MAN</option><option>Volvo</option>
+                <option>Mercedes-Benz</option><option>DAF</option><option>IVECO</option>
+                <option>Renault Trucks</option><option>ISUZU</option><option>Hino</option>
+                <option>Mitsubishi Fuso</option><option>Ford Cargo</option>
+              </optgroup>
+              <optgroup label="Отечественные">
+                <option>КАМАЗ</option><option>МАЗ</option><option>КРАЗ</option>
+                <option>УРАЛ</option><option>ГАЗ</option><option>ЗИЛ</option>
+                <option>FAW</option><option>Dong Feng</option><option>Foton</option>
+              </optgroup>
+              <optgroup label="Прицепы">
+                <option>Schmitz</option><option>Kögel</option><option>Krone</option>
+                <option>Wielton</option><option>ЧМЗАП</option><option>НЕФАЗ</option>
+              </optgroup>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);font-size:12px">▾</span>
           </div>
-          <input id="vinYearInput" class="vin-main-input" placeholder="Год" style="width:90px;font-size:14px" type="number" min="1980" max="2026">
-          <button class="vin-main-btn" onclick="vinSearchByBrand()" style="white-space:nowrap">Найти →</button>
+
+          <!-- Модель -->
+          <div style="position:relative">
+            <select id="vmModel" class="vin-main-input" style="font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px" onchange="vmOnModelChange()" disabled>
+              <option value="">— Модель —</option>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);font-size:12px">▾</span>
+          </div>
+
+          <!-- Год -->
+          <div style="position:relative">
+            <select id="vmYear" class="vin-main-input" style="font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px" disabled>
+              <option value="">Год</option>
+            </select>
+            <span style="position:absolute;right:6px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);font-size:12px">▾</span>
+          </div>
+
+          <!-- Кнопка -->
+          <button class="vin-main-btn" onclick="vmSearch()" style="white-space:nowrap;padding:0 14px">Найти →</button>
+        </div>
+
+        <!-- Результат -->
+        <div id="vmResult" style="display:none;margin-top:12px;max-width:680px;margin-left:auto;margin-right:auto;
+          background:var(--greenbg);border:1px solid rgba(34,197,94,.3);border-radius:var(--r2);padding:12px 16px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Подобран VIN для вашего автомобиля:</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <code id="vmFoundVin" style="font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--green);letter-spacing:.08em"></code>
+            <button onclick="vmUseVin()" style="padding:6px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer">
+              Подобрать запчасти →
+            </button>
+          </div>
+          <div id="vmCarDesc" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
         </div>
       </div>
     </div>
