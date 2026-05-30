@@ -3,18 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>Управление — Дорожный комплекс Гараж</title>
+<title>Дорожный комплекс ГАРАЖ — Управление</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d0f10;--bg2:#141719;--bg3:#1a1d20;
-  --border:#2a2f33;--text:#e8eaeb;--text2:#9da5ab;--text3:#5a6268;
-  --accent:#e8411a;--accent2:#c73516;
+  --bg:#0d0f10;--bg2:#131618;--bg3:#1a1d20;
+  --line:#2a2f33;--line2:#363c41;
+  --text:#e8eaeb;--text2:#9da5ab;--text3:#5a6268;
+  --accent:#e8411a;--accent2:#ff6b45;
   --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
-  --radius:8px;--font:'Segoe UI',system-ui,sans-serif;
-  --sidebar-w:220px;--hdr-h:52px;
+  --r:4px;--r2:8px;
+  --font:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-head:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','Consolas',monospace;
+  --sidebar-w:220px;--hdr-h:56px;
+  /* legacy aliases */
+  --border:var(--line);--radius:var(--r2);--accent2:#c73516;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
 
 /* ── Login ── */
 #loginScreen{
@@ -321,15 +329,32 @@ tr:hover td{background:var(--bg3)}
 <!-- ═══ LOGIN ═══ -->
 <div id="loginScreen">
   <div class="login-box">
-    <div class="login-brand">
-      <div class="login-brand-icon">🏢</div>
-      <div class="login-brand-name">Гараж</div>
+    <div class="login-brand" style="flex-direction:column;gap:6px">
+      <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="36" stroke="#e8411a" stroke-width="1"/>
+        <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
+        <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+        <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="8" r="3" fill="#e8411a"/>
+        <circle cx="50" cy="92" r="3" fill="#e8411a"/>
+        <circle cx="8" cy="50" r="3" fill="#e8411a"/>
+        <circle cx="92" cy="50" r="3" fill="#e8411a"/>
+      </svg>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-head);font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)">Дорожный комплекс</div>
+        <div style="font-family:var(--font-head);font-size:1.8rem;font-weight:900;letter-spacing:.05em;color:#fff;line-height:1">ГАРАЖ</div>
+      </div>
     </div>
-    <div class="login-sub">Панель управления • Дорожный комплекс</div>
+    <div class="login-sub">Панель управления</div>
+    <div id="siteStatusBar" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:var(--r);font-size:.78rem;border:1px solid"></div>
     <div class="login-field">
-      <label>Логин</label>
-      <input type="text" id="loginUsername" placeholder="Введите логин"
-             autocomplete="username" inputmode="text"
+      <label>Email / Логин</label>
+      <input type="email" id="loginEmail" placeholder="artem@detalpro.ru или artem"
+             autocomplete="email" inputmode="email"
              onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
     </div>
     <div class="login-field">
@@ -339,11 +364,23 @@ tr:hover td{background:var(--bg3)}
              onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="login-error" id="loginError"></div>
-    <div class="login-hints">
-      <b>boss / boss1234</b> — Директор &nbsp;·&nbsp; <b>manager / 1234</b> — Менеджер<br>
-      <b>buhgalter / 1234</b> — Бухгалтер &nbsp;·&nbsp; <b>admin / admin</b> — Создатель
+    <div class="login-hints" id="loginHints">
+      Подключение к сайту…
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти →</button>
+    <div style="margin-top:14px;text-align:center">
+      <span style="font-size:.75rem;color:var(--text3);cursor:pointer" onclick="toggleSiteSettings()">⚙ Адрес сайта</span>
+    </div>
+    <div id="siteSettingsPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
+      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">URL сайта Гараж</div>
+      <input type="text" id="siteUrlInput" placeholder="http://localhost:3000"
+        style="width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:.85rem;font-family:var(--font-mono);outline:none;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')saveSiteUrl()">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="saveSiteUrl()" style="flex:1;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.8rem;font-weight:600;cursor:pointer">Сохранить</button>
+        <button onclick="pingSite()" style="padding:7px 12px;background:var(--bg2);border:1px solid var(--line2);color:var(--text2);border-radius:var(--r);font-size:.8rem;cursor:pointer">Проверить</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -352,7 +389,21 @@ tr:hover td{background:var(--bg3)}
 
   <header>
     <button class="hdr-burger" id="burgerBtn" onclick="toggleSidebar()">☰</button>
-    <div class="logo">Гараж <span class="logo-sub">/ Управление</span></div>
+    <div class="logo" style="display:flex;align-items:center;gap:8px">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <circle cx="50" cy="50" r="47" stroke="#e8411a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="50" cy="50" r="42" stroke="#e8411a" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="22" stroke="#e8411a" stroke-width="4"/>
+        <circle cx="50" cy="50" r="7" fill="#e8411a"/>
+        <line x1="50" y1="43" x2="50" y2="28" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44.4" y1="53.5" x2="33.4" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="55.6" y1="53.5" x2="66.6" y2="66.5" stroke="#e8411a" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div style="line-height:1.1">
+        <div style="font-family:var(--font-head);font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)">Дорожный комплекс</div>
+        <div style="font-family:var(--font-head);font-weight:900;font-size:1.1rem;letter-spacing:.05em;color:#fff;line-height:1">ГАРАЖ <span style="font-size:.65rem;font-weight:600;color:var(--text3);letter-spacing:.04em">/ Управление</span></div>
+      </div>
+    </div>
     <div class="hdr-spacer"></div>
     <div class="hdr-chip" id="roleBadge">👤 —</div>
     <div class="hdr-chip clickable" id="syncBadge" onclick="pushNow()" title="Синхронизировать">
@@ -566,10 +617,18 @@ tr:hover td{background:var(--bg3)}
       <div class="view-panel" id="view-users">
         <div class="sec-hdr">
           <div><div class="sec-title">👥 Пользователи</div><div class="sec-sub">Только для Создателя</div></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="addUserRow()">+ Добавить</button>
-            <button class="btn btn-primary" onclick="saveUsers()">💾 Сохранить</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="addUserRow()">+ Добавить</button>
+            <button class="btn btn-ghost btn-sm" onclick="pullUsersCloud()" title="Загрузить пользователей с сайта">↓ С сайта</button>
+            <button class="btn btn-ghost btn-sm" onclick="pushUsersCloud()" title="Отправить пользователей на сайт">↑ На сайт</button>
+            <button class="btn btn-primary btn-sm" onclick="saveUsers()">💾 Сохранить</button>
           </div>
+        </div>
+        <!-- Cloud sync status -->
+        <div id="userSyncInfo" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span>☁ Синхронизация пользователей с сайтом:</span>
+          <span id="userBinStatus" style="color:var(--text3)">Проверяем…</span>
+          <button class="btn btn-ghost btn-sm" id="btnCreateUsersBin" onclick="createUsersBin()" style="display:none">📦 Создать хранилище</button>
         </div>
         <div class="table-wrap">
           <table style="min-width:400px">
@@ -588,13 +647,19 @@ tr:hover td{background:var(--bg3)}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// ══════════ ROLES ══════════
+// ══════════ ROLES (синхронизированы с сайтом Дорожный комплекс ГАРАЖ) ══════════
+// Сайт использует: admin, manager, customer
+// Маппинг на права приложения:
 const ROLES = {
-  creator:   {name:'Создатель', icon:'⚡', reports:true, admin:true,  audit:true },
-  boss:      {name:'Директор',  icon:'🎯', reports:true, admin:false, audit:true },
-  accountant:{name:'Бухгалтер',icon:'📊', reports:true, admin:false, audit:true },
-  manager:   {name:'Менеджер', icon:'👔', reports:false,admin:false, audit:false},
-  warehouse: {name:'Кладовщик',icon:'📦', reports:false,admin:false, audit:true },
+  // Роли сайта
+  admin:     {name:'Администратор', icon:'⚡', reports:true, admin:true,  audit:true  },
+  manager:   {name:'Менеджер',      icon:'👔', reports:true, admin:false, audit:true  },
+  customer:  {name:'Клиент',        icon:'👤', reports:false,admin:false, audit:false },
+  // Локальные роли (запасные)
+  creator:   {name:'Создатель',     icon:'⚡', reports:true, admin:true,  audit:true  },
+  boss:      {name:'Директор',      icon:'🎯', reports:true, admin:false, audit:true  },
+  accountant:{name:'Бухгалтер',     icon:'📊', reports:true, admin:false, audit:true  },
+  warehouse: {name:'Кладовщик',     icon:'📦', reports:false,admin:false, audit:true  },
 };
 const WHL = {wh1:'Склад 1',wh2:'Склад 2',wh3:'Склад 3',all:'Все'};
 
@@ -613,15 +678,58 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
+// ══════════ SITE SETTINGS ══════════
+async function initSiteSettings(){
+  const r=await adminAPI.getSiteUrl();
+  const url=r.siteUrl||'http://localhost:3000';
+  document.getElementById('siteUrlInput').value=url;
+  const ping=await adminAPI.pingSite();
+  const bar=document.getElementById('siteStatusBar');
+  const hints=document.getElementById('loginHints');
+  if(ping.ok){
+    bar.style.display='block';
+    bar.style.background='rgba(34,197,94,.1)';bar.style.borderColor='rgba(34,197,94,.3)';bar.style.color='#22c55e';
+    bar.textContent=`✓ Сайт доступен: ${url}`;
+    hints.innerHTML='Используйте логин и пароль от сайта.<br><b>timmon</b> / <b>l050525L</b> — Создатель';
+  } else {
+    bar.style.display='block';
+    bar.style.background='rgba(245,158,11,.1)';bar.style.borderColor='rgba(245,158,11,.3)';bar.style.color='var(--amber)';
+    bar.textContent='⚡ Сайт недоступен — используется локальный вход';
+    hints.innerHTML='Локальный: <b>timmon / l050525L</b> (создатель) · <b>boss / boss1234</b> · <b>sklad / 1234</b>';
+  }
+}
+function toggleSiteSettings(){
+  const p=document.getElementById('siteSettingsPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+async function saveSiteUrl(){
+  const url=document.getElementById('siteUrlInput').value.trim()||'http://localhost:3000';
+  await adminAPI.setSiteUrl(url);
+  toast('Адрес сохранён','green');
+  initSiteSettings();
+}
+async function pingSite(){
+  const r=await adminAPI.pingSite();
+  toast(r.ok?`Сайт доступен (${r.status})`:`Недоступен: ${r.error}`,'white');
+}
+
 // ══════════ LOGIN ══════════
 async function doLogin(){
-  const u=document.getElementById('loginUsername').value.trim();
+  const email=document.getElementById('loginEmail').value.trim();
   const p=document.getElementById('loginPassword').value;
   const err=document.getElementById('loginError');
   const btn=document.getElementById('loginBtn');
-  if(!u||!p){err.textContent='Введите логин и пароль';err.classList.add('visible');return;}
+  if(!email||!p){err.textContent='Введите email и пароль';err.classList.add('visible');return;}
   btn.disabled=true;btn.textContent='Проверка…';err.classList.remove('visible');
-  const res=await adminAPI.validateUser(u,p);
+
+  // Сначала пробуем авторизацию через сайт
+  let res=await adminAPI.validateWithSite(email,p);
+
+  // Если сайт недоступен — пробуем локальных пользователей
+  if(!res.ok && res.source==='offline'){
+    res=await adminAPI.validateUser(email,p);
+  }
+
   btn.disabled=false;btn.textContent='Войти →';
   if(!res.ok){
     err.textContent=res.error||'Неверный логин или пароль';
@@ -635,6 +743,7 @@ async function doLogin(){
   document.getElementById('mainApp').style.display='';
   applyRole();
   await loadAll();
+  if(currentUser?.admin) checkUsersBinStatus();
 }
 function logout(){
   document.getElementById('mainApp').style.display='none';
@@ -644,7 +753,10 @@ function logout(){
   currentUser=null;
 }
 function applyRole(){
-  document.getElementById('roleBadge').textContent=`${currentUser.icon} ${currentUser.name}`;
+  const badge=document.getElementById('roleBadge');
+  badge.textContent=`${currentUser.icon} ${currentUser.name}`;
+  // Показываем источник авторизации
+  if(currentUser.source==='site') badge.title='Авторизован через сайт Дорожный комплекс ГАРАЖ';
   const show=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'':'none'};
   const flex=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'flex':'none'};
   flex('navAudit',   currentUser.audit);
@@ -666,7 +778,7 @@ function setView(name,el){
   if(name==='transfers') renderTransfers();
   if(name==='audit')     renderAudit();
   if(name==='reports')   renderReports();
-  if(name==='users')     renderUsers();
+  if(name==='users')     {renderUsers();if(currentUser?.role==='creator')checkUsersBinStatus();}
 }
 
 // ══════════ DATA ══════════
@@ -899,8 +1011,73 @@ function removeUser(i){
 }
 async function saveUsers(){
   if(currentUser?.role!=='creator')return;
+  // Re-collect passwords from inputs before saving
+  document.querySelectorAll('#usersBody tr').forEach((tr,i)=>{
+    const pwInput=tr.querySelector('input[type="password"]');
+    if(pwInput&&pwInput.value)users[i].password=pwInput.value;
+  });
   const res=await adminAPI.saveUsers(users);
-  res.ok?toast('Пользователи сохранены','success'):toast('Ошибка','error');
+  if(res.ok){
+    toast(res.synced?'✓ Сохранено и синхронизировано с сайтом':'✓ Сохранено (синхронизация не настроена)','success');
+    checkUsersBinStatus();
+  }else{toast('Ошибка сохранения','error');}
+}
+
+async function pushUsersCloud(){
+  if(currentUser?.role!=='creator')return;
+  toast('Отправка пользователей на сайт…','info');
+  const res=await adminAPI.pushUsers();
+  res.ok?toast('✓ Пользователи синхронизированы с сайтом','success'):toast('Ошибка: '+(res.error||'?'),'error');
+}
+
+async function pullUsersCloud(){
+  if(currentUser?.role!=='creator')return;
+  toast('Загрузка пользователей с сайта…','info');
+  const res=await adminAPI.pullUsers();
+  if(res.ok){
+    users=await adminAPI.getUsers();
+    renderUsers();
+    toast(`✓ Загружено ${res.count} пользователей с сайта`,'success');
+  }else{
+    toast('Ошибка: '+(res.error||'?'),'error');
+  }
+}
+
+async function createUsersBin(){
+  if(currentUser?.role!=='creator')return;
+  const cfg=await adminAPI.getConfig();
+  if(!cfg.apiKey){toast('Сначала настройте API-ключ JSONBin в синхронизации','error');return;}
+  toast('Создание хранилища пользователей…','info');
+  const res=await adminAPI.createUsersBin(cfg.apiKey);
+  if(res.ok){
+    toast(`✓ Хранилище создано: ${res.usersBinId}`,'success');
+    checkUsersBinStatus();
+  }else{
+    toast('Ошибка: '+(res.error||'?'),'error');
+  }
+}
+
+async function checkUsersBinStatus(){
+  try{
+    const{usersBinId}=await adminAPI.getUsersBinId();
+    const statusEl=document.getElementById('userBinStatus');
+    const createBtn=document.getElementById('btnCreateUsersBin');
+    if(usersBinId){
+      statusEl.innerHTML=`<span style="color:var(--green)">✓ Активно</span> · Bin ID: <code style="font-size:.75rem;color:var(--blue)">${usersBinId}</code>`;
+      if(createBtn)createBtn.style.display='none';
+      // Show site URL
+      const siteUrl=`https://api.jsonbin.io/v3/b/${usersBinId}/latest`;
+      if(!document.getElementById('userBinUrl')){
+        const urlEl=document.createElement('span');
+        urlEl.id='userBinUrl';
+        urlEl.innerHTML=` · <a href="#" style="color:var(--text3);font-size:.72rem" onclick="event.preventDefault();navigator.clipboard?.writeText('${usersBinId}');toast('ID скопирован','info')">📋 Копировать ID</a>`;
+        statusEl.parentNode.appendChild(urlEl);
+      }
+    }else{
+      statusEl.innerHTML='<span style="color:var(--amber)">⚠ Не создано</span> — пользователи не синхронизируются с сайтом';
+      if(createBtn)createBtn.style.display='';
+    }
+  }catch(e){}
 }
 
 // ══════════ SYNC ══════════
@@ -949,6 +1126,11 @@ if(typeof adminAPI!=='undefined'){
 
 // Close sidebar on escape key
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSidebar();});
+
+// Инициализация настроек сайта при загрузке
+if(typeof adminAPI!=='undefined'){
+  initSiteSettings();
+}
 </script>
 </body>
 </html>

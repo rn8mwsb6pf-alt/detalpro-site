@@ -183,6 +183,19 @@
 :root.light #page-cart span[style*="color:#fff"]
 { color:var(--text) !important }
 
+:root.light #page-delivery strong[style*="color:#fff"],
+:root.light #page-delivery div[style*="color:#fff"],
+:root.light #page-delivery span[style*="color:#fff"]
+{ color:var(--text) !important }
+
+:root.light #page-about strong[style*="color:#fff"],
+:root.light #page-about div[style*="color:#fff"],
+:root.light #page-about span[style*="color:#fff"]
+{ color:var(--text) !important }
+
+/* Modal sale-total */
+:root.light #sale-total-display{ color:var(--text) !important }
+
 /* Hero section stays dark regardless of theme */
 :root.light .hero{ background:var(--bg);color:var(--text) }
 :root.light .hero h1{ color:var(--text) }
@@ -1334,6 +1347,18 @@ footer{
 
   /* Sale modal item rows */
   .sale-item-row{grid-template-columns:1fr 1fr!important;gap:8px!important}
+
+  /* О нас page */
+  #page-about .container>[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  #page-about [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
+  #page-about [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
+  #page-about [style*="grid-template-columns:1fr auto"]{grid-template-columns:1fr!important}
+
+  /* Доставка page */
+  #page-delivery [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  #page-delivery [style*="grid-template-columns:auto 1fr"]{grid-template-columns:1fr!important;text-align:center}
+  #page-delivery [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
+  #page-delivery [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
 }
 
 /* ── 480px SMALL PHONE ─────────────────────────────────────────────────── */
@@ -2293,7 +2318,7 @@ footer{
           <div class="stat-label">Дня доставки</div>
         </div>
         <div class="stat">
-          <div class="stat-num">12<span>лет</span></div>
+          <div class="stat-num">18<span>лет</span></div>
           <div class="stat-label">На рынке</div>
         </div>
       </div>
@@ -2367,7 +2392,7 @@ footer{
       </div>
     </div>
     <div class="footer-bottom">
-      <span class="footer-copy">© 2025 Дорожный комплекс ГАРАЖ. Все права защищены.</span>
+      <span class="footer-copy">© 2007–2026 Дорожный комплекс ГАРАЖ. Все права защищены.</span>
       <span class="footer-copy" style="color:var(--text3)">Магазин грузовых запчастей · 932 км трассы М4 «Дон»</span>
     </div>
   </footer>
@@ -3179,8 +3204,17 @@ footer{
 
       <!-- USERS -->
       <div class="admin-section" id="admin-tab-users">
-        <div class="admin-page-title">Пользователи</div>
-        <div class="admin-page-sub">Список аккаунтов и управление ролями</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div>
+            <div class="admin-page-title" style="margin-bottom:2px">Пользователи</div>
+            <div class="admin-page-sub">Список аккаунтов и управление ролями</div>
+          </div>
+          <button class="admin-btn admin-btn-outline" onclick="openSyncSettings()" title="Настройка синхронизации сотрудников из приложения">☁ Синхронизация персонала</button>
+        </div>
+        <!-- Cloud sync status banner -->
+        <div id="site-sync-banner" style="background:#141719;border:1px solid #2a2f33;border-radius:8px;padding:10px 14px;font-size:.78rem;color:#9da5ab;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="site-sync-status">☁ Проверка синхронизации…</span>
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table"><thead><tr>
             <th>Пользователь</th><th>Роль</th><th>Последний вход</th><th>Заказов</th><th>1С профиль</th><th>Действия</th>
@@ -3477,7 +3511,7 @@ footer{
 
     <div style="background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r2);padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
       <span style="color:var(--text2);font-size:14px">Итого:</span>
-      <span id="sale-total-display" style="font-family:var(--font-head);font-size:24px;font-weight:700;color:#fff">0 ₽</span>
+      <span id="sale-total-display" style="font-family:var(--font-head);font-size:24px;font-weight:700;color:var(--text)">0 ₽</span>
     </div>
 
     <div style="display:flex;gap:10px">
@@ -3643,17 +3677,96 @@ footer{
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTH CREDENTIALS (системные аккаунты — не хранятся в localStorage)
+// AUTH CREDENTIALS
+// SYSTEM_ACCOUNTS — базовые аккаунты (резервные, работают всегда)
+// CLOUD_STAFF      — загружаются из JSONBin при старте страницы
 // ═══════════════════════════════════════════════════════════════════════════
 const SYSTEM_ACCOUNTS = {
   'timmon':     {password:'l050525L',   role:'creator',     name:'Timmon',     phone:''},
   'artem':      {password:'a050525A',   role:'boss',        name:'Артём',      phone:'+7 (928) 155-22-24'},
   'Alexsandr':  {password:'s050525S',   role:'boss',        name:'Александр',  phone:'+7 (938) 154-80-30'},
   'buh':        {password:'b050525B',   role:'accountant',  name:'Бухгалтерия',phone:''},
-  'manager':    {password:'manager123', role:'manager',     name:'Менеджер',   phone:'+7 (928) 000-00-00'},
+  'manager':    {password:'manager123', role:'manager',     name:'Менеджер',   phone:''},
   'sklad1':     {password:'sklad123',   role:'warehouse',   name:'Склад #1',   phone:''},
   'h4x0r':      {password:'H@ck3r!9X',  role:'hacker',      name:'Системный аудит', phone:''},
 };
+
+// Аккаунты из приложения (синхронизированные через JSONBin)
+let CLOUD_STAFF = {};
+let _cloudStaffLoaded = false;
+
+// Загружаем персонал из JSONBin (публичный бин, созданный приложением)
+async function loadCloudStaff() {
+  const binId = localStorage.getItem('dp_users_bin_id');
+  if (!binId) return;
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Bin-Meta': 'false' }
+    });
+    if (!r.ok) return;
+    const data = await r.json();
+    const cloudUsers = data?.record?.users || data?.users || [];
+    CLOUD_STAFF = {};
+    cloudUsers.forEach(u => {
+      if (u.username && u.password) {
+        CLOUD_STAFF[u.username] = {
+          password: u.password,
+          role:     u.role || 'manager',
+          name:     u.name || u.username,
+          phone:    u.phone || '',
+        };
+      }
+    });
+    _cloudStaffLoaded = true;
+    console.log(`[Sync] Загружено ${cloudUsers.length} пользователей из приложения`);
+  } catch(e) {
+    console.warn('[Sync] Не удалось загрузить пользователей:', e.message);
+  }
+}
+
+// Настройка sync — вызывается из кабинета создателя
+function openSyncSettings() {
+  const binId = localStorage.getItem('dp_users_bin_id') || '';
+  const el = document.getElementById('sync-settings-modal');
+  if (el) { el.style.display='flex'; document.getElementById('sync-bin-id').value=binId; return; }
+  const div = document.createElement('div');
+  div.id = 'sync-settings-modal';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  div.innerHTML = `
+    <div style="background:#141719;border:1px solid #2a2f33;border-radius:14px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+      <div style="font-size:1.05rem;font-weight:700;color:#e8eaeb;margin-bottom:6px">☁ Синхронизация пользователей</div>
+      <div style="font-size:.78rem;color:#5a6268;margin-bottom:20px">Введите Bin ID из приложения управления (вкладка Пользователи)</div>
+      <label style="font-size:.7rem;color:#5a6268;text-transform:uppercase;letter-spacing:.07em">JSONBin Bin ID</label>
+      <input id="sync-bin-id" value="${binId}" placeholder="например: 6a0ccadfee5a..." style="width:100%;background:#1a1d20;border:1px solid #2a2f33;border-radius:8px;padding:10px 12px;color:#e8eaeb;font-size:.9rem;outline:none;margin:6px 0 16px;font-family:monospace">
+      <div id="sync-test-msg" style="font-size:.78rem;margin-bottom:12px;min-height:18px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="testAndSaveSyncBin()" style="flex:1;padding:10px;background:#e8411a;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">Сохранить и проверить</button>
+        <button onclick="document.getElementById('sync-settings-modal').style.display='none'" style="padding:10px 16px;background:#1a1d20;color:#9da5ab;border:1px solid #2a2f33;border-radius:8px;cursor:pointer">Закрыть</button>
+      </div>
+    </div>`;
+  document.body.appendChild(div);
+}
+
+async function testAndSaveSyncBin() {
+  const binId = document.getElementById('sync-bin-id').value.trim();
+  const msg   = document.getElementById('sync-test-msg');
+  if (!binId) { msg.style.color='#ef4444'; msg.textContent='Введите Bin ID'; return; }
+  msg.style.color='#9da5ab'; msg.textContent='Проверяем…';
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, { headers:{'X-Bin-Meta':'false'} });
+    const data = await r.json();
+    const users = data?.record?.users || data?.users || [];
+    if (!r.ok || !Array.isArray(users)) throw new Error(`HTTP ${r.status}`);
+    localStorage.setItem('dp_users_bin_id', binId);
+    await loadCloudStaff();
+    msg.style.color='#22c55e';
+    msg.textContent=`✓ Успешно! Загружено ${users.length} сотрудников.`;
+    setTimeout(()=>{ document.getElementById('sync-settings-modal').style.display='none'; }, 1500);
+  } catch(e) {
+    msg.style.color='#ef4444';
+    msg.textContent='Ошибка: ' + e.message;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // USERS DB (зарегистрированные пользователи в localStorage)
@@ -3761,8 +3874,6 @@ const CATEGORIES = [
 
 const STORES = [
   {id:'store1',name:'Героев Пионеров, 95',address:'Каменск-Шахтинский, ул. Героев Пионеров, д. 95 (932 км М4)',tag:'Главный склад'},
-  {id:'store2',name:'Варшавское шоссе',address:'Москва, Варшавское шоссе, д. 87',tag:'Склад'},
-  {id:'store3',name:'Митино',address:'Москва, ул. Митинская, д. 16',tag:'Магазин'},
 ];
 
 const PVZ_LIST = [
@@ -3963,7 +4074,25 @@ function doLogin(){
   const pass=document.getElementById('login-pass').value;
   const errEl=document.getElementById('login-error');
 
-  // Проверяем системные аккаунты
+  // 1. Проверяем облачных сотрудников (из приложения)
+  const cloudAcc=CLOUD_STAFF[login];
+  if(cloudAcc&&cloudAcc.password===pass){
+    try{
+      state.user={login,name:cloudAcc.name,role:cloudAcc.role};
+      state.role=cloudAcc.role;
+      sessionStorage.setItem('dp_session',JSON.stringify(state.user));
+      logActivity({user:login,role:cloudAcc.role,action:'login',details:'Вход (облачный аккаунт)'});
+      closeLogin();renderAuthHeader();
+      if(state.currentResults.length)renderResults();
+      showWelcome(cloudAcc.name,cloudAcc.role,()=>{
+        if(STAFF_ROLES.includes(cloudAcc.role))showPage('admin');
+        else{showPage('admin');switchAdminTab('my_profile');}
+      });
+    }catch(err){console.error('Login error:',err);}
+    return;
+  }
+
+  // 2. Проверяем системные аккаунты
   const sysAcc=SYSTEM_ACCOUNTS[login];
   if(sysAcc&&sysAcc.password===pass){
     try{
@@ -4357,7 +4486,7 @@ function renderRow(r,isManager){
     actionHtml=`<div class="cta-order">
       <div class="cta-order-status">Под заказ</div>
       <div class="cta-order-hint">Доставка от ${r.delivery_days} дн.</div>
-      <a href="tel:+78001234567" class="btn btn-call btn-sm" style="margin-top:4px">
+      <a href="tel:+79281552224" class="btn btn-call btn-sm" style="margin-top:4px">
         📞 Позвонить
       </a>
     </div>`;
@@ -4954,9 +5083,25 @@ function renderAdminUsers(){
   const profiles=getOnecProfiles();
   const regUsers=getUsers();
 
-  // Системные аккаунты (из SYSTEM_ACCOUNTS)
-  const systemRows=Object.entries(SYSTEM_ACCOUNTS).map(([login,acc])=>({
-    login, role:acc.role, name:acc.name, phone:acc.phone||'', system:true
+  // Обновить баннер синхронизации
+  const bannerEl=document.getElementById('site-sync-status');
+  if(bannerEl){
+    const binId=localStorage.getItem('dp_users_bin_id');
+    const cloudCount=Object.keys(CLOUD_STAFF).length;
+    if(binId&&cloudCount>0){
+      bannerEl.innerHTML=`<span style="color:#22c55e">✓ Синхронизировано с приложением</span> — загружено <b>${cloudCount}</b> сотрудников · <a href="#" onclick="openSyncSettings();return false" style="color:#5a6268;font-size:.72rem">настройки</a>`;
+    }else if(binId){
+      bannerEl.innerHTML=`<span style="color:#f59e0b">⚠ Bin ID настроен, но данные не загружены</span> · <a href="#" onclick="openSyncSettings();return false" style="color:#5a6268;font-size:.72rem">настройки</a>`;
+    }else{
+      bannerEl.innerHTML=`<span style="color:#5a6268">Не настроено</span> — сотрудники берутся из файла. <a href="#" onclick="openSyncSettings();return false" style="color:#e8411a">Настроить синхронизацию →</a>`;
+    }
+  }
+
+  // Системные аккаунты (из SYSTEM_ACCOUNTS + облако)
+  const allSysAccs={...SYSTEM_ACCOUNTS,...CLOUD_STAFF};
+  const systemRows=Object.entries(allSysAccs).map(([login,acc])=>({
+    login, role:acc.role, name:acc.name, phone:acc.phone||'',
+    system:true, fromCloud:!!(CLOUD_STAFF[login])
   }));
   // Зарегистрированные пользователи
   const regRows=regUsers.map(u=>({...u,system:false}));
@@ -5477,7 +5622,7 @@ function renderAboutManagers(){
   el.innerHTML=all.map(m=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
       <div>
-        <div style="font-size:13px;font-weight:600;color:#fff">${m.name}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${m.name}</div>
         <div style="font-size:11px;color:var(--text3)">${m.role==='boss'?'Руководитель':'Менеджер'}</div>
       </div>
       <a href="tel:${m.phone}" style="font-family:var(--font-mono);font-size:13px;color:var(--green);font-weight:600">${m.phone}</a>
@@ -7893,6 +8038,8 @@ function init(){
   applyTheme();
   // Seed demo catalog if empty
   seedDemoCatalog();
+  // Load staff from cloud (async, non-blocking)
+  loadCloudStaff();
 
   // Restore session
   try{
@@ -8405,56 +8552,6 @@ function vinAddToCart(prod){
 }
 
 init();
-
-// ── Авто-загрузка товаров со склада (JSONBin.io) ──────────────────────────────
-(function loadWarehouseProducts() {
-  // Bin ID задаётся через localStorage ключ 'dp_sync_bin' или хардкодится ниже
-  const JSONBIN_URL_KEY = 'dp_sync_url'; // пользователь может задать через консоль
-
-  function getSyncUrl() {
-    const stored = localStorage.getItem(JSONBIN_URL_KEY);
-    if (stored) return stored;
-    // Если не задан — не загружаем (нет смысла без конфига)
-    return null;
-  }
-
-  async function fetchAndMerge() {
-    const url = getSyncUrl();
-    if (!url) return;
-    try {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) return;
-      const json = await res.json();
-      const items = json.record?.products || json.products || [];
-      if (Array.isArray(items) && items.length > 0) {
-        mergeCatalog(items, 'warehouse');
-        localStorage.setItem('dp_catalog_meta', JSON.stringify({
-          updatedAt: new Date().toISOString(),
-          file: 'Склад (облако)',
-          count: items.length
-        }));
-        console.log(`[Склад] Загружено ${items.length} товаров из облака`);
-      }
-    } catch (e) {
-      console.warn('[Склад] Ошибка загрузки:', e.message);
-    }
-  }
-
-  // Загружаем сразу и потом каждые 5 минут
-  fetchAndMerge();
-  setInterval(fetchAndMerge, 5 * 60 * 1000);
-
-  // Публичная функция для настройки
-  window.setWarehouseSyncUrl = function(binId, apiKey) {
-    // Для JSONBin public bins используем публичный URL
-    // Для private bins нужен X-Master-Key заголовок — используем прокси или публичный бин
-    const url = `https://api.jsonbin.io/v3/b/${binId}/latest`;
-    localStorage.setItem(JSONBIN_URL_KEY, url);
-    if (apiKey) localStorage.setItem('dp_sync_key', apiKey);
-    fetchAndMerge();
-    console.log('[Склад] URL синхронизации установлен:', url);
-  };
-})();
 </script>
 </body>
 </html>
